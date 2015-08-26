@@ -17,6 +17,7 @@ import android.widget.ListView;
 
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.adapters.ListsPagerAdapter;
+import com.freddieptf.mangatest.adapters.MangaLatestListAdapter;
 import com.freddieptf.mangatest.adapters.MangaListAdapter;
 import com.freddieptf.mangatest.data.Contract;
 import com.freddieptf.mangatest.mainUi.baseUi.BaseFragment;
@@ -61,6 +62,7 @@ public class PagerFragment extends BaseFragment implements LoaderManager.LoaderC
     public static final int COLUMN_DATE = 4;
 
     MangaListAdapter mangaListAdapter;
+    MangaLatestListAdapter latestListAdapter;
 
     @Override
     protected boolean showTabs() {
@@ -84,6 +86,13 @@ public class PagerFragment extends BaseFragment implements LoaderManager.LoaderC
 
         mangaListAdapter = new MangaListAdapter(getActivity(), null, 0);
 
+        Cursor c = getActivity().getContentResolver().query(Contract.MangaReaderLatestList.CONTENT_URI,
+                LATEST_COLUMNS, null, null, null);
+
+        latestListAdapter = new MangaLatestListAdapter(getActivity(), c, 0);
+
+
+
     }
 
     @Override
@@ -93,6 +102,10 @@ public class PagerFragment extends BaseFragment implements LoaderManager.LoaderC
             case 0:
                 changeActiveUri(pos);
                 listView.setAdapter(mangaListAdapter);
+                break;
+
+            case 1:
+                listView.setAdapter(latestListAdapter);
                 break;
             default:
                 Utilities.Log(LOG_TAG, "NOPE! No listView");

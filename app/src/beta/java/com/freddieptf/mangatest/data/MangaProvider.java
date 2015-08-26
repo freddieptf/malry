@@ -176,6 +176,7 @@ public class MangaProvider extends ContentProvider {
         );
     }
 
+
     @Override
     public boolean onCreate() {
         myDbHelper = new DbHelper(getContext());
@@ -358,7 +359,6 @@ public class MangaProvider extends ContentProvider {
         final int match = myUriMatcher().match(uri);
 
         switch (match){
-
             case MANGAREADER_LIST:
                 db.beginTransaction();
                 for(ContentValues contentValues : values){

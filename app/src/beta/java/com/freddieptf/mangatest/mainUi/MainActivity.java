@@ -22,7 +22,6 @@ import android.widget.FrameLayout;
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.mainUi.baseUi.BaseActivity;
 import com.freddieptf.mangatest.mainUi.fragments.DownloadsFragment;
-import com.freddieptf.mangatest.mainUi.fragments.MangaListFragment;
 import com.freddieptf.mangatest.mainUi.fragments.MyMangaFragment;
 import com.freddieptf.mangatest.mainUi.fragments.PagerFragment;
 import com.freddieptf.mangatest.sync.MangaTestSyncAdapter;
@@ -288,7 +287,7 @@ public class MainActivity extends BaseActivity implements FragmentManager.OnBack
             }
 
             case 1: {
-                currentFrag = new MangaListFragment();
+                currentFrag = new PagerFragment();
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, currentFrag, fragmentTitles[position]).commit();
                 break;
             }
