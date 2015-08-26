@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true">
+
+
+        <!--<android.support.v4.view.ViewPager-->
+            <!--android:id="@+id/pager_MangaPics"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:background="#fff"-->
+            <!--android:saveEnabled="true"/>-->
+
+
+    <com.freddieptf.mangatest.mainUi.widgets.CustomViewPager
+        android:id="@+id/pager_MangaPics"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:background="#fff"
+        android:saveEnabled="true"/>
+
+
+</FrameLayout>

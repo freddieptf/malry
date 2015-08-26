@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="myMangaFragment">My Library</string>
+    <string name="myMangaList">Manga List</string>
+    <string name="myDownloads">Downloads</string>
+
+    <string name="app_name">My Manga Beta</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_manga_details">Manga</string>
+
+    <string name="no_internet">No internet Connection</string>
+    <string name="dead_internet">Your internets is being a BAKA!</string>
+
+    <string name="FirstMangaPagePref">first_manga_page_pref</string>
+    <string name="SecondMangaPagePref">second_manga_page_pref</string>
+    <string name="ThirdMangaPagePref">third_manga_page_pref</string>
+
+
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
+
+    <string name="pref_manga_sources_title">Manga Sources</string>
+    <string name="pref_manga_sources_key">sources</string>
+    <string name="pref_manga_fox">MangaFox</string>
+    <string name="pref_manga_reader">MangaReader</string>
+    <string name="pref_my_manga_cards_compact">Compact Cards</string>
+    <string name="pref_my_manga_cards_key">compact</string>
+    <string name="pref_themes_title">Theme</string>
+    <string name="pref_themes_key">theme</string>
+    <string name="pref_theme_light">Light</string>
+    <string name="pref_theme_dark">Dark</string>
+    <string name="pref_about_title">About</string>
+    <string name="emptyLibraryString">You haven\'t added anything to your Library.</string>
+    <string name="wifi_only">Load images on WiFi only</string>
+    <string name="wifi_only_key">wifi_only</string>
+    <string name="pref_fix_database_key">update_database</string>
+    <string name="pref_fix_database_title">Fix/Update</string>
+    <string name="contentAuthority">com.freddieptf.mangatest</string>
+    <string name="account_type">mangatest</string>
+
+
+</resources>

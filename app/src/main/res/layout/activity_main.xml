@@ -1,0 +1,63 @@
+<android.support.v4.widget.DrawerLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/drawerLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fitsSystemWindows="true"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include layout="@layout/toolbar_actionbar_big"/>
+
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <FrameLayout
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:id="@+id/container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:context=".MainActivity"
+                    tools:ignore="MergeRootFrame" />
+
+                <View
+                    android:id="@+id/toolBarShadow"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:visibility="gone"
+                    android:background="?toolBar_shadow"/>
+
+            </FrameLayout>
+
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/navdrawer_frame"
+        android:layout_width="1dp"
+        android:fitsSystemWindows="true"
+        android:layout_height="match_parent"
+        android:layout_gravity="start">
+
+        <fragment
+            android:id="@+id/navigation_drawer_fragment"
+            android:name="com.freddieptf.mangatest.mainUi.fragments.NavDrawerFrag"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:tag="NAV_DRAWER"
+            />
+
+    </FrameLayout>
+
+
+
+
+</android.support.v4.widget.DrawerLayout>

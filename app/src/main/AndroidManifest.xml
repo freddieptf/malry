@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.freddieptf.mangatest"
+    android:installLocation="auto" >
+
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme"
+        android:supportsRtl="false">
+
+        <activity
+            android:name=".mainUi.MainActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"
+                />
+
+        </activity>
+
+        <activity android:name=".mainUi.Settings"
+            android:parentActivityName=".mainUi.MainActivity">
+        </activity>
+
+        <activity android:name=".mainUi.MangaViewerActivity"
+            android:theme="@style/MangaViewerTheme" />
+
+        <provider
+            android:name=".data.MangaProvider"
+            android:authorities="com.freddieptf.mangatest"
+            android:syncable="true"
+            android:exported="false"/>
+
+
+        <service android:name=".service.MangaDownloadService" />
+        <service android:name=".service.DownloadMangaDatabase"/>
+        <service android:name=".service.MangaUpdateService" />
+
+        <!-- SyncAdapter's dummy authentication service -->
+        <service android:name=".sync.MangaTestAuthenticatorService">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+
+        <!-- The SyncAdapter service -->
+        <service
+            android:name=".sync.MangaTestSyncAdapterService"
+            android:exported="true">
+        <intent-filter>
+            <action android:name="android.content.SyncAdapter" />
+        </intent-filter>
+        <meta-data
+            android:name="android.content.SyncAdapter"
+            android:resource="@xml/syncadapter" />
+        </service>
+
+
+
+    </application>
+
+</manifest>

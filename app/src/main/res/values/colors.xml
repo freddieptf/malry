@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="primary">#3F51B5</color>
+    <color name="primary_dark">#303F9F</color>
+    <color name="primary_light">#C5CAE9</color>
+    <color name="accent">#03A9F4</color>
+    <color name="accent_light">#03A9F4</color>
+
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
+
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#40B6B6B6</color>
+    <color name="transparent_black">#80000000</color>
+
+    <color name="dark_theme_gray">#1F1F1F</color>
+    <color name="dark_theme_gray_darker">#292929</color>
+    <color name="dark_background">#424242</color>
+
+
+    <color name="semi_transparent_white">#ccFFFFFF</color>
+    <color name="semi_transparent_white_50">#bfFFFFFF</color>
+    <color name="semi_transparent_black">#cc303030</color>
+    <color name="semi_transparent_black_50">#bf303030</color>
+
+    <color name="item_selected">#26727272</color>
+    <color name="item_activated">#26000000</color>
+
+    <color name="item_selected_background">#d0d0d0</color>
+    <color name="item_activated_background">#26000000</color>
+
+
+
+
+
+
+    <color name="blue_primary">#35FF</color>
+    <color name="blue_secondary">#35EEFF</color>
+    <color name="transparent_blue_primary">#2635FFFF</color>
+    <color name="transparent_blue_secondary">#8035FFFF</color>
+
+    <color name="test">#00FFFFFF</color>
+
+    <color name="gplus_color_1">#3e802f</color>
+    <color name="gplus_color_2">#f4b400</color>
+    <color name="gplus_color_3">#427fed</color>
+    <color name="gplus_color_4">#b23424</color>
+
+
+</resources>

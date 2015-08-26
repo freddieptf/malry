@@ -1,0 +1,21 @@
+ext {
+
+    basePackageName = "com.freddieptf.mangatest"
+    resAppName = "appName"
+
+    beta = [
+            packageName: "${basePackageName}.beta",
+            appName: "My Manga Beta",
+            version: 1,
+            versionName: "0.5.3.1"
+
+    ]
+
+    stable = [
+            packageName: "${basePackageName}.stable",
+            appName: "My Manga",
+            version: 1,
+            versionName: "0.5"
+    ]
+
+}

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="pref_manga_sources_Entries">
+        <item>@string/pref_manga_reader</item>
+        <item>@string/pref_manga_fox</item>
+    </string-array>
+
+    <string-array name="pref_theme_entries">
+        <item>@string/pref_theme_light</item>
+        <item>@string/pref_theme_dark</item>
+    </string-array>
+
+    <string-array name="drawer_list">
+        <item>@string/myMangaFragment</item>
+        <item>@string/myMangaList</item>
+        <item>@string/myDownloads</item>
+        <item>@string/action_settings</item>
+    </string-array>
+
+    <integer-array name="gplus_colors">
+        <item>@color/gplus_color_1</item>
+        <item>@color/gplus_color_2</item>
+        <item>@color/gplus_color_3</item>
+        <item>@color/gplus_color_4</item>
+    </integer-array>
+
+    <integer-array name="manga_colors">
+        <item>@color/gplus_color_3</item>
+        <item>@color/blue_secondary</item>
+        <item>@color/accent</item>
+    </integer-array>
+
+</resources>

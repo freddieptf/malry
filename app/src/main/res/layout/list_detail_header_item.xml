@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:id="@+id/details_content"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+        <!--android:background="?android:windowBackground">-->
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="?cardBackgroundColor"
+            app:cardElevation="2dp">
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+            <TableRow
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="Author: "
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/MediumTextAppearance.Condensed"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_MangaDetails_author"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/MediumTextAppearance"
+                    />
+
+            </TableRow>
+            <TableRow
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="Chapters: "
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/MediumTextAppearance.Condensed"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_MangaDetails_chapterCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    style="@style/MediumTextAppearance"
+                    />
+
+            </TableRow>
+            <TableRow
+                android:paddingBottom="4dp"
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="Status: "
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/MediumTextAppearance.Condensed"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_MangaDetails_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    style="@style/MediumTextAppearance"
+                    />
+
+            </TableRow>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/LargeTextAppearance"
+                    android:text="Description"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_MangaDetails_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minLines="2"
+                    style="@style/SmallTextAppearance"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="8dp"
+                    />
+
+            </TableLayout>
+
+
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/mfab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        fab:fab_colorNormal="@color/accent"
+        fab:fab_colorPressed="@color/primary"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="-40dp"
+        android:src="@drawable/ic_add_white_24dp"
+        />
+
+</LinearLayout>
