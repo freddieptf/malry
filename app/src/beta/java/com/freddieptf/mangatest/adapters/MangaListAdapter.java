@@ -16,16 +16,12 @@ import com.freddieptf.mangatest.mainUi.fragments.MangaListFragment;
  */
 public class MangaListAdapter extends CursorAdapter {
 
-    Cursor search;
-
-    public MangaListAdapter(Context context, Cursor c, int flags) {
-        super(context, c, flags);
-        search = c;
+    public MangaListAdapter(Context context, Cursor c) {
+        super(context, c, 0);
     }
 
     public static class ViewHolder{
         public final TextView mangaTitle;
-
         public ViewHolder(View view) {
             mangaTitle = (TextView) view.findViewById(R.id.tv_MangaTitle);
         }
@@ -41,23 +37,12 @@ public class MangaListAdapter extends CursorAdapter {
         View view = LayoutInflater.from(context).inflate(R.layout.list_manga_item, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
-
         return view;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-        String manga_title;
-
-        if(search != null){
-            manga_title = search.getString(1);
-        }else{
-            manga_title = cursor.getString(MangaListFragment.COLUMN_MANGA_NAME);
-        }
-
-        viewHolder.mangaTitle.setText(manga_title);
-
-
+        viewHolder.mangaTitle.setText(cursor.getString(MangaListFragment.COLUMN_MANGA_NAME));
     }
 }
