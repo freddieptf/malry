@@ -22,8 +22,8 @@ import android.widget.FrameLayout;
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.mainUi.baseUi.BaseActivity;
 import com.freddieptf.mangatest.mainUi.fragments.DownloadsFragment;
-import com.freddieptf.mangatest.mainUi.fragments.MyMangaFragment;
 import com.freddieptf.mangatest.mainUi.fragments.PagerFragment;
+import com.freddieptf.mangatest.mainUi.fragments.MyMangaFragment;
 import com.freddieptf.mangatest.sync.MangaTestSyncAdapter;
 import com.freddieptf.mangatest.utils.MyColorUtils;
 import com.freddieptf.mangatest.utils.ThemeUtilities;
@@ -304,7 +304,6 @@ public class MainActivity extends BaseActivity implements FragmentManager.OnBack
         setTitle(fragmentTitles[position]);
 
     }
-
 
 }
 

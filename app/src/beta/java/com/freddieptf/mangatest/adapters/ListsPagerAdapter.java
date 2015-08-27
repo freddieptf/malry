@@ -13,7 +13,7 @@ import com.freddieptf.mangatest.R;
 public class ListsPagerAdapter extends android.support.v4.view.PagerAdapter{
 
 
-    String[] titles = {"List", "Latest", "Popular"};
+    String[] titles = {"Latest", "List", "Popular"};
 
     PagerHelper helper;
 

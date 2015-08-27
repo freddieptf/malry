@@ -9,22 +9,28 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.freddieptf.mangatest.R;
-import com.freddieptf.mangatest.mainUi.fragments.MangaListFragment;
+import com.freddieptf.mangatest.mainUi.fragments.PagerFragment;
 
 /**
  * Created by fred on 2/8/15.
  */
-public class MangaListAdapter extends CursorAdapter {
+public class MangaListAdapter extends CursorAdapter implements View.OnClickListener {
 
     public MangaListAdapter(Context context, Cursor c) {
         super(context, c, 0);
     }
 
     public static class ViewHolder{
-        public final TextView mangaTitle;
+        TextView mangaTitle;
         public ViewHolder(View view) {
             mangaTitle = (TextView) view.findViewById(R.id.tv_MangaTitle);
         }
+    }
+
+    OnMangaClicked onMangaClick;
+
+    public void setOnMangaClickListener(OnMangaClicked onMangaClick){
+        this.onMangaClick = onMangaClick;
     }
 
     @Override
@@ -43,6 +49,20 @@ public class MangaListAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-        viewHolder.mangaTitle.setText(cursor.getString(MangaListFragment.COLUMN_MANGA_NAME));
+        view.setOnClickListener(this);
+        String[] manga = {cursor.getString(PagerFragment.COLUMN_MANGA_NAME),
+                cursor.getString(PagerFragment.COLUMN_MANGA_ID)};
+        viewHolder.mangaTitle.setText(manga[0]);
+        viewHolder.mangaTitle.setTag(manga);
+    }
+
+    @Override
+    public void onClick(View view) {
+        String[] manga = (String[])view.findViewById(R.id.tv_MangaTitle).getTag();
+        onMangaClick.onMangaClicked(manga[0], manga[1]);
+    }
+
+    public interface OnMangaClicked{
+        void onMangaClicked(String name, String id);
     }
 }
