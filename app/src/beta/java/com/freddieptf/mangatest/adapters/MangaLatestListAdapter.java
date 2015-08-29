@@ -17,7 +17,6 @@ import com.freddieptf.mangatest.mainUi.fragments.PagerFragment;
  */
 public class MangaLatestListAdapter extends CursorAdapter implements View.OnClickListener {
 
-
     public MangaLatestListAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
@@ -52,9 +51,10 @@ public class MangaLatestListAdapter extends CursorAdapter implements View.OnClic
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder holder = (ViewHolder) view.getTag();
         view.setOnClickListener(this);
-        String[] manga = {cursor.getString(PagerFragment.COLUMN_MANGA_NAME),
+        String[] manga = {context.getString(R.string.pref_manga_reader),
+                cursor.getString(PagerFragment.COLUMN_MANGA_NAME),
                 cursor.getString(PagerFragment.COLUMN_MANGA_ID)};
-        holder.name.setText(manga[0]);
+        holder.name.setText(manga[1]);
         holder.chapter.setText("Ch:" + cursor.getString(PagerFragment.COLUMN_CHAPTER));
         holder.date.setText(cursor.getString(PagerFragment.COLUMN_DATE));
 
@@ -64,6 +64,6 @@ public class MangaLatestListAdapter extends CursorAdapter implements View.OnClic
     @Override
     public void onClick(View view) {
         String[] manga = (String[])view.findViewById(R.id.name).getTag();
-        onMangaClick.onMangaClicked(manga[0], manga[1]);
+        onMangaClick.onMangaClicked(manga[0], manga[1], manga[2]);
     }
 }

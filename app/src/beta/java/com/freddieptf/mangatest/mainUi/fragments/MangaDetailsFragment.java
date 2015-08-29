@@ -3,16 +3,12 @@ package com.freddieptf.mangatest.mainUi.fragments;
 import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v7.app.AppCompatActivity;
@@ -31,10 +27,10 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.toolbox.ImageLoader;
-import com.freddieptf.mangatest.MangaFoxAndReader.FetchManga;
 import com.freddieptf.mangatest.MangaFoxAndReader.FetchMangaChapter;
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.adapters.MangaChapterAdapter;
+import com.freddieptf.mangatest.api.GetManga;
 import com.freddieptf.mangatest.beans.ChapterAttrForAdapter;
 import com.freddieptf.mangatest.beans.MangaDetailsObject;
 import com.freddieptf.mangatest.data.Contract;
@@ -52,14 +48,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
@@ -67,10 +56,11 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 /**
  * Created by fred on 1/30/15.
  */
-public class MangaDetailsFragment extends BaseFragment implements ListView.OnScrollListener {
+public class MangaDetailsFragment extends BaseFragment implements ListView.OnScrollListener,
+        GetManga.OnGetManga {
 
     public MangaDetailsFragment(){
-        setRetainInstance(false);
+        setRetainInstance(true);
     }
 
     @Override
@@ -78,10 +68,11 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
         return false;
     }
 
-    String mangaTitle, mangaId, imgUrl, mangaAuthor, mangaInfo, mangaStatus, chapterCount;
+    String mangaTitle, mangaId, source, imgUrl, mangaAuthor, mangaInfo, mangaStatus, chapterCount;
     public static String DIS_FRAGMENT = "Details";
     public static final String TITLE_KEY = "manga_title";
     public static final String ID_KEY = "manga_id";
+    public static final String SOURCE_KEY = "source";
     public static final String COVER_URL = "URL";
     public static final String DETAILS_OBJECT = "details_object";
 
@@ -97,8 +88,8 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
     SmoothProgressBar smoothProgressBar;
     String LOG_TAG = getClass().getSimpleName();
     public static PopulateViewsWithData populateViewsWithData;
-    MangaDetailsObject mainMangaDetailsObject;
-    getMangaFromTitle getManga;
+    MangaDetailsObject cacheMangaDetailsObject;
+    GetManga getMyManga;
 
 
     @Override
@@ -128,16 +119,16 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
         manga_info = (TextView)headerRowView.findViewById(R.id.tv_MangaDetails_info);
         manga_status = (TextView)headerRowView.findViewById(R.id.tv_MangaDetails_status);
         manga_chapterCount = (TextView)headerRowView.findViewById(R.id.tv_MangaDetails_chapterCount);
-
         smoothProgressBar = (SmoothProgressBar)view.findViewById(R.id.progress);
 
         //search mangareader list for this manga title and use it's manga_id
         //if it does not exist, use MangaEdens manga_id
         mangaTitle = getArguments().getString(TITLE_KEY);
         mangaId = getArguments().getString(ID_KEY);
+        source = getArguments().getString(SOURCE_KEY);
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(mangaTitle);
-        Toast.makeText(getActivity(), mangaTitle + "\n" + mangaId, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), mangaTitle + "\n" + mangaId + "\n" + source, Toast.LENGTH_SHORT).show();
 
         listView = (ListView)view.findViewById(R.id.lv_MangaChapters);
         listView.addHeaderView(headerRowView, null, false);
@@ -149,8 +140,8 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mainMangaDetailsObject != null) {
-                    new getMangaFromTitle(getActivity()).insertMangaToDb(mainMangaDetailsObject);
+                if (cacheMangaDetailsObject != null) {
+                    getMyManga.insertToDb();
                     view.animate().scaleX(0).scaleY(0).setInterpolator(new OvershootInterpolator()).setDuration(250);
                 }
             }
@@ -158,11 +149,18 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
 
         populateViewsWithData = new PopulateViewsWithData(listView);
 
-        if(savedInstanceState != null && savedInstanceState.containsKey(DETAILS_OBJECT)){
+        if(savedInstanceState != null && (savedInstanceState.containsKey(DETAILS_OBJECT)
+                || savedInstanceState.containsKey("Faker"))){
             Utilities.Log(LOG_TAG, "save instance not null");
-            mainMangaDetailsObject = savedInstanceState.getParcelable(DETAILS_OBJECT);
-            new PopulateViewsWithData(listView, mainMangaDetailsObject).execute();
+            if(savedInstanceState.containsKey(DETAILS_OBJECT)){
+                cacheMangaDetailsObject = savedInstanceState.getParcelable(DETAILS_OBJECT);
+                new PopulateViewsWithData(listView, cacheMangaDetailsObject).execute();
+            }
+
+            if(savedInstanceState.containsKey("Faker")) showProgressBar();
+
         }else{
+            getMyManga = new GetManga(getActivity());
             MangaExists mangaExists = new MangaExists();
             mangaExists.execute(mangaTitle);
         }
@@ -176,7 +174,7 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
                 Utilities.Log(LOG_TAG, "Id: " + ch.chapter_id);
                 Utilities.Log(LOG_TAG, "Chapter: " + ch.chapter_title);
 
-                final String name = searchListForMangaID(mangaTitle);
+                final String name = mangaId;
                 String path = viewIfExistsOnDisk(name.replace("-", " "), ch.chapter_id, ch.chapter_title);
 
                 if(path == null){
@@ -231,7 +229,6 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
                     bundle.putString("chapter_title", chapter);
                     intent.putExtra("bundle", bundle);
                     startActivity(intent);
-
                 }
 
             }
@@ -239,22 +236,35 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
     }
 
 
+    @Override
+    public void onGetManga(MangaDetailsObject mangaDetailsObject) {
+        Utilities.Log(LOG_TAG, "onGetManga");
+        cacheMangaDetailsObject = mangaDetailsObject;
+        new PopulateViewsWithData(listView, mangaDetailsObject).execute();
+    }
+
+    @Override
+    public void onGetMangaFailed() {
+        hideProgressBar();
+        Toast.makeText(getActivity(), "Couldn't get this Manga", Toast.LENGTH_LONG).show();
+    }
 
     @Override
     public void onStop() {
         super.onStop();
-
         if(exists)
             if (mangaId != null) Utilities.writeMangaPageToPrefs(getActivity(), mangaId, 0);
-
-        if(getManga != null && getManga.getStatus() == AsyncTask.Status.RUNNING) getManga.cancel(true);
-
+        if(getMyManga.get.getStatus() == GetManga.Get.Status.RUNNING) getMyManga.get.cancel(true);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(mainMangaDetailsObject != null) outState.putParcelable(DETAILS_OBJECT, mainMangaDetailsObject);
+        if(cacheMangaDetailsObject != null) outState.putParcelable(DETAILS_OBJECT, cacheMangaDetailsObject);
+        if(cacheMangaDetailsObject == null && getMyManga.get.getStatus() == GetManga.Get.Status.RUNNING){
+//            FAKING IT SO getMyManga async isn't called again
+            outState.putString("Faker", "Faker flag");
+        }
     }
 
 
@@ -305,40 +315,6 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
 
     }
 
-
-    //Search for manga in the Mangalist databases, get its ID and start the manga's info download
-    class Search extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... strings) {
-            return searchListForMangaID(strings[0]);
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-
-            if(Utilities.isOnline(getActivity())) {
-
-                if (!s.isEmpty()) {
-                    Utilities.Log(LOG_TAG, "Search Found: " + s);
-                    getManga = new getMangaFromTitle(getActivity());
-                    getManga.execute(s);
-                } else {
-                    Log.d(LOG_TAG, "MangaEden: " + mangaId);
-                    FetchManga.getMangaFromID getMangaFromID = new FetchManga.getMangaFromID(getActivity());
-//                    getMangaFromID.execute(mangaId);
-                }
-
-            }else {
-                Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
-                smoothProgressBar.progressiveStop();
-            }
-
-
-        }
-    }
-
     //Check if manga Exists in My Manga library
     class MangaExists extends AsyncTask<String, Void, Boolean>{
 
@@ -352,59 +328,14 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
             super.onPostExecute(mangaExists);
             showFab = mangaExists;
             if(!mangaExists){
-                Search search = new Search();
-                search.execute(mangaTitle);
+                showProgressBar();
+                getMyManga.getManga(mangaId, source, MangaDetailsFragment.this);
             }else {
                 Log.d("Manga Exists: ", mangaExists.toString());
                 new PopulateViewsWithData(listView).execute();
             }
         }
     }
-
-    // returns the manga_id given the manga name
-    public String searchListForMangaID(String name){
-        Uri mangaUri;
-        String mName = "";
-        int i;
-
-        if(Utilities.getCurrentSource(getActivity()).equals(getResources().getString(R.string.pref_manga_reader))){
-            mangaUri = Contract.MangaReaderMangaList.buildMangaInListWithNameUri(name);
-            i=0;
-        }else {
-            mangaUri = Contract.MangaFoxMangaList.buildMangaInListWithNameUri(name);
-            i=1;
-        }
-
-        Cursor cursor = getActivity().getContentResolver().query(mangaUri,
-                new String[]{Contract.MangaFoxMangaList.COLUMN_MANGA_ID},
-                null, null, null);
-
-        if(cursor.moveToFirst()){
-            mName = cursor.getString(0);
-        }else {
-            switch (i){
-                case 0:{
-                    mangaUri = Contract.MangaFoxMangaList.buildMangaInListWithNameUri(name);
-                    cursor = getActivity().getContentResolver().query(mangaUri, null, null, null, null);
-                    if(cursor.moveToFirst()) mName = cursor.getString(2);
-                    break;
-                }
-                case 1: {
-                    mangaUri = Contract.MangaReaderMangaList.buildMangaInListWithNameUri(name);
-                    cursor = getActivity().getContentResolver().query(mangaUri, null, null, null, null);
-                    if(cursor.moveToFirst()) mName = cursor.getString(2);
-                    break;
-                }
-
-                default: mName = "";
-
-            }
-        }
-
-        cursor.close();
-        return mName;
-    }
-
 
     public boolean mangaExistsInMyLibrary(String name){
         Uri uri = Contract.MyManga.buildMangaWithNameUri(name);
@@ -500,7 +431,7 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
                 mangaInfo = detailsObject.getInfo();
                 mangaStatus = detailsObject.getStatus();
                 imgUrl = detailsObject.getCover();
-                Log.i(getClass().getSimpleName(), "json: " + json);
+                Log.i(LOG_TAG, "json: " + json);
                 try {
 
                     array = new JSONArray(json);
@@ -509,7 +440,7 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
                     JSONObject object = array.getJSONObject(array.length() - 1);
                     chapterCount = object.getString("chapterId");
 
-                } catch (JSONException e) {
+                } catch (JSONException | NullPointerException e) {
                     e.printStackTrace();
                 }
             }
@@ -551,7 +482,7 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
                     anim2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                         @Override
                         public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                            getMyColorUtils().setStatusBarColor((Integer)valueAnimator.getAnimatedValue());
+                            getMyColorUtils().setStatusBarColor((Integer) valueAnimator.getAnimatedValue());
                         }
                     });
                     colorAnimator.setDuration(200);
@@ -588,246 +519,15 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
                 }
             });
 
-
         }
     }
 
-    public class getMangaFromTitle extends AsyncTask<String, Void, Integer>{
-
-        Context context;
-        Handler handler = new Handler();
-        public final Boolean DEBUG = true;
-        String result;
-
-        public getMangaFromTitle(Context context){
-            this.context = context;
-        }
-
-        String LOG_TAG = getClass().getSimpleName();
-
-        HttpURLConnection httpURLConnection;
-        HttpResponseCache httpResponseCache;
-        BufferedReader bufferedReader;
-
-        @Override
-        protected void onPostExecute(Integer internets) {
-            super.onPostExecute(internets);
-            hideProgressBar();
-            if(internets == 1){
-                new PopulateViewsWithData(listView, mainMangaDetailsObject).execute();
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showProgressBar();
-        }
-
-        @Override
-        protected Integer doInBackground(String... strings) {
-            try {
-                URL baseUrl;
-
-                if(Utilities.getCurrentSource(context).equals(context.getString(R.string.pref_manga_reader))){
-                    baseUrl = new URL
-                            ("https://doodle-manga-scraper.p.mashape.com/mangareader.net/manga/" + strings[0] + "/");
-                }else {
-                    baseUrl = new URL
-                            ("https://doodle-manga-scraper.p.mashape.com/mangafox.me/manga/" + strings[0] + "/");
-                }
-
-                httpURLConnection = (HttpURLConnection)baseUrl.openConnection();
-                httpURLConnection.setRequestMethod("GET");
-                httpURLConnection.addRequestProperty("X-Mashape-Key", "8Fp0bd39gLmshw7qSKtW61cjlK6Ip1V1Z5Fjsnhpy813RcQflk");
-                httpURLConnection.connect();
-
-                int statusCode = httpURLConnection.getResponseCode();
-
-                if(statusCode != 200) return -1;
-
-
-
-                Log.i(LOG_TAG, "Status Code: " + statusCode);
-
-                InputStream inputStream = httpURLConnection.getInputStream();
-                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                StringBuilder stringBuilder = new StringBuilder();
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    stringBuilder.append(line);
-                }
-
-                result = stringBuilder.toString();
-
-                Log.d(LOG_TAG, result);
-
-                mainMangaDetailsObject = processResults(result);
-
-
-            } catch (MalformedURLException e) {
-                if(DEBUG) e.printStackTrace();
-
-                Log.d(LOG_TAG, e.getMessage());
-
-            } catch (IOException e) {
-                if(DEBUG) e.printStackTrace();
-
-                Log.d(LOG_TAG, e.getMessage());
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, "No internet Connection", Toast.LENGTH_LONG).show();
-                    }
-                });
-
-                return 0;
-
-            }
-
-            finally {
-                if(httpURLConnection != null) httpURLConnection.disconnect();
-
-                if(bufferedReader != null) try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-
-            return 1;
-        }
-
-
-        public MangaDetailsObject processResults(String string){
-            String MANGA_NAME = "name",
-                    MANGA_AUTHOR = "author",
-                    MANGA_INFO = "info",
-                    MANGA_STATUS = "status",
-                    MANGA_COVER = "cover",
-                    MANGA_LAST_UPDATE = "lastUpdate",
-                    MANGA_CHAPTERS = "chapters";
-
-            MangaDetailsObject mangaDetailsObject = new MangaDetailsObject();
-
-            try {
-                String name, status, info, cover, author, chapters, lastUpdate;
-                JSONObject mainJsonObject = new JSONObject(string);
-
-                name = mainJsonObject.getString(MANGA_NAME);
-                mangaDetailsObject.setName(name);
-
-                if(!mainJsonObject.has(MANGA_STATUS))status = "wakaranai";
-                else status = mainJsonObject.getString(MANGA_STATUS);
-                mangaDetailsObject.setStatus(status);
-
-
-                if(!mainJsonObject.has(MANGA_INFO))info = "No description";
-                else info = mainJsonObject.getString(MANGA_INFO);
-                mangaDetailsObject.setInfo(info);
-
-
-                if(!mainJsonObject.has(MANGA_AUTHOR))author = "Some Mangaka";
-                else {
-                    try {
-                        author = mainJsonObject.getJSONArray(MANGA_AUTHOR).getString(0);
-                    }catch(NullPointerException | ArrayIndexOutOfBoundsException | JSONException e){
-                        try {
-                            author = mainJsonObject.getJSONArray("artist").getString(0);
-                        }catch (NullPointerException | ArrayIndexOutOfBoundsException | JSONException ex){
-                            author = "Some Mangaka";
-                        }
-                    }
-                }
-                mangaDetailsObject.setAuthor(author);
-
-
-                if(!mainJsonObject.has(MANGA_LAST_UPDATE)) lastUpdate = "";
-                else lastUpdate = mainJsonObject.getString(MANGA_LAST_UPDATE);
-                mangaDetailsObject.setLastUpdate(lastUpdate);
-
-                cover = mainJsonObject.getString(MANGA_COVER);
-                chapters = mainJsonObject.getJSONArray(MANGA_CHAPTERS).toString();
-                mangaDetailsObject.setCover(cover);
-                mangaDetailsObject.setChapters(chapters);
-
-
-                if(DEBUG) {
-                    Log.d("Manga Chapters: ", chapters);
-                    Log.d("Manga author: ", author);
-                    Log.d("Manga lastUpdate: ", lastUpdate);
-                    Log.d("Manga Name: ", name);
-                    Log.d("Manga status: ", status);
-                    Log.d("Manga info: ", info);
-                    Log.d("Manga cover: ", cover);
-                }
-
-                if(info == null || author == null || name == null){
-                    name = "...";
-                    info = "No info.";
-                    author = "Some great mangaka";
-
-                }
-
-
-            } catch (JSONException e) {
-                if(DEBUG) e.printStackTrace();
-            }
-
-            return mangaDetailsObject;
-
-        }
-
-         void insertMangaToDb(MangaDetailsObject mangaDetailsObject) {
-
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(Contract.MyManga.COLUMN_MANGA_NAME, mangaDetailsObject.getName());
-             contentValues.put(Contract.MyManga.COLUMN_MANGA_ID, mangaId);
-            contentValues.put(Contract.MyManga.COLUMN_MANGA_AUTHOR, mangaDetailsObject.getAuthor());
-            contentValues.put(Contract.MyManga.COLUMN_MANGA_INFO, mangaDetailsObject.getInfo());
-            contentValues.put(Contract.MyManga.COLUMN_MANGA_COVER, mangaDetailsObject.getCover());
-            contentValues.put(Contract.MyManga.COLUMN_MANGA_STATUS, mangaDetailsObject.getStatus());
-            contentValues.put(Contract.MyManga.COLUMN_MANGA_CHAPTER_JSON, mangaDetailsObject.getChapters());
-             contentValues.put(Contract.MyManga.COLUMN_MANGA_SOURCE, Utilities.getCurrentSource(getActivity()));
-            contentValues.put(Contract.MyManga.COLUMN_MANGA_LAST_UPDATE, mangaDetailsObject.getLastUpdate());
-
-             JSONArray array;
-             try {
-                 array = new JSONArray(mangaDetailsObject.getChapters());
-                 JSONObject object = array.getJSONObject(array.length() - 1);
-                 contentValues.put(Contract.MyManga.COLUMN_MANGA_LATEST_CHAPTER, object.getString("chapterId"));
-             } catch (JSONException e) {
-                 e.printStackTrace();
-             }
-
-
-             Uri uri = context.getContentResolver().insert(Contract.MyManga.CONTENT_URI, contentValues);
-
-
-            if(uri != null) {
-                Log.i("URI", uri.getPath());
-                Cursor cursor = context.getContentResolver().query(
-                        Contract.MyManga.CONTENT_URI.buildUpon().appendPath(uri.getPath()).build(), null, null, null, null);
-                if(cursor.moveToFirst()){
-                    Log.d("Cursor test: ", "SOMETHING BOII");
-                    Log.d("Cursor test: ", cursor.getString(0) + cursor.getString(1));
-                }
-
-                cursor.close();
-            }else{
-                Log.d("Cursor test: ", "failed");
-            }
-        }
-
-    }
-
-    private void hideProgressBar() {
+    void hideProgressBar() {
         smoothProgressBar.progressiveStop();
         smoothProgressBar.setVisibility(View.GONE);
     }
 
-    private void showProgressBar() {
+    void showProgressBar() {
         smoothProgressBar.setVisibility(View.VISIBLE);
         smoothProgressBar.progressiveStart();
     }

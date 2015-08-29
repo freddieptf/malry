@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.mainUi.fragments.PagerFragment;
+import com.freddieptf.mangatest.utils.Utilities;
 
 /**
  * Created by fred on 2/8/15.
@@ -50,19 +51,20 @@ public class MangaListAdapter extends CursorAdapter implements View.OnClickListe
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         view.setOnClickListener(this);
-        String[] manga = {cursor.getString(PagerFragment.COLUMN_MANGA_NAME),
+        String[] manga = {Utilities.getCurrentSource(context),
+                cursor.getString(PagerFragment.COLUMN_MANGA_NAME),
                 cursor.getString(PagerFragment.COLUMN_MANGA_ID)};
-        viewHolder.mangaTitle.setText(manga[0]);
+        viewHolder.mangaTitle.setText(manga[1]);
         viewHolder.mangaTitle.setTag(manga);
     }
 
     @Override
     public void onClick(View view) {
         String[] manga = (String[])view.findViewById(R.id.tv_MangaTitle).getTag();
-        onMangaClick.onMangaClicked(manga[0], manga[1]);
+        onMangaClick.onMangaClicked(manga[0], manga[1], manga[2]);
     }
 
     public interface OnMangaClicked{
-        void onMangaClicked(String name, String id);
+        void onMangaClicked(String source, String name, String id);
     }
 }

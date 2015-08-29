@@ -2,7 +2,6 @@ package com.freddieptf.mangatest.api.mangareader;
 
 import com.freddieptf.mangatest.beans.MangaInfoBean;
 import com.freddieptf.mangatest.beans.MangaLatestInfoBean;
-import com.freddieptf.mangatest.utils.Utilities;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -31,13 +30,6 @@ public class Processor {
             list.add(mangaInfoBean);
         }
 
-        int i = 0;
-
-        for(MangaInfoBean m : list){
-            i++;
-            if(i < 10) Utilities.Log("Processsor", m.getManga_NAME());
-
-        }
         return list;
     }
 

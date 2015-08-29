@@ -33,13 +33,21 @@ public class FetchCall implements Callable<FetchCall.DocumentObject> {
         try {
             Document document = Jsoup.connect(url)
                     .userAgent("Mozilla")
-                    .timeout(10000).get();
+                    .timeout(10000)
+                    .get();
+
+            //lulz
+            for(int i = 0; i < 5; i++){
+                if(document == null) Thread.sleep(500);
+                document = Jsoup.connect(url)
+                        .userAgent("Mozilla")
+                        .timeout(10000)
+                        .get();
+            }
 
             documentObject.setDocument(document);
             documentObject.setId(id);
-        }catch (SocketTimeoutException e){
-
-        }
+        }catch (SocketTimeoutException e){}
         return documentObject;
     }
 

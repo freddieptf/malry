@@ -58,6 +58,7 @@ public class PagerFragment extends BaseFragment implements LoaderManager.LoaderC
     SmoothProgressBar progressBar;
     Cursor searchCursor = null;
     SearchManager searchManager;
+    SearchView searchView;
 
     private static final String[] MANGA_COLUMNS = {
             Contract.MangaReaderMangaList._ID,
@@ -126,6 +127,7 @@ public class PagerFragment extends BaseFragment implements LoaderManager.LoaderC
 
         mangaListAdapter = new MangaListAdapter(getActivity(), null);
         mangaListAdapter.setOnMangaClickListener(this);
+
         //on the main thread, like a boss
         Cursor c = getActivity().getContentResolver().query(Contract.MangaReaderLatestList.CONTENT_URI,
                 LATEST_COLUMNS, null, null, null);
@@ -151,17 +153,22 @@ public class PagerFragment extends BaseFragment implements LoaderManager.LoaderC
     }
 
     @Override
-    public void onMangaClicked(String name, String id) {
-            Bundle bundle = new Bundle();
-            bundle.putString(MangaDetailsFragment.TITLE_KEY, name);
-            bundle.putString(MangaDetailsFragment.ID_KEY, id);
-            Fragment fragment = new MangaDetailsFragment();
-            fragment.setArguments(bundle);
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, fragment, "details")
-                    .addToBackStack(MangaDetailsFragment.DIS_FRAGMENT)
-                    .commit();
+    public void onMangaClicked(String source, String name, String id) {
+        if (getActivity().getCurrentFocus() != null) {
+            InputMethodManager im = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            im.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+        }
 
+        Bundle bundle = new Bundle();
+        bundle.putString(MangaDetailsFragment.TITLE_KEY, name);
+        bundle.putString(MangaDetailsFragment.ID_KEY, id);
+        bundle.putString(MangaDetailsFragment.SOURCE_KEY, source);
+        Fragment fragment = new MangaDetailsFragment();
+        fragment.setArguments(bundle);
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment, "details")
+                .addToBackStack(MangaDetailsFragment.DIS_FRAGMENT)
+                .commit();
     }
 
     @Override
@@ -203,7 +210,7 @@ public class PagerFragment extends BaseFragment implements LoaderManager.LoaderC
         menu.findItem(R.id.menu_sourceReader).setVisible(true);
         menu.findItem(R.id.menu_sourceFox).setVisible(true);
 
-        final SearchView searchView = (SearchView)menu.findItem(R.id.menu_search).getActionView();
+        searchView = (SearchView)menu.findItem(R.id.menu_search).getActionView();
 
         if(searchView == null) Utilities.Log(LOG_TAG, "SearchView: Null");
 
@@ -218,7 +225,9 @@ public class PagerFragment extends BaseFragment implements LoaderManager.LoaderC
                     Uri uri = Contract.VirtualTable.buildVirtualMangaUriWithQuery(s);
                     searchCursor = getActivity().getContentResolver().query(uri, null, null, null, null);
                     Utilities.Log(LOG_TAG, "onQueryTextChange searchCursor = " + searchCursor.getCount());
-                    searchView.setSuggestionsAdapter(new MangaListAdapter(getActivity(), searchCursor));
+                    MangaListAdapter adapter = new MangaListAdapter(getActivity(), searchCursor);
+                    adapter.setOnMangaClickListener(PagerFragment.this);
+                    searchView.setSuggestionsAdapter(adapter);
                     return true;
                 }
 
@@ -227,48 +236,12 @@ public class PagerFragment extends BaseFragment implements LoaderManager.LoaderC
                     Uri uri = Contract.VirtualTable.buildVirtualMangaUriWithQuery(s);
                     searchCursor = getActivity().getContentResolver().query(uri, null, null, null, null);
                     Utilities.Log(LOG_TAG, "onQueryTextChange searchCursor = " + searchCursor.getCount());
-                    searchView.setSuggestionsAdapter(new MangaListAdapter(getActivity(), searchCursor));
+                    MangaListAdapter adapter = new MangaListAdapter(getActivity(), searchCursor);
+                    adapter.setOnMangaClickListener(PagerFragment.this);
+                    searchView.setSuggestionsAdapter(adapter);
                     return true;
                 }
 
-            });
-
-            searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
-                @Override
-                public boolean onSuggestionSelect(int position) {
-                    Utilities.Log(LOG_TAG, "onSuggestionSelect YES: " + searchCursor.getCount());
-                    if (searchCursor != null) {
-                        searchCursor.moveToPosition(position);
-                    }
-                    return true;
-                }
-
-                @Override
-                public boolean onSuggestionClick(int position) {
-                    if (searchCursor != null) {
-                        searchCursor.moveToPosition(position);
-                        Utilities.Log(LOG_TAG, "SuggestionSelect searchCursor = " + searchCursor.getString(1)
-                                + " \n" + searchCursor.getString(2));
-
-                        if (getActivity().getCurrentFocus() != null) {
-                            InputMethodManager im = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                            im.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-                        }
-
-                        Bundle bundle = new Bundle();
-                        bundle.putString(MangaDetailsFragment.TITLE_KEY, searchCursor.getString(1));
-                        bundle.putString(MangaDetailsFragment.ID_KEY, searchCursor.getString(2));
-                        Fragment fragment = new MangaDetailsFragment();
-                        fragment.setArguments(bundle);
-//                        getActivity().getSupportFragmentManager().popBackStack();
-                        getActivity().getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.container, fragment, "details")
-                                .addToBackStack(MangaDetailsFragment.DIS_FRAGMENT)
-                                .commit();
-
-                    }
-                    return true;
-                }
             });
 
             searchView.setOnCloseListener(new SearchView.OnCloseListener() {
@@ -351,9 +324,6 @@ public class PagerFragment extends BaseFragment implements LoaderManager.LoaderC
 
         if(data.getCount() > 0){
             hideProgressBar();
-//            android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-//            if(actionBar != null) actionBar.setSubtitle(Utilities.getCurrentSource(getActivity())
-//            + ": " + mangaListAdapter.getCount() + " manga");
         }
 
         Utilities.Log(LOG_TAG, " onLoadFinshed: " + data.getCount() + " items");
@@ -394,15 +364,15 @@ public class PagerFragment extends BaseFragment implements LoaderManager.LoaderC
                             .build();
                 }
                 else{
-                        materialDialog = new MaterialDialog.Builder(getActivity())
-                                .title(operation)
-                                .content(status)
-                                .progress(true, 0)
-                                .build();
-                    }
+                    materialDialog = new MaterialDialog.Builder(getActivity())
+                            .title(operation)
+                            .content(status)
+                            .progress(true, 0)
+                            .build();
                 }
+            }
 
-                materialDialog.show();
+            materialDialog.show();
 
             }
 
