@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,7 +30,7 @@ import com.freddieptf.mangatest.MangaFoxAndReader.FetchMangaChapter;
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.adapters.MangaChapterAdapter;
 import com.freddieptf.mangatest.api.GetManga;
-import com.freddieptf.mangatest.beans.ChapterAttrForAdapter;
+import com.freddieptf.mangatest.beans.ChapterAttrs;
 import com.freddieptf.mangatest.beans.MangaDetailsObject;
 import com.freddieptf.mangatest.data.Contract;
 import com.freddieptf.mangatest.mainUi.MainActivity;
@@ -57,10 +56,10 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
  * Created by fred on 1/30/15.
  */
 public class MangaDetailsFragment extends BaseFragment implements ListView.OnScrollListener,
-        GetManga.OnGetManga {
+        GetManga.OnGetManga, MangaChapterAdapter.OnChapterClicked {
 
     public MangaDetailsFragment(){
-        setRetainInstance(true);
+        setRetainInstance(false);
     }
 
     @Override
@@ -75,10 +74,10 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
     public static final String SOURCE_KEY = "source";
     public static final String COVER_URL = "URL";
     public static final String DETAILS_OBJECT = "details_object";
-
+    public final String MANGA_COLOR = "mc";
+    public final String DARK_MANGA_COLOR = "dmc";
 
     MangaChapterAdapter adapter;
-    boolean loadFinished;
     boolean showFab;
     ListView listView;
     FloatingActionButton fab;
@@ -89,7 +88,9 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
     String LOG_TAG = getClass().getSimpleName();
     public static PopulateViewsWithData populateViewsWithData;
     MangaDetailsObject cacheMangaDetailsObject;
-    GetManga getMyManga;
+    static GetManga getMyManga;
+    public int myMangaColor = -1, myDarkMangaColor = -1;
+    boolean animate;
 
 
     @Override
@@ -148,91 +149,32 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
         });
 
         populateViewsWithData = new PopulateViewsWithData(listView);
+        getMyManga = new GetManga(getActivity());
+        MangaExists mangaExists = new MangaExists();
 
-        if(savedInstanceState != null && (savedInstanceState.containsKey(DETAILS_OBJECT)
-                || savedInstanceState.containsKey("Faker"))){
+        //@ToDo figure out how to not get the getMyManga async called everytiem orientation changes when its running
+
+        if(savedInstanceState != null && savedInstanceState.containsKey(DETAILS_OBJECT)){
             Utilities.Log(LOG_TAG, "save instance not null");
-            if(savedInstanceState.containsKey(DETAILS_OBJECT)){
-                cacheMangaDetailsObject = savedInstanceState.getParcelable(DETAILS_OBJECT);
-                new PopulateViewsWithData(listView, cacheMangaDetailsObject).execute();
-            }
-
-            if(savedInstanceState.containsKey("Faker")) showProgressBar();
-
+            cacheMangaDetailsObject = savedInstanceState.getParcelable(DETAILS_OBJECT);
+            new PopulateViewsWithData(listView, cacheMangaDetailsObject).execute();
         }else{
-            getMyManga = new GetManga(getActivity());
-            MangaExists mangaExists = new MangaExists();
             mangaExists.execute(mangaTitle);
         }
 
+        if(savedInstanceState != null && savedInstanceState.containsKey("Faker")) showProgressBar();
+
+        if(savedInstanceState != null
+                && (savedInstanceState.containsKey(MANGA_COLOR) || savedInstanceState.containsKey(DARK_MANGA_COLOR))){
+            getMyColorUtils().setStatusBarColor(savedInstanceState.getInt(DARK_MANGA_COLOR));
+            MainActivity.toolbarBig.setBackgroundColor(savedInstanceState.getInt(MANGA_COLOR));
+            animate = false;
+        }else {
+            animate = true;
+        }
+
         listView.setOnScrollListener(this);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                final ChapterAttrForAdapter ch = adapter.getItem(i - 1);
 
-                Utilities.Log(LOG_TAG, "Id: " + ch.chapter_id);
-                Utilities.Log(LOG_TAG, "Chapter: " + ch.chapter_title);
-
-                final String name = mangaId;
-                String path = viewIfExistsOnDisk(name.replace("-", " "), ch.chapter_id, ch.chapter_title);
-
-                if(path == null){
-
-                    MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                            .title("Chapter " + ch.chapter_id)
-                            .positiveText("download")
-                            .negativeText("read")
-                            .neutralText("cancel")
-                            .callback(new MaterialDialog.ButtonCallback() {
-                                @Override
-                                public void onPositive(MaterialDialog dialog) {
-                                    super.onPositive(dialog);
-                                    FetchMangaChapter fetchMangaChapter = new FetchMangaChapter(getActivity());
-                                    fetchMangaChapter.execute(name, ch.chapter_id);
-                                }
-
-                                @Override
-                                public void onNegative(MaterialDialog dialog) {
-                                    super.onNegative(dialog);
-                                    Toast.makeText(getActivity(), "No online reading yet", Toast.LENGTH_SHORT).show();
-                                }
-
-                                @Override
-                                public void onNeutral(MaterialDialog dialog) {
-                                    super.onNeutral(dialog);
-                                    dialog.dismiss();
-                                }
-                            }).build();
-                    dialog.show();
-
-                }else {
-                    File file = new File(path);
-                    String[] picUris = new String[file.listFiles().length];
-
-                    for(int y = 0; y < file.listFiles().length; y++){
-                        picUris[y] = file.listFiles()[y].getAbsolutePath();
-                    }
-
-                    Intent intent = new Intent(getActivity(), MangaViewerActivity.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putStringArray(MangaViewerFragment.PIC_URLS, picUris);
-                    bundle.putString("manga_title", name);
-
-                    String chapter;
-                    if(ch.chapter_title == null) {
-                        chapter = "Chapter " + ch.chapter_id;
-                    }else{
-                        chapter = "c" + ch.chapter_id + " " + ch.chapter_title;
-                    }
-
-                    bundle.putString("chapter_title", chapter);
-                    intent.putExtra("bundle", bundle);
-                    startActivity(intent);
-                }
-
-            }
-        });
     }
 
 
@@ -250,6 +192,65 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
     }
 
     @Override
+    public void onChapterClicked(final ChapterAttrs ch) {
+        final String name = mangaId;
+        String path = viewIfExistsOnDisk(name.replace("-", " "), ch.chapter_id, ch.chapter_title);
+
+        if(path == null){
+            MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                    .title("Chapter " + ch.chapter_id)
+                    .positiveText("download")
+                    .negativeText("read")
+                    .neutralText("cancel")
+                    .callback(new MaterialDialog.ButtonCallback() {
+                        @Override
+                        public void onPositive(MaterialDialog dialog) {
+                            super.onPositive(dialog);
+                            FetchMangaChapter fetchMangaChapter = new FetchMangaChapter(getActivity());
+                            fetchMangaChapter.execute(name, ch.chapter_id);
+                        }
+
+                        @Override
+                        public void onNegative(MaterialDialog dialog) {
+                            super.onNegative(dialog);
+                            Toast.makeText(getActivity(), "No online reading yet", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onNeutral(MaterialDialog dialog) {
+                            super.onNeutral(dialog);
+                            dialog.dismiss();
+                        }
+                    }).build();
+            dialog.show();
+
+        }else {
+            File file = new File(path);
+            String[] picUris = new String[file.listFiles().length];
+
+            for(int y = 0; y < file.listFiles().length; y++)
+                picUris[y] = file.listFiles()[y].getAbsolutePath();
+
+            Intent intent = new Intent(getActivity(), MangaViewerActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putStringArray(MangaViewerFragment.PIC_URLS, picUris);
+            bundle.putString("manga_title", name);
+
+            String chapter;
+            if(ch.chapter_title == null) {
+                chapter = "Chapter " + ch.chapter_id;
+            }else{
+                chapter = "c" + ch.chapter_id + " " + ch.chapter_title;
+            }
+
+            bundle.putString("chapter_title", chapter);
+            intent.putExtra("bundle", bundle);
+            startActivity(intent);
+        }
+
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         if(exists)
@@ -262,8 +263,11 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
         super.onSaveInstanceState(outState);
         if(cacheMangaDetailsObject != null) outState.putParcelable(DETAILS_OBJECT, cacheMangaDetailsObject);
         if(cacheMangaDetailsObject == null && getMyManga.get.getStatus() == GetManga.Get.Status.RUNNING){
-//            FAKING IT SO getMyManga async isn't called again
-            outState.putString("Faker", "Faker flag");
+            outState.putString("Faker", "Running");
+        }
+        if(myMangaColor != -1 && myDarkMangaColor != -1){
+            outState.putInt(MANGA_COLOR, myMangaColor);
+            outState.putInt(DARK_MANGA_COLOR, myDarkMangaColor);
         }
     }
 
@@ -356,7 +360,7 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
    // then populate listView with the Array Adapter,
    //.populate other views with their respctive data
 
-    public class PopulateViewsWithData extends AsyncTask<Void, Void, ArrayList<ChapterAttrForAdapter>>{
+    public class PopulateViewsWithData extends AsyncTask<Void, Void, ArrayList<ChapterAttrs>>{
         ListView listView;
         MangaDetailsObject detailsObject;
         private PopulateViewsWithData(ListView view){
@@ -376,8 +380,8 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
         }
 
         @Override
-        protected ArrayList<ChapterAttrForAdapter> doInBackground(Void... voids) {
-            ArrayList<ChapterAttrForAdapter> chapters = new ArrayList<>();
+        protected ArrayList<ChapterAttrs> doInBackground(Void... voids) {
+            ArrayList<ChapterAttrs> chapters = new ArrayList<>();
             String[] projection = {Contract.MyManga.COLUMN_MANGA_NAME,
                     Contract.MyManga.COLUMN_MANGA_CHAPTER_JSON,
                     Contract.MyManga.COLUMN_MANGA_AUTHOR,
@@ -413,7 +417,7 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
                     try {
 
                         array = new JSONArray(json);
-                        chapters = ChapterAttrForAdapter.fromJSON(array);
+                        chapters = ChapterAttrs.fromJSON(array);
 
                         JSONObject object = array.getJSONObject(array.length() - 1);
                         chapterCount = object.getString("chapterId");
@@ -435,7 +439,7 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
                 try {
 
                     array = new JSONArray(json);
-                    chapters = ChapterAttrForAdapter.fromJSON(array);
+                    chapters = ChapterAttrs.fromJSON(array);
 
                     JSONObject object = array.getJSONObject(array.length() - 1);
                     chapterCount = object.getString("chapterId");
@@ -449,15 +453,14 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
         }
 
         @Override
-        protected void onPostExecute(ArrayList<ChapterAttrForAdapter> chapters) {
+        protected void onPostExecute(ArrayList<ChapterAttrs> chapters) {
             super.onPostExecute(chapters);
 
-            if(showFab)
-                fab.setImageResource(R.drawable.ic_done_white_24dp);
+            if(showFab) fab.setImageResource(R.drawable.ic_done_white_24dp);
 
-            Log.d(LOG_TAG, " YOO " + chapters.size());
-
+            Log.d(LOG_TAG, "chapters: " + chapters.size());
             adapter = new MangaChapterAdapter(getActivity(), chapters);
+            adapter.setOnChapterClickedListener(MangaDetailsFragment.this);
             listView.setAdapter(adapter);
 
             ImageLoader imageLoader = new ImageLoader(VolleySingletonClass.getInstance(getActivity()).getRequestQueue(),
@@ -467,36 +470,40 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
             coverImageView.setPaletteHelper(new PaletteHelper() {
                 @Override
                 public void OnPaletteGenerated(final Palette palette, final int mangaColor, final int darkMangaColor) {
-                    ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(),
-                            getMyColorUtils().getPrimaryColor(), mangaColor);
-                    ValueAnimator anim2 = ValueAnimator.ofObject(new ArgbEvaluator(),
-                            getMyColorUtils().getPrimaryDarkColor(), darkMangaColor);
+                    myMangaColor = mangaColor;
+                    myDarkMangaColor = darkMangaColor;
+                    if (animate) {
+                        ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(),
+                                getMyColorUtils().getPrimaryColor(), mangaColor);
+                        ValueAnimator anim2 = ValueAnimator.ofObject(new ArgbEvaluator(),
+                                getMyColorUtils().getPrimaryDarkColor(), darkMangaColor);
 
-                    colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                            MainActivity.toolbarBig.setBackgroundColor((Integer) valueAnimator.getAnimatedValue());
-                        }
-                    });
+                        colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                            @Override
+                            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                                MainActivity.toolbarBig.setBackgroundColor((Integer) valueAnimator.getAnimatedValue());
+                            }
+                        });
 
-                    anim2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                            getMyColorUtils().setStatusBarColor((Integer) valueAnimator.getAnimatedValue());
-                        }
-                    });
-                    colorAnimator.setDuration(200);
-                    anim2.setDuration(150);
-                    colorAnimator.start();
-                    anim2.start();
+                        anim2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                            @Override
+                            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                                getMyColorUtils().setStatusBarColor((Integer) valueAnimator.getAnimatedValue());
+                            }
+                        });
+                        colorAnimator.setDuration(200);
+                        anim2.setDuration(150);
+                        colorAnimator.start();
+                        anim2.start();
+                    }
                 }
             });
+
             manga_author.setText(mangaAuthor);
             manga_info.setText(Html.fromHtml(mangaInfo));
             manga_status.setText(mangaStatus);
             manga_chapterCount.setText(chapterCount);
 
-            loadFinished = true;
             listView.animate().alpha(1f).setDuration(200).setListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animator) {

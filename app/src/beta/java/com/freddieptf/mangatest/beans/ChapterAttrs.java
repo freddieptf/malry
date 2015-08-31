@@ -9,11 +9,11 @@ import java.util.ArrayList;
 /**
  * Created by fred on 2/11/15.
  */
-public class ChapterAttrForAdapter {
+public class ChapterAttrs {
 
     public String chapter_id, chapter_title;
 
-    public ChapterAttrForAdapter(JSONObject object){
+    public ChapterAttrs(JSONObject object){
         try {
             chapter_id = object.getString("chapterId");
             chapter_title = object.getString("name");
@@ -24,12 +24,12 @@ public class ChapterAttrForAdapter {
 
     }
 
-    public static ArrayList<ChapterAttrForAdapter> fromJSON(JSONArray array){
-        ArrayList<ChapterAttrForAdapter> chapters = new ArrayList<>();
+    public static ArrayList<ChapterAttrs> fromJSON(JSONArray array){
+        ArrayList<ChapterAttrs> chapters = new ArrayList<>();
 
            for(int i = array.length(); i >= 0; i--){
                 try {
-                     ChapterAttrForAdapter c = new ChapterAttrForAdapter(array.getJSONObject(i));
+                     ChapterAttrs c = new ChapterAttrs(array.getJSONObject(i));
                      chapters.add(c);
 
                 }catch (JSONException e) {
