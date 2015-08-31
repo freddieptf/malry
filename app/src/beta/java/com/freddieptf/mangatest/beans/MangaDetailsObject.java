@@ -80,6 +80,7 @@ public class MangaDetailsObject implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(name);
         parcel.writeString(status);
         parcel.writeString(info);
         parcel.writeString(cover);
@@ -98,6 +99,7 @@ public class MangaDetailsObject implements Parcelable {
     }
 
     void readFromParcel(Parcel in){
+        name = in.readString();
         status = in.readString();
         info = in.readString();
         cover = in.readString();

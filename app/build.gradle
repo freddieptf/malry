@@ -19,6 +19,7 @@ android {
         }
     }
 
+    //no real use, just wanted to learn how to do this
     productFlavors {
 
         beta {
