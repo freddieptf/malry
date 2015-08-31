@@ -30,15 +30,6 @@ android {
             versionName beta.versionName
         }
 
-        stable {
-            def stable = rootProject.ext.stable
-
-            applicationId stable.packageName
-            resValue 'string', resAppName, stable.appName
-            versionCode stable.version
-            versionName stable.versionName
-        }
-
     }
 }
 

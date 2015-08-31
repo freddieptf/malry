@@ -3,7 +3,6 @@ package com.freddieptf.mangatest.api;
 import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
@@ -37,61 +36,44 @@ public class GetManga {
     Handler handler;
     MangaDetailsObject mangaDetailsObject;
     Context context;
-    OnGetManga onGetManga;
-    public Get get;
 
     public GetManga(Context context){
         handler = new Handler();
         this.context = context;
-        get = new Get();
     }
 
-    public void getManga(final String mangaId, final String source, final OnGetManga onGetManga){
+    public MangaDetailsObject getManga(final String mangaId, final String source){
         this.mangaId = mangaId;
         this.source = source;
-        this.onGetManga = onGetManga;
-        get.execute();
-    }
 
-    public class Get extends AsyncTask<Void, Void, MangaDetailsObject>{
-        @Override
-        protected MangaDetailsObject doInBackground(Void... voids) {
-            try {
-                URL readerUrl = new URL
-                        ("https://doodle-manga-scraper.p.mashape.com/mangareader.net/manga/" + mangaId + "/");
-                URL foxUrl = new URL
-                        ("https://doodle-manga-scraper.p.mashape.com/mangafox.me/manga/" + mangaId + "/");
+        try {
+            URL readerUrl = new URL
+                    ("https://doodle-manga-scraper.p.mashape.com/mangareader.net/manga/" + mangaId + "/");
+            URL foxUrl = new URL
+                    ("https://doodle-manga-scraper.p.mashape.com/mangafox.me/manga/" + mangaId + "/");
 
-                if(source.equals(context.getString(R.string.pref_manga_reader)))
-                    result = getResultString(readerUrl);
-                else result = getResultString(foxUrl);
+            if(source.equals(context.getString(R.string.pref_manga_reader)))
+                result = getResultString(readerUrl);
+            else result = getResultString(foxUrl);
 
-                if(result.isEmpty() || result.equals("")) throw new NullPointerException();
-                Log.d(LOG_TAG, result);
+            if(result.isEmpty() || result.equals("")) throw new NullPointerException();
+            Log.d(LOG_TAG, result);
 
-                return processResults(result);
-            } catch (MalformedURLException | NullPointerException e) {
+            return processResults(result);
+        } catch (MalformedURLException | NullPointerException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        finally {
+            if(httpURLConnection != null) httpURLConnection.disconnect();
+            if(bufferedReader != null) try {
+                bufferedReader.close();
+            } catch (IOException e) {
                 e.printStackTrace();
-                return null;
             }
-
-            finally {
-                if(httpURLConnection != null) httpURLConnection.disconnect();
-                if(bufferedReader != null) try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
         }
 
-        @Override
-        protected void onPostExecute(MangaDetailsObject mangaDetailsObject) {
-            super.onPostExecute(mangaDetailsObject);
-            if(mangaDetailsObject != null) onGetManga.onGetManga(mangaDetailsObject);
-            else onGetManga.onGetMangaFailed();
-        }
     }
 
 
@@ -212,7 +194,7 @@ public class GetManga {
 
     }
 
-    public void insertToDb(){
+    public static void insertToDb(Context context, MangaDetailsObject mangaDetailsObject, String mangaId, String source){
         ContentValues contentValues = new ContentValues();
         contentValues.put(Contract.MyManga.COLUMN_MANGA_NAME, mangaDetailsObject.getName());
         contentValues.put(Contract.MyManga.COLUMN_MANGA_ID, mangaId);
@@ -236,17 +218,6 @@ public class GetManga {
 
         Uri uri = context.getContentResolver().insert(Contract.MyManga.CONTENT_URI, contentValues);
 
-        if(uri != null) {
-            Log.i("URI", uri.getPath());
-        }else{
-            Log.d(LOG_TAG, "Cursor test failed");
-        }
-
-    }
-
-    public interface OnGetManga{
-        void onGetManga(MangaDetailsObject mangaDetailsObject);
-        void onGetMangaFailed();
     }
 
 
