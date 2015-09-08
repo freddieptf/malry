@@ -29,8 +29,14 @@ public class Downloader {
         return downloader;
     }
 
+    PublishProgress publishProgress;
+
     public Downloader() {
         executorService = Executors.newFixedThreadPool(3);
+    }
+
+    public void setProgressListener(PublishProgress publishProgress){
+        this.publishProgress = publishProgress;
     }
 
 
@@ -46,18 +52,23 @@ public class Downloader {
         ArrayList<NetworkChapterAttrs> mangaChapterAttrs;
         int notificationId;
         File parent;
+        ProgressData progressData;
 
         public DownloadImages (ArrayList<NetworkChapterAttrs> n, int id){
             mangaChapterAttrs = n;
             notificationId = id;
+            progressData = new ProgressData();
         }
 
         @Override
         public void run() {
             String parentDirectory = Environment.getExternalStorageDirectory().toString();
             String manga = mangaChapterAttrs.get(0).getName();
+            progressData.setMangaName(manga);
+            progressData.setId(notificationId);
 
             String chapter = mangaChapterAttrs.get(0).getChapter();
+            progressData.setChapter(chapter);
             String chapterTitle = mangaChapterAttrs.get(0).getChapterTitle();
 
             if (Utilities.externalStorageMounted()) {
@@ -87,7 +98,7 @@ public class Downloader {
         }
 
 
-        final void downloadStuff(ArrayList<ImageData> imageDatas) {
+        void downloadStuff(ArrayList<ImageData> imageDatas) {
             for(int i = 0; i < imageDatas.size(); i++){
                 Utilities.Log(LOG_TAG + " " + notificationId, "downloading: " + imageDatas.get(i).getImageUrl());
                 Bitmap bitmap = Utilities.DownloadBitmapFromUrl(imageDatas.get(i).getImageUrl());
@@ -99,6 +110,10 @@ public class Downloader {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 50, fileOutputStream);
                     fileOutputStream.flush();
                     fileOutputStream.close();
+
+                    progressData.setMax(imageDatas.size());
+                    progressData.setProgress(i);
+                    publishProgress.onPublishProgress(progressData);
                 } catch (IOException e) {
                     e.printStackTrace();
                     Log.e(LOG_TAG + " ImageRequest: ", e.toString());
@@ -127,5 +142,56 @@ public class Downloader {
             this.pageId = pageId;
         }
 
+    }
+
+    public interface PublishProgress{
+        void onPublishProgress(ProgressData progressData);
+    }
+
+    public class ProgressData{
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public int getProgress() {
+            return progress;
+        }
+
+        public void setProgress(int progress) {
+            this.progress = progress;
+        }
+
+        public int getMax() {
+            return max;
+        }
+
+        public void setMax(int max) {
+            this.max = max;
+        }
+
+        public String getMangaName() {
+            return mangaName;
+        }
+
+        public void setMangaName(String mangaName) {
+            this.mangaName = mangaName;
+        }
+
+        public String getChapter() {
+            return chapter;
+        }
+
+        public void setChapter(String chapter) {
+            this.chapter = chapter;
+        }
+
+        int id;
+        int progress;
+        int max;
+        String mangaName, chapter;
     }
 }
