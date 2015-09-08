@@ -2,7 +2,6 @@ package com.freddieptf.mangatest.api;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
@@ -178,14 +177,6 @@ public class GetManga {
             Log.d(LOG_TAG, "Manga cover: " + cover);
 
 
-            if(info == null || author == null || name == null){
-                name = "...";
-                info = "No info.";
-                author = "Some great mangaka";
-
-            }
-
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -215,8 +206,7 @@ public class GetManga {
             e.printStackTrace();
         }
 
-
-        Uri uri = context.getContentResolver().insert(Contract.MyManga.CONTENT_URI, contentValues);
+        context.getContentResolver().insert(Contract.MyManga.CONTENT_URI, contentValues);
 
     }
 

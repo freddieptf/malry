@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.api;
+package com.freddieptf.mangatest.api.workers;
 
 import android.app.NotificationManager;
 import android.content.Context;
@@ -8,8 +8,8 @@ import android.support.v4.app.NotificationCompat;
 
 import com.freddieptf.mangatest.api.helperInterfaces.GetListListener;
 import com.freddieptf.mangatest.api.helperInterfaces.InsertListener;
-import com.freddieptf.mangatest.api.mangafox.MangaFox;
-import com.freddieptf.mangatest.api.mangareader.MangaReader;
+import com.freddieptf.mangatest.api.MangaFox;
+import com.freddieptf.mangatest.api.MangaReader;
 import com.freddieptf.mangatest.data.Contract;
 import com.freddieptf.mangatest.utils.Utilities;
 

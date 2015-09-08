@@ -17,7 +17,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         app:cardBackgroundColor="?cardBackgroundColor"
-        android:foreground="?list_selector">
+        android:foreground="?selectableItemBackground">
 
         <LinearLayout
             android:orientation="horizontal"

@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.api;
+package com.freddieptf.mangatest.api.workers;
 
 import android.content.ContentValues;
 import android.content.Context;

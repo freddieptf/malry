@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.api;
+package com.freddieptf.mangatest.api.workers;
 
 import android.support.annotation.NonNull;
 

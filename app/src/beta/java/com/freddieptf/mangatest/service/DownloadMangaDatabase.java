@@ -9,7 +9,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.api.Worker;
-import com.freddieptf.mangatest.api.WorkerThread;
+import com.freddieptf.mangatest.api.workers.WorkerThread;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import java.util.concurrent.ExecutorService;
@@ -85,9 +85,9 @@ public class DownloadMangaDatabase extends Service {
             Utilities.Log(LOG_TAG, "No Internets breh");
         }
 
-//        builder.setContentText("Done")
-//                .setProgress(0, 0, false);
-//        notificationManager.notify(NOTIFICATION_ID, builder.build());
+        builder.setContentText("Done")
+                .setProgress(0, 0, false);
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
 
         return START_NOT_STICKY;
     }

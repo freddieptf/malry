@@ -7,8 +7,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.freddieptf.mangatest.R;
-import com.freddieptf.mangatest.beans.MangaChapterAttr;
+import com.freddieptf.mangatest.beans.NetworkChapterAttrs;
 import com.freddieptf.mangatest.service.MangaDownloadService;
+import com.freddieptf.mangatest.service.MangaDownloadServiceTest;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import org.json.JSONArray;
@@ -28,11 +29,10 @@ import java.util.ArrayList;
  */
 public class FetchMangaChapter extends AsyncTask<String, Void, String> {
 
-    ArrayList<MangaChapterAttr> mangaChapterAttrs;
+    ArrayList<NetworkChapterAttrs> mangaChapterAttrs;
     HttpURLConnection httpURLConnection = null;
     BufferedReader bufferedReader = null;
     Context context;
-    boolean DEBUG = true;
 
     public FetchMangaChapter(Context c){
         context = c;
@@ -51,7 +51,10 @@ public class FetchMangaChapter extends AsyncTask<String, Void, String> {
 
         if (arrayList != null && arrayList.size() > 1) {
             Log.d(getClass().getSimpleName(), "size: " + arrayList.size());
-            Intent downloadIntent = new Intent(context, MangaDownloadService.class);
+//            Intent downloadIntent = new Intent(context, MangaDownloadService.class);
+
+            Intent downloadIntent = new Intent(context, MangaDownloadServiceTest.class);
+
             downloadIntent.putExtra(MangaDownloadService.ARRAY_LIST, arrayList);
             context.startService(downloadIntent);
             connected = "Yas";
@@ -100,7 +103,6 @@ public class FetchMangaChapter extends AsyncTask<String, Void, String> {
             return arrayList;
         }
 
-
         String baseUrlReader, baseUrlFox;
         baseUrlReader = "https://doodle-manga-scraper.p.mashape.com/mangareader.net/manga/";
         baseUrlFox = "https://doodle-manga-scraper.p.mashape.com/mangafox.me/manga/";
@@ -122,7 +124,7 @@ public class FetchMangaChapter extends AsyncTask<String, Void, String> {
         Log.d(getClass().getSimpleName(), baseUrl);
 
         mangaChapterAttrs = new ArrayList<>();
-        MangaChapterAttr a = new MangaChapterAttr();
+        NetworkChapterAttrs a = new NetworkChapterAttrs();
         String name = strings[0];
         name = name.replaceAll("-", " ");
         a.setName(name);
@@ -181,7 +183,7 @@ public class FetchMangaChapter extends AsyncTask<String, Void, String> {
             JSONArray pages = mangaStuff.getJSONArray("pages");
 
             for(int i = 0; i < pages.length(); i++){
-                MangaChapterAttr attr = new MangaChapterAttr();
+                NetworkChapterAttrs attr = new NetworkChapterAttrs();
                 JSONObject singlePageContent = pages.getJSONObject(i);
                 attr.setPageId(singlePageContent.getString("pageId"));
                 attr.setImageUrl(singlePageContent.getString("url"));

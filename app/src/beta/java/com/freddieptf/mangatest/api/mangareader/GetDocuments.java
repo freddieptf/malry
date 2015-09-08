@@ -3,7 +3,7 @@ package com.freddieptf.mangatest.api.mangareader;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import com.freddieptf.mangatest.api.FetchCall;
+import com.freddieptf.mangatest.api.workers.FetchCall;
 import com.freddieptf.mangatest.api.helperInterfaces.OnDocumentReceived;
 import com.freddieptf.mangatest.utils.Utilities;
 

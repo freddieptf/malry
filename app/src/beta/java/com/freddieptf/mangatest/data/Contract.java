@@ -14,7 +14,7 @@ public class Contract {
     public static final String PATH_MANGAREADER_LIST = "manga_reader_list";
     public static final String PATH_MANGAREADER_LATEST_LIST = "manga_reader_latest_list";
     public static final String PATH_MANGAFOX_LIST = "manga_fox_list";
-    public static final String PATH_MY_MANGA = "manga_my_manga";
+    public static final String PATH_MY_MANGA = "my_manga_list";
     public static final String PATH_MANGA_EDEN = "manga_eden_list";
     public static final String PATH_VIRTUAL_TABLE = "virtual_fts3_table";
 
@@ -133,7 +133,7 @@ public class Contract {
         public static final String CONTENT_ITEM_TYPE =
                 "vnd.android.cursor.item/" + CONTENT_AUTH + "/" + PATH_MY_MANGA;
 
-        public static final String TABLE_NAME = "manga_my_manga";
+        public static final String TABLE_NAME = "my_manga";
 
         public static final String COLUMN_MANGA_NAME = "manga_name";
         public static final String COLUMN_MANGA_ID = "manga_id";

@@ -2,6 +2,8 @@ package com.freddieptf.mangatest.api;
 
 import android.content.Context;
 
+import com.freddieptf.mangatest.api.workers.WorkerThread;
+
 /**
  * Created by fred on 8/24/15.
  */

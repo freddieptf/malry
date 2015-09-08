@@ -1,6 +1,7 @@
-package com.freddieptf.mangatest.api.mangafox;
+package com.freddieptf.mangatest.api;
 
 import com.freddieptf.mangatest.api.helperInterfaces.GetListListener;
+import com.freddieptf.mangatest.api.mangafox.Processor;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import java.io.BufferedReader;

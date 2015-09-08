@@ -9,8 +9,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.freddieptf.mangatest.beans.MangaChapterAttr;
 import com.freddieptf.mangatest.R;
+import com.freddieptf.mangatest.beans.NetworkChapterAttrs;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import java.io.File;
@@ -44,7 +44,7 @@ public class MangaDownloadService extends IntentService {
         builder = new NotificationCompat.Builder(getApplicationContext());
 
 
-        final ArrayList<MangaChapterAttr> mangaChapterAttrs = (ArrayList<MangaChapterAttr>) intent.getExtras().get(ARRAY_LIST);
+        final ArrayList<NetworkChapterAttrs> mangaChapterAttrs = (ArrayList<NetworkChapterAttrs>) intent.getExtras().get(ARRAY_LIST);
         final String parentDirectory = Environment.getExternalStorageDirectory().toString();
         final String manga = mangaChapterAttrs.get(0).getName();
 
@@ -71,7 +71,7 @@ public class MangaDownloadService extends IntentService {
                     imageDataArrayList.add(imageData);
                 }
 
-                Log.d(LOG_TAG + " 1st size Test, ", "Size: " + imageDataArrayList.size());
+                Log.d(LOG_TAG + "1st size Test, ", "Size: " + imageDataArrayList.size());
 
                 downloadStuff(imageDataArrayList);
 

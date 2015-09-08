@@ -1,7 +1,9 @@
-package com.freddieptf.mangatest.api.mangareader;
+package com.freddieptf.mangatest.api;
 
 import com.freddieptf.mangatest.api.helperInterfaces.GetListListener;
 import com.freddieptf.mangatest.api.helperInterfaces.OnDocumentReceived;
+import com.freddieptf.mangatest.api.mangareader.GetDocuments;
+import com.freddieptf.mangatest.api.mangareader.Processor;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import org.jsoup.nodes.Document;

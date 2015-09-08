@@ -36,10 +36,6 @@ public class BaseFragment extends Fragment {
         return false;
     }
 
-    protected boolean useDefaultNavigationIcon(){
-        return true;
-    }
-
     protected MainActivityHelper getMainActivityHelper(){
         return ((MainActivityHelper) getActivity()).getMainActivityHelper();
     }
@@ -74,11 +70,14 @@ public class BaseFragment extends Fragment {
         if(showTabs()) showTabsNow();
         else hideTabsNow();
 
-        if(useDefaultNavigationIcon()) useHamburgerIcon();
-        else useBackIcon();
-
-        if(lockDrawer()) getMainActivityHelper().lockDrawer(true);
-        else getMainActivityHelper().lockDrawer(false);
+        if(lockDrawer()){
+            getMainActivityHelper().lockDrawer(true);
+            useBackIcon();
+        }
+        else{
+            getMainActivityHelper().lockDrawer(false);
+            useHamburgerIcon();
+        }
 
     }
 

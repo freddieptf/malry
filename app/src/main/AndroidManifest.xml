@@ -56,6 +56,8 @@
         <service android:name=".service.MangaDownloadService" />
         <service android:name=".service.DownloadMangaDatabase"/>
         <service android:name=".service.MangaUpdateService" />
+        <service android:name=".service.MangaRequestService"/>
+        <service android:name=".service.MangaDownloadServiceTest"/>
 
         <!-- SyncAdapter's dummy authentication service -->
         <service android:name=".sync.MangaTestAuthenticatorService">

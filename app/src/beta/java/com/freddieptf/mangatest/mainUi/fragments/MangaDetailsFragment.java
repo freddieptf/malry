@@ -107,11 +107,6 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
     }
 
     @Override
-    protected boolean useDefaultNavigationIcon() {
-        return false;
-    }
-
-    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 

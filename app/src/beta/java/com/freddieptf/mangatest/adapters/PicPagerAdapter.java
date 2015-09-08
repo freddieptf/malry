@@ -71,7 +71,7 @@ public class PicPagerAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         mContainer = container;
-        View view = LayoutInflater.from(context).inflate(R.layout.viewer_pager_pic_item, container, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.pager_pic_item, container, false);
         viewHolder = new ViewHolder(view);
 
 //        String orientation = viewHolder.imageView.getTag().toString();

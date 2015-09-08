@@ -44,7 +44,7 @@ public class ListsPagerAdapter extends android.support.v4.view.PagerAdapter{
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         View view = LayoutInflater.from(container.getContext())
-                .inflate(R.layout.view_pager_list_item, container, false);
+                .inflate(R.layout.pager_list_item, container, false);
 
         PagerViewHolder viewHolder = new PagerViewHolder(view);
         viewHolder.list.setTag(position);

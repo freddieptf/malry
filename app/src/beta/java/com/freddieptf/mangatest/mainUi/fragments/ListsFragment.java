@@ -42,7 +42,7 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 /**
  * Created by fred on 1/30/15.
  */
-public class PagerFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>,
+public class ListsFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>,
         ListsPagerAdapter.PagerHelper, MangaListAdapter.OnMangaClicked{
 
     private static final int MANGA_LOADER = 0;
@@ -83,7 +83,7 @@ public class PagerFragment extends BaseFragment implements LoaderManager.LoaderC
 
 
 
-    public PagerFragment() {
+    public ListsFragment() {
         setHasOptionsMenu(true);
     }
 
@@ -226,7 +226,7 @@ public class PagerFragment extends BaseFragment implements LoaderManager.LoaderC
                     searchCursor = getActivity().getContentResolver().query(uri, null, null, null, null);
                     Utilities.Log(LOG_TAG, "onQueryTextChange searchCursor = " + searchCursor.getCount());
                     MangaListAdapter adapter = new MangaListAdapter(getActivity(), searchCursor);
-                    adapter.setOnMangaClickListener(PagerFragment.this);
+                    adapter.setOnMangaClickListener(ListsFragment.this);
                     searchView.setSuggestionsAdapter(adapter);
                     return true;
                 }
@@ -237,7 +237,7 @@ public class PagerFragment extends BaseFragment implements LoaderManager.LoaderC
                     searchCursor = getActivity().getContentResolver().query(uri, null, null, null, null);
                     Utilities.Log(LOG_TAG, "onQueryTextChange searchCursor = " + searchCursor.getCount());
                     MangaListAdapter adapter = new MangaListAdapter(getActivity(), searchCursor);
-                    adapter.setOnMangaClickListener(PagerFragment.this);
+                    adapter.setOnMangaClickListener(ListsFragment.this);
                     searchView.setSuggestionsAdapter(adapter);
                     return true;
                 }

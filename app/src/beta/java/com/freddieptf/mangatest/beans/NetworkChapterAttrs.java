@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * Created by fred on 1/21/15.
  */
-public class MangaChapterAttr implements Parcelable {
+public class NetworkChapterAttrs implements Parcelable {
 
     private String pageId;
     private String imageUrl;
@@ -55,11 +55,11 @@ public class MangaChapterAttr implements Parcelable {
     }
 
 
-    public MangaChapterAttr() {
+    public NetworkChapterAttrs() {
         super();
     }
 
-    public MangaChapterAttr(Parcel in){
+    public NetworkChapterAttrs(Parcel in){
         readFromParcel(in);
     }
 
@@ -78,14 +78,14 @@ public class MangaChapterAttr implements Parcelable {
 
     }
 
-    public static final Creator<MangaChapterAttr> CREATOR
-            = new Creator<MangaChapterAttr>() {
-        public MangaChapterAttr createFromParcel(Parcel in) {
-            return new MangaChapterAttr(in);
+    public static final Creator<NetworkChapterAttrs> CREATOR
+            = new Creator<NetworkChapterAttrs>() {
+        public NetworkChapterAttrs createFromParcel(Parcel in) {
+            return new NetworkChapterAttrs(in);
         }
 
-        public MangaChapterAttr[] newArray(int size) {
-            return new MangaChapterAttr[size];
+        public NetworkChapterAttrs[] newArray(int size) {
+            return new NetworkChapterAttrs[size];
         }
     };
 
