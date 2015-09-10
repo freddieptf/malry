@@ -21,6 +21,7 @@ public class Downloader {
 
     final String LOG_TAG = getClass().getSimpleName();
     ExecutorService executorService;
+    int i = 0;
 
     private static Downloader downloader;
 
@@ -39,13 +40,18 @@ public class Downloader {
         this.publishProgress = publishProgress;
     }
 
+    public int getJobs(){
+        return i;
+    }
 
     public void submitDownload(ArrayList<NetworkChapterAttrs> n, int id){
         executorService.submit(new DownloadImages(n, id));
+        i++;
+        publishProgress.activeDownloads(i);
     }
 
     public void shutdownDownloader(){
-        if(!executorService.isShutdown()) executorService.shutdown();
+        if(!executorService.isShutdown()) executorService.shutdownNow();
     }
 
     public class DownloadImages implements Runnable {
@@ -89,6 +95,8 @@ public class Downloader {
                     Log.d(LOG_TAG + " " + notificationId, "ImageDatas Size: " + imageDataArrayList.size());
 
                     downloadStuff(imageDataArrayList);
+                    i--;
+                    publishProgress.activeDownloads(i);
 
                 } else{
                     Utilities.Log(LOG_TAG, "Already there!");
@@ -146,6 +154,7 @@ public class Downloader {
 
     public interface PublishProgress{
         void onPublishProgress(ProgressData progressData);
+        void activeDownloads(int numOfActiveDownloads);
     }
 
     public class ProgressData{
