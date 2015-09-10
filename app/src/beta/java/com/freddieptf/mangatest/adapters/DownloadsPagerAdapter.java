@@ -19,7 +19,7 @@ public class DownloadsPagerAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 1;
     }
 
     DonwloadsPagerHelper pagerHelper;

@@ -28,7 +28,7 @@ public class MyColorUtils {
     }
 
     public int getAccentColor(){
-        return R.color.accent;
+        return context.getResources().getColor(R.color.accent);
     }
 
     public int getPrimaryColor(){
