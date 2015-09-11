@@ -7,9 +7,11 @@ import android.net.Uri;
 import com.freddieptf.mangatest.api.helperInterfaces.InsertListener;
 import com.freddieptf.mangatest.beans.MangaInfoBean;
 import com.freddieptf.mangatest.beans.MangaLatestInfoBean;
+import com.freddieptf.mangatest.beans.MangaPopularInfoBean;
 import com.freddieptf.mangatest.data.Contract.MangaFoxMangaList;
 import com.freddieptf.mangatest.data.Contract.MangaReaderLatestList;
 import com.freddieptf.mangatest.data.Contract.MangaReaderMangaList;
+import com.freddieptf.mangatest.data.Contract.MangaReaderPopularList;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import java.util.ArrayList;
@@ -46,8 +48,11 @@ public class InsertCall extends Thread {
             insert(list, destination);
         }else if(destination.equals(MangaReaderLatestList.CONTENT_URI)){
             insertLatest(list, destination);
-        }else {
-            Utilities.Log(LOG_TAG, "Insert wut breh?");
+        }else if(destination.equals(MangaReaderPopularList.CONTENT_URI)){
+            insertPopular(list, destination);
+        }
+        else {
+            Utilities.Log(LOG_TAG, "Bitch where?");
         }
 
         insertListener.onInsertDone();
@@ -58,12 +63,12 @@ public class InsertCall extends Thread {
 
         List<ContentValues> contentValuesList = new ArrayList<>(list.size());
 
-        for(int i = 0; i < list.size(); i++){
+        for(Object m : contentValuesList){
             ContentValues contentValues = new ContentValues();
             contentValues.put(MangaReaderMangaList.COLUMN_MANGA_ID,
-                    ((MangaInfoBean)list.get(i)).getManga_ID());
+                    ((MangaInfoBean)m).getManga_ID());
             contentValues.put(MangaReaderMangaList.COLUMN_MANGA_NAME,
-                    ((MangaInfoBean)list.get(i)).getManga_NAME());
+                    ((MangaInfoBean)m).getManga_NAME());
             contentValuesList.add(contentValues);
         }
 
@@ -98,8 +103,23 @@ public class InsertCall extends Thread {
 
     }
 
-    //@TODO insertPopular
     public void insertPopular(List<Object> list, Uri destination){
+        List<ContentValues> contentValuesList = new ArrayList<>(list.size());
+        for(Object m : list){
+            ContentValues cv = new ContentValues();
+            cv.put(MangaReaderPopularList.COLUMN_MANGA_NAME, ((MangaPopularInfoBean)m).getName());
+            cv.put(MangaReaderPopularList.COLUMN_CHAPTER_DETAILS, ((MangaPopularInfoBean)m).getChapterCount());
+            cv.put(MangaReaderPopularList.COLUMN_MANGA_AUTHOR, ((MangaPopularInfoBean)m).getAuthor());
+            cv.put(MangaReaderPopularList.COLUMN_MANGA_GENRE, ((MangaPopularInfoBean)m).getGenre());
+            contentValuesList.add(cv);
+        }
 
+        if(contentValuesList.size() > 0){
+            ContentValues[] contentValues = new ContentValues[contentValuesList.size()];
+            contentValuesList.toArray(contentValues);
+            contentValuesList.clear();
+            int rowsInserted = context.getContentResolver().bulkInsert(destination, contentValues);
+            Utilities.Log(LOG_TAG, "Rows inserted: " + rowsInserted);
+        }
     }
 }

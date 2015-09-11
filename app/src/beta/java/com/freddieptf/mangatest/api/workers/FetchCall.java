@@ -6,6 +6,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -13,13 +15,14 @@ import java.util.concurrent.Callable;
  */
 public class FetchCall implements Callable<FetchCall.DocumentObject> {
 
-    String url;
     int id;
+    List<String> urls;
 
     public FetchCall(){}
 
     public FetchCall(@NonNull String url, int id){
-        this.url = url;
+        urls = new ArrayList<>();
+        urls.add(url);
         this.id = id;
     }
 
@@ -27,32 +30,44 @@ public class FetchCall implements Callable<FetchCall.DocumentObject> {
         return id;
     }
 
+    public void setUrl(List<String> urls){
+        this.urls = urls;
+    }
+
     @Override
     public DocumentObject call() throws Exception {
         DocumentObject documentObject = new DocumentObject();
-        try {
-            Document document = Jsoup.connect(url)
-                    .userAgent("Mozilla")
-                    .timeout(10000)
-                    .get();
-
-            //lulz
-            for(int i = 0; i < 5; i++){
-                if(document == null) Thread.sleep(500);
-                document = Jsoup.connect(url)
+        for(String url : urls) {
+            try {
+                Document document = Jsoup.connect(url)
                         .userAgent("Mozilla")
                         .timeout(10000)
                         .get();
-            }
 
-            documentObject.setDocument(document);
-            documentObject.setId(id);
-        }catch (SocketTimeoutException e){}
+                //lulz lulz
+                for (int i = 0; i < 10; i++) {
+                    if(document == null) {
+                        Thread.sleep(1000);
+                        document = Jsoup.connect(url)
+                                .userAgent("Mozilla")
+                                .timeout(10000)
+                                .get();
+                    }
+                    else break;
+                }
+
+                documentObject.setDocument(document);
+                documentObject.setId(id);
+            } catch (SocketTimeoutException e) {}
+        }
         return documentObject;
     }
 
 
     public class DocumentObject{
+        public DocumentObject(){
+            documents = new ArrayList<>();
+        }
         public int getId() {
             return id;
         }
@@ -61,15 +76,15 @@ public class FetchCall implements Callable<FetchCall.DocumentObject> {
             this.id = id;
         }
 
-        public Document getDocument() {
-            return document;
+        public List<Document> getDocumentList() {
+            return documents;
         }
 
         public void setDocument(Document document) {
-            this.document = document;
+            documents.add(document);
         }
 
-        Document document;
+        List<Document> documents;
         int id;
     }
 }

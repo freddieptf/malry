@@ -3,12 +3,14 @@ package com.freddieptf.mangatest.api.mangareader;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import com.freddieptf.mangatest.api.workers.FetchCall;
 import com.freddieptf.mangatest.api.helperInterfaces.OnDocumentReceived;
+import com.freddieptf.mangatest.api.workers.FetchCall;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import org.jsoup.nodes.Document;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
@@ -48,8 +50,8 @@ public class GetDocuments {
             public void run() {
                 try {
                     FetchCall.DocumentObject documentObject = (FetchCall.DocumentObject) ecs.take().get();
-                    Document document = documentObject.getDocument();
-                    if(document == null) throw new NullPointerException();
+                    List<Document> document = documentObject.getDocumentList();
+                    if(document.isEmpty()) throw new NullPointerException();
                     documentReceived.onDocumentReceived(document);
 
                 } catch (InterruptedException | ExecutionException | NullPointerException e) {
@@ -61,14 +63,22 @@ public class GetDocuments {
 
     public void getPopularListDocument(final OnDocumentReceived documentReceived) {
         Utilities.Log(LOG_TAG, "getting doc");
+        final String base = Uri.parse(BASE_URL).buildUpon().appendPath(URL_LIST_POPULAR).build().toString();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                ecs.submit(new GetPopularListDoc());
+                GetPopularListDoc getPopularListDoc = new GetPopularListDoc();
+                List<String> urls = new ArrayList<String>();
+                for(int i = 0; i < 4000 ; i+=30){
+                    if(i > 0) urls.add(base + "/" + i);
+                    else urls.add(base);
+                }
+                getPopularListDoc.setUrl(urls);
+                ecs.submit(getPopularListDoc);
                 try {
                     FetchCall.DocumentObject documentObject = (FetchCall.DocumentObject) ecs.take().get();
-                    Document document = documentObject.getDocument();
-                    if(document == null) throw new NullPointerException();
+                    List<Document> document = documentObject.getDocumentList();
+                    if(document.isEmpty()) throw new NullPointerException();
                     documentReceived.onDocumentReceived(document);
 
                 } catch (InterruptedException | ExecutionException | NullPointerException e) {
@@ -86,8 +96,8 @@ public class GetDocuments {
                 ecs.submit(new GetLatestListDoc());
                 try {
                     FetchCall.DocumentObject documentObject = (FetchCall.DocumentObject) ecs.take().get();
-                    Document document = documentObject.getDocument();
-                    if(document == null) throw new NullPointerException();
+                    List<Document> document = documentObject.getDocumentList();
+                    if(document.isEmpty()) throw new NullPointerException();
                     documentReceived.onDocumentReceived(document);
                 } catch (InterruptedException | ExecutionException | NullPointerException e) {
                     Utilities.Log(LOG_TAG, "Latest Doc: " + e.getMessage());
@@ -106,6 +116,11 @@ public class GetDocuments {
     private class GetPopularListDoc extends FetchCall {
         public GetPopularListDoc() {
             super(Uri.parse(BASE_URL).buildUpon().appendPath(URL_LIST_POPULAR).build().toString(), POPULAR_ID);
+        }
+
+        @Override
+        public void setUrl(List<String> urls) {
+            super.setUrl(urls);
         }
     }
 

@@ -2,6 +2,7 @@ package com.freddieptf.mangatest.api.mangareader;
 
 import com.freddieptf.mangatest.beans.MangaInfoBean;
 import com.freddieptf.mangatest.beans.MangaLatestInfoBean;
+import com.freddieptf.mangatest.beans.MangaPopularInfoBean;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -58,8 +59,27 @@ public class Processor {
 
     }
 
-    //@TODO processPopularListDocument
-    public static List processPopularListDocument(Document document){
-        return new ArrayList();
+    public static List<MangaPopularInfoBean> processPopularListDocument(List<Document> documents){
+        List<MangaPopularInfoBean> list = new ArrayList<>();
+
+        for(Document document : documents) {
+            Elements div_popularMangas = document.select("div.mangaresultitem");
+
+            for (Element element : div_popularMangas) {
+                MangaPopularInfoBean popularInfoBean = new MangaPopularInfoBean();
+                String name = element.select("h3 > a").text();
+                String author = element.select("div.author_name").text();
+                String chapterCount = element.select("div.chapter_count").text();
+                String genres = element.select("div.manga_genre").text();
+
+                popularInfoBean.setAuthor(author);
+                popularInfoBean.setName(name);
+                popularInfoBean.setChapterCount(chapterCount);
+                popularInfoBean.setGenre(genres);
+                list.add(popularInfoBean);
+            }
+        }
+
+        return list;
     }
 }

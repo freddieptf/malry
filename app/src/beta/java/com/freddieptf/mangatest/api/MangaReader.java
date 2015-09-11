@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Created by fred on 7/25/15.
@@ -86,7 +87,7 @@ public class MangaReader {
     public void getPopularList(final GetListListener listener){
         getDocuments.getPopularListDocument(new OnDocumentReceived() {
             @Override
-            public void onDocumentReceived(Document document) {
+            public void onDocumentReceived(List<Document> document) {
                 listener.onGetList(Processor.processPopularListDocument(document));
             }
         });
@@ -95,8 +96,8 @@ public class MangaReader {
     public void getLatestList(final GetListListener listener){
         getDocuments.getLatestListDocument(new OnDocumentReceived() {
             @Override
-            public void onDocumentReceived(Document document) {
-                listener.onGetList(Processor.processLatestListDocument(document));
+            public void onDocumentReceived(List<Document> document) {
+                listener.onGetList(Processor.processLatestListDocument(document.get(0)));
             }
         });
     }

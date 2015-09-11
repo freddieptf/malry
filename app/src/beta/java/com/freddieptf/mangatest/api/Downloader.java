@@ -19,6 +19,8 @@ import java.util.concurrent.Executors;
  */
 public class Downloader {
 
+    //@ToDo a pref for this, maybe
+    public final static int MAX_RUNNING_DOWNLOADS = 3;
     final String LOG_TAG = getClass().getSimpleName();
     ExecutorService executorService;
     int i = 0;
@@ -33,7 +35,7 @@ public class Downloader {
     PublishProgress publishProgress;
 
     public Downloader() {
-        executorService = Executors.newFixedThreadPool(3);
+        executorService = Executors.newFixedThreadPool(MAX_RUNNING_DOWNLOADS);
     }
 
     public void setProgressListener(PublishProgress publishProgress){

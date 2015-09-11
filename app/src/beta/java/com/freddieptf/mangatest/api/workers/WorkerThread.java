@@ -120,7 +120,15 @@ public class WorkerThread extends Thread {
                         public void onGetList(@NonNull List list) {
                             Utilities.Log(LOG_TAG, "Popular: " + list.size());
                             if (list.size() > 0) {
-
+                                context.getContentResolver().delete(Contract.MangaReaderPopularList.CONTENT_URI, null, null);
+                                InsertCall insertCall = new InsertCall(list, Contract.MangaReaderPopularList.CONTENT_URI, context);
+                                service.submit(insertCall);
+                                insertCall.setInsertDoneListener(new InsertListener() {
+                                    @Override
+                                    public void onInsertDone() {
+                                        Utilities.Log(LOG_TAG, "Popular list insert done!");
+                                    }
+                                });
                             }
                         }
                     });
