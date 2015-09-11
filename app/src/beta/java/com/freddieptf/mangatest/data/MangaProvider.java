@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 import com.freddieptf.mangatest.data.Contract.MangaReaderLatestList;
+import com.freddieptf.mangatest.data.Contract.MangaReaderPopularList;
 import com.freddieptf.mangatest.data.Contract.VirtualTable;
 
 import static com.freddieptf.mangatest.data.Contract.MangaEden;
@@ -29,6 +30,7 @@ public class MangaProvider extends ContentProvider {
     private static final int MANGAREADER_LIST = 300;
     private static final int MANGA_IN_READER_LIST_WITH_NAME = 301;
     private static final int MANGAREADER_LATEST_LIST = 302;
+    private static final int MANGAREADER_POPULAR_LIST = 303;
     private static final int MANGA_EDEN = 500;
     private static final int MANGA_EDEN_WITH_NAME = 501;
     private static final int MANGAFOX_LIST = 700;
@@ -48,6 +50,8 @@ public class MangaProvider extends ContentProvider {
         matcher.addURI(AUTH, Contract.PATH_MANGAREADER_LIST + "/*", MANGA_IN_READER_LIST_WITH_NAME);
 
         matcher.addURI(AUTH, Contract.PATH_MANGAREADER_LATEST_LIST, MANGAREADER_LATEST_LIST);
+
+        matcher.addURI(AUTH, Contract.PATH_MANGAREADER_POPULAR_LIST, MANGAREADER_POPULAR_LIST);
 
         matcher.addURI(AUTH, Contract.PATH_MANGAFOX_LIST, MANGAFOX_LIST);
         matcher.addURI(AUTH, Contract.PATH_MANGAFOX_LIST + "/*", MANGA_IN_FOX_LIST_WITH_NAME);
@@ -226,6 +230,16 @@ public class MangaProvider extends ContentProvider {
                 break;
             }
 
+            case MANGAREADER_POPULAR_LIST:{
+                returnCursor = myDbHelper.getReadableDatabase().query(MangaReaderPopularList.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null, null,
+                        sortOrder);
+                break;
+            }
+
             case MANGAFOX_LIST: {
                 returnCursor = myDbHelper.getReadableDatabase().query(MangaFoxMangaList.TABLE_NAME,
                         projection,
@@ -296,52 +310,52 @@ public class MangaProvider extends ContentProvider {
                 break;
             }
 
-            case MANGAREADER_LIST: {
-                long id = db.insert(MangaReaderMangaList.TABLE_NAME, null, contentValues);
-                if(id > 0) {
-                    returnUri = MangaReaderMangaList.buildMangaListUri(id);
-                }else{
-                    throw new android.database.SQLException("Failed to insert: " + uri);
-                }
-                break;
-            }
-
-            case MANGAREADER_LATEST_LIST: {
-                long id = db.insert(MangaReaderLatestList.TABLE_NAME, null, contentValues);
-                if(id > 0) returnUri = MangaReaderLatestList.buildMangaReaderLatestListUri(id);
-                else throw new android.database.SQLException("Failed to insert: " + uri);
-                break;
-            }
-
-            case MANGAFOX_LIST: {
-                long id = db.insert(MangaFoxMangaList.TABLE_NAME, null, contentValues);
-                if(id > 0) {
-                    returnUri = MangaFoxMangaList.buildMangaListUri(id);
-                }else{
-                    throw new android.database.SQLException("Failed to insert: " + uri);
-                }
-                break;
-            }
-
-            case MANGA_EDEN: {
-                long id = db.insert(MangaEden.TABLE_NAME, null, contentValues);
-                if(id > 0) {
-                    returnUri = MangaEden.buildMangaUri(id);
-                }else{
-                    throw new android.database.SQLException("Failed to insert: " + uri);
-                }
-                break;
-            }
-
-            case VIRTUAL_TABLE: {
-                long id = db.insert(VirtualTable.TABLE_NAME, null, contentValues);
-                if(id > 0){
-                    returnUri = VirtualTable.buildVirtualMangaUri(id);
-                }else {
-                    throw new android.database.SQLException("Failed to insert: " + uri);
-                }
-                break;
-            }
+//            case MANGAREADER_LIST: {
+//                long id = db.insert(MangaReaderMangaList.TABLE_NAME, null, contentValues);
+//                if(id > 0) {
+//                    returnUri = MangaReaderMangaList.buildMangaListUri(id);
+//                }else{
+//                    throw new android.database.SQLException("Failed to insert: " + uri);
+//                }
+//                break;
+//            }
+//
+//            case MANGAREADER_LATEST_LIST: {
+//                long id = db.insert(MangaReaderLatestList.TABLE_NAME, null, contentValues);
+//                if(id > 0) returnUri = MangaReaderLatestList.buildMangaReaderLatestListUri(id);
+//                else throw new android.database.SQLException("Failed to insert: " + uri);
+//                break;
+//            }
+//
+//            case MANGAFOX_LIST: {
+//                long id = db.insert(MangaFoxMangaList.TABLE_NAME, null, contentValues);
+//                if(id > 0) {
+//                    returnUri = MangaFoxMangaList.buildMangaListUri(id);
+//                }else{
+//                    throw new android.database.SQLException("Failed to insert: " + uri);
+//                }
+//                break;
+//            }
+//
+//            case MANGA_EDEN: {
+//                long id = db.insert(MangaEden.TABLE_NAME, null, contentValues);
+//                if(id > 0) {
+//                    returnUri = MangaEden.buildMangaUri(id);
+//                }else{
+//                    throw new android.database.SQLException("Failed to insert: " + uri);
+//                }
+//                break;
+//            }
+//
+//            case VIRTUAL_TABLE: {
+//                long id = db.insert(VirtualTable.TABLE_NAME, null, contentValues);
+//                if(id > 0){
+//                    returnUri = VirtualTable.buildVirtualMangaUri(id);
+//                }else {
+//                    throw new android.database.SQLException("Failed to insert: " + uri);
+//                }
+//                break;
+//            }
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -403,6 +417,17 @@ public class MangaProvider extends ContentProvider {
                 inserted = values.length;
                 break;
 
+            case MANGAREADER_POPULAR_LIST:
+                db.beginTransaction();
+                for(ContentValues contentValues : values){
+                    long id = db.insertOrThrow(MangaReaderPopularList.TABLE_NAME, null, contentValues);
+                    if(id == -1) throw new android.database.SQLException("Failed to insert a row into " + MangaReaderPopularList.CONTENT_URI);
+                }
+                db.setTransactionSuccessful();
+                db.endTransaction();
+                inserted = values.length;
+                break;
+
         }
 
         getContext().getContentResolver().notifyChange(MangaReaderMangaList.CONTENT_URI, null);
@@ -430,6 +455,10 @@ public class MangaProvider extends ContentProvider {
             }
             case MANGAREADER_LATEST_LIST: {
                 rowsDeleted = db.delete(MangaReaderLatestList.TABLE_NAME, s, strings);
+                break;
+            }
+            case MANGAREADER_POPULAR_LIST: {
+                rowsDeleted = db.delete(MangaReaderPopularList.TABLE_NAME, s, strings);
                 break;
             }
             case MANGAFOX_LIST: {
@@ -484,6 +513,11 @@ public class MangaProvider extends ContentProvider {
 
             case MANGAREADER_LATEST_LIST: {
                 rowsUpdated = sqLiteDatabase.update(MangaReaderLatestList.TABLE_NAME, contentValues, selection, selectionArgs);
+                break;
+            }
+
+            case MANGAREADER_POPULAR_LIST: {
+                rowsUpdated = sqLiteDatabase.update(MangaReaderPopularList.TABLE_NAME, contentValues, selection, selectionArgs);
                 break;
             }
 

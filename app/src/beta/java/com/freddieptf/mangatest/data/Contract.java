@@ -13,6 +13,7 @@ public class Contract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTH);
     public static final String PATH_MANGAREADER_LIST = "manga_reader_list";
     public static final String PATH_MANGAREADER_LATEST_LIST = "manga_reader_latest_list";
+    public static final String PATH_MANGAREADER_POPULAR_LIST = "manga_reader_popular_list";
     public static final String PATH_MANGAFOX_LIST = "manga_fox_list";
     public static final String PATH_MY_MANGA = "my_manga_list";
     public static final String PATH_MANGA_EDEN = "manga_eden_list";
@@ -76,7 +77,7 @@ public class Contract {
 
 
     public static class MangaReaderLatestList implements BaseColumns{
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendEncodedPath(PATH_MANGAREADER_LATEST_LIST).build();
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_MANGAREADER_LATEST_LIST).build();
         public static final String CONTENT_TYPE =
                 "vnd.android.cursor.dir/" + CONTENT_AUTH + "/" + PATH_MANGAREADER_LATEST_LIST;
         public static final String CONTENT_ITEM_TYPE =
@@ -94,8 +95,25 @@ public class Contract {
 
     }
 
-    //@TODO popular list
 
+    public static class MangaReaderPopularList implements BaseColumns{
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_MANGAREADER_POPULAR_LIST).build();
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/" + CONTENT_AUTH + "/" + PATH_MANGAREADER_POPULAR_LIST;
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/" + CONTENT_AUTH + "/" + PATH_MANGAREADER_POPULAR_LIST;
+
+        public static final String TABLE_NAME = "mangareader_popular_list";
+        public static final String COLUMN_MANGA_NAME = "manga_name";
+        public static final String COLUMN_CHAPTER_DETAILS = "chapter_dets";
+        public static final String COLUMN_MANGA_AUTHOR = "manga_author";
+        public static final String COLUMN_MANGA_GENRE = "genres";
+
+        public static Uri buildListUri(long id){
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+    }
 
     public static class MangaFoxMangaList implements BaseColumns {
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_MANGAFOX_LIST).build();

@@ -13,7 +13,7 @@ import static com.freddieptf.mangatest.data.Contract.MyManga;
  */
 public class DbHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "manga.db";
 
     public DbHelper(Context context) {
@@ -34,6 +34,13 @@ public class DbHelper extends SQLiteOpenHelper {
                 + Contract.MangaReaderLatestList.COLUMN_MANGA_ID + " TEXT NOT NULL, "
                 + Contract.MangaReaderLatestList.COLUMN_CHAPTER + " TEXT NOT NULL, "
                 + Contract.MangaReaderLatestList.COLUMN_DATE + " TEXT NOT NULL );";
+
+        final String CREATE_MANGAREADER_POPULAR_LIST = "CREATE TABLE " + Contract.MangaReaderPopularList.TABLE_NAME
+                + " (" + Contract.MangaReaderPopularList._ID + " INTEGER PRIMARY KEY, "
+                + Contract.MangaReaderPopularList.COLUMN_MANGA_NAME + " TEXT NOT NULL, "
+                + Contract.MangaReaderPopularList.COLUMN_MANGA_AUTHOR + " TEXT NOT NULL, "
+                + Contract.MangaReaderPopularList.COLUMN_CHAPTER_DETAILS + " TEXT NOT NULL, "
+                + Contract.MangaReaderPopularList.COLUMN_MANGA_GENRE + " TEXT NOT NULL );";
 
         final String CREATE_VIRTUAL_TABLE = "CREATE VIRTUAL TABLE "
                 + Contract.VirtualTable.TABLE_NAME + " USING fts3 ("
@@ -70,6 +77,7 @@ public class DbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(CREATE_MY_MANGA);
         sqLiteDatabase.execSQL(CREATE_MANGAREADER_LIST);
         sqLiteDatabase.execSQL(CREATE_MANGAREADER_LATEST_LIST);
+        sqLiteDatabase.execSQL(CREATE_MANGAREADER_POPULAR_LIST);
         sqLiteDatabase.execSQL(CREATE_MANGAFOX_LIST);
         sqLiteDatabase.execSQL(CREATE_MANGAEDEN_LIST);
         sqLiteDatabase.execSQL(CREATE_VIRTUAL_TABLE);
@@ -83,7 +91,9 @@ public class DbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MangaReaderMangaList.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MangaFoxMangaList.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Contract.MangaEden.TABLE_NAME);
-        sqLiteDatabase.execSQL("DROP TABLE ID EXISTS " + Contract.MangaReaderLatestList.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Contract.MangaReaderLatestList.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Contract.MangaReaderPopularList.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " +  Contract.VirtualTable.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }
