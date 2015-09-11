@@ -119,8 +119,6 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
         manga_chapterCount = (TextView)headerRowView.findViewById(R.id.tv_MangaDetails_chapterCount);
         smoothProgressBar = (SmoothProgressBar)view.findViewById(R.id.progress);
 
-        //search mangareader list for this manga title and use it's manga_id
-        //if it does not exist, use MangaEdens manga_id
         mangaTitle = getArguments().getString(TITLE_KEY);
         mangaId = getArguments().getString(ID_KEY);
         source = getArguments().getString(SOURCE_KEY);
