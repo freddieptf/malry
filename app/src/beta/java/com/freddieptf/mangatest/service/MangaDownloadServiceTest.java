@@ -59,7 +59,7 @@ public class MangaDownloadServiceTest extends Service implements Downloader.Publ
     @Override
     public void activeDownloads(int numOfActiveDownloads) {
         Utilities.Log(LOG_TAG, "downloads: " + numOfActiveDownloads);
-        if(numOfActiveDownloads > 3) {
+        if(numOfActiveDownloads > Downloader.MAX_RUNNING_DOWNLOADS) {
             builder.setContentTitle("Added to Queue");
             builder.setContentText((downloader.getJobs() - 3) + " download(s) queued.")
                     .setProgress(0, 0, true);
@@ -88,7 +88,7 @@ public class MangaDownloadServiceTest extends Service implements Downloader.Publ
 
         downloader.submitDownload(mangaChapterAttrs, id);
 
-        if(downloader.getJobs() <= 3){
+        if(downloader.getJobs() <= Downloader.MAX_RUNNING_DOWNLOADS){
             notificationManager.notify(id, builder.build());
         }
 

@@ -31,6 +31,7 @@ import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.adapters.ListsPagerAdapter;
 import com.freddieptf.mangatest.adapters.MangaLatestListAdapter;
 import com.freddieptf.mangatest.adapters.MangaListAdapter;
+import com.freddieptf.mangatest.adapters.MangaPopularListAdapter;
 import com.freddieptf.mangatest.data.Contract;
 import com.freddieptf.mangatest.mainUi.MainActivity;
 import com.freddieptf.mangatest.mainUi.baseUi.BaseFragment;
@@ -48,6 +49,7 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
     private static final int MANGA_LOADER = 0;
     MangaListAdapter mangaListAdapter;
     MangaLatestListAdapter latestListAdapter;
+    MangaPopularListAdapter popularListAdapter;
     String source = "";
     private final String LOG_TAG = getClass().getSimpleName();
     public static final String SORT_ORDER = "sort_order";
@@ -67,6 +69,15 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
 
     };
 
+    private static final String[] POPULAR_COLUMNS = {
+            Contract.MangaReaderPopularList._ID,
+            Contract.MangaReaderPopularList.COLUMN_MANGA_NAME,
+            Contract.MangaReaderPopularList.COLUMN_MANGA_AUTHOR,
+            Contract.MangaReaderPopularList.COLUMN_CHAPTER_DETAILS,
+            Contract.MangaReaderPopularList.COLUMN_MANGA_GENRE
+    };
+
+
     private static String[] LATEST_COLUMNS = {
             Contract.MangaReaderLatestList._ID,
             Contract.MangaReaderLatestList.COLUMN_MANGA_NAME,
@@ -80,6 +91,9 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
     public static final int COLUMN_MANGA_ID = 2;
     public static final int COLUMN_CHAPTER = 3;
     public static final int COLUMN_DATE = 4;
+    public static final int COLUMN_MANGA_AUTHOR = 2;
+    public static final int COLUMN_CHAPTER_DETAILS = 3;
+    public static final int COLUMN_MANGA_GENRE = 4;
 
 
 
@@ -121,9 +135,11 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
 
         progressBar = (SmoothProgressBar) view.findViewById(R.id.progress);
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.pager);
-        viewPager.setAdapter(new ListsPagerAdapter(this));
+        viewPager.setAdapter(new ListsPagerAdapter(this, getActivity()));
         TabLayout tabLayout = getMainActivityHelper().getTabs();
         tabLayout.setupWithViewPager(viewPager);
+
+
 
         mangaListAdapter = new MangaListAdapter(getActivity(), null);
         mangaListAdapter.setOnMangaClickListener(this);
@@ -135,17 +151,25 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
         latestListAdapter = new MangaLatestListAdapter(getActivity(), c, 0);
         latestListAdapter.setOnMangaClickListener(this);
 
+
+        c = getActivity().getContentResolver().query(Contract.MangaReaderPopularList.CONTENT_URI,
+                POPULAR_COLUMNS, null, null, null);
+        popularListAdapter = new MangaPopularListAdapter(getActivity(), c);
+
     }
 
     @Override
     public void getListView(ListView listView) {
         int pos = (Integer) listView.getTag();
         switch (pos){
-            case 1:
-                listView.setAdapter(mangaListAdapter);
-                break;
             case 0:
                 listView.setAdapter(latestListAdapter);
+                break;
+            case 1:
+                listView.setAdapter(popularListAdapter);
+                break;
+            case 2:
+                listView.setAdapter(mangaListAdapter);
                 break;
             default:
                 Utilities.Log(LOG_TAG, "NOPE! No listView");
@@ -310,6 +334,7 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
             sortOrder = getArguments().getString(SORT_ORDER);
         }catch (NullPointerException e){}
 
+        Utilities.Log(LOG_TAG, PREF_CONTENT_URI.toString());
         return new CursorLoader(getActivity(),
                 PREF_CONTENT_URI,
                 MANGA_COLUMNS,
@@ -321,12 +346,12 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mangaListAdapter.swapCursor(data);
+        Utilities.Log(LOG_TAG, "onLoadFinshed: " + data.getCount() + " items");
 
         if(data.getCount() > 0){
             hideProgressBar();
         }
 
-        Utilities.Log(LOG_TAG, " onLoadFinshed: " + data.getCount() + " items");
 
     }
 
@@ -339,10 +364,6 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
     public void onLoaderReset(Loader<Cursor> loader) {
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
 
     private BroadcastReceiver broadCastReceiver = new BroadcastReceiver() {
         @Override

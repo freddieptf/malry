@@ -53,6 +53,7 @@ public class GetDocuments {
                     List<Document> document = documentObject.getDocumentList();
                     if(document.isEmpty()) throw new NullPointerException();
                     documentReceived.onDocumentReceived(document);
+                    document.clear();
 
                 } catch (InterruptedException | ExecutionException | NullPointerException e) {
                     Utilities.Log(LOG_TAG, "Aplhabetical docs: " + e.getMessage());
@@ -69,7 +70,7 @@ public class GetDocuments {
             public void run() {
                 GetPopularListDoc getPopularListDoc = new GetPopularListDoc();
                 List<String> urls = new ArrayList<String>();
-                for(int i = 0; i < 4000 ; i+=30){
+                for(int i = 0; i < 1000; i+=30){
                     if(i > 0) urls.add(base + "/" + i);
                     else urls.add(base);
                 }
@@ -80,7 +81,7 @@ public class GetDocuments {
                     List<Document> document = documentObject.getDocumentList();
                     if(document.isEmpty()) throw new NullPointerException();
                     documentReceived.onDocumentReceived(document);
-
+                    document.clear();
                 } catch (InterruptedException | ExecutionException | NullPointerException e) {
                     Utilities.Log(LOG_TAG, "Popular doc: " + e.getMessage());
                 }
@@ -99,6 +100,7 @@ public class GetDocuments {
                     List<Document> document = documentObject.getDocumentList();
                     if(document.isEmpty()) throw new NullPointerException();
                     documentReceived.onDocumentReceived(document);
+                    document.clear();
                 } catch (InterruptedException | ExecutionException | NullPointerException e) {
                     Utilities.Log(LOG_TAG, "Latest Doc: " + e.getMessage());
                 }

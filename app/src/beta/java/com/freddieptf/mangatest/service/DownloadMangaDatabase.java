@@ -46,8 +46,6 @@ public class DownloadMangaDatabase extends Service {
 
         if(Utilities.isOnline(this)) {
 
-            init();
-
             ExecutorService service = Executors.newFixedThreadPool(2);
             Worker worker = Worker.getInstance();
 
@@ -85,10 +83,6 @@ public class DownloadMangaDatabase extends Service {
             Utilities.Log(LOG_TAG, "No Internets breh");
         }
 
-        builder.setContentText("Done")
-                .setProgress(0, 0, false);
-        notificationManager.notify(NOTIFICATION_ID, builder.build());
-
         return START_NOT_STICKY;
     }
 
@@ -97,7 +91,5 @@ public class DownloadMangaDatabase extends Service {
                 .setProgress(0, 0, true)
                 .setContentText("Preparing to download databases")
                 .setSmallIcon(R.drawable.ic_stat_maps_local_library);
-
-        startForeground(NOTIFICATION_ID, builder.build());
     }
 }
