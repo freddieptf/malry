@@ -50,8 +50,7 @@ public class InsertCall extends Thread {
             insertLatest(list, destination);
         }else if(destination.equals(MangaReaderPopularList.CONTENT_URI)){
             insertPopular(list, destination);
-        }
-        else {
+        } else {
             Utilities.Log(LOG_TAG, "Bitch where?");
         }
 
@@ -63,12 +62,10 @@ public class InsertCall extends Thread {
 
         List<ContentValues> contentValuesList = new ArrayList<>(list.size());
 
-        for(Object m : contentValuesList){
+        for(Object m : list){
             ContentValues contentValues = new ContentValues();
-            contentValues.put(MangaReaderMangaList.COLUMN_MANGA_ID,
-                    ((MangaInfoBean)m).getManga_ID());
-            contentValues.put(MangaReaderMangaList.COLUMN_MANGA_NAME,
-                    ((MangaInfoBean)m).getManga_NAME());
+            contentValues.put(MangaReaderMangaList.COLUMN_MANGA_NAME, ((MangaInfoBean) m).getManga_NAME());
+            contentValues.put(MangaReaderMangaList.COLUMN_MANGA_ID, ((MangaInfoBean) m).getManga_ID());
             contentValuesList.add(contentValues);
         }
 
