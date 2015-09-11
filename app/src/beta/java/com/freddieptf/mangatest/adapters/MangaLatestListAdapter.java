@@ -25,12 +25,10 @@ public class MangaLatestListAdapter extends CursorAdapter implements View.OnClic
 
     class ViewHolder{
         TextView name;
-        TextView chapter;
         TextView date;
 
         public ViewHolder(View view){
             name = (TextView) view.findViewById(R.id.name);
-            chapter = (TextView) view.findViewById(R.id.chapter);
             date = (TextView) view.findViewById(R.id.date);
         }
     }
@@ -56,8 +54,7 @@ public class MangaLatestListAdapter extends CursorAdapter implements View.OnClic
         String[] manga = {context.getString(R.string.pref_manga_reader),
                 cursor.getString(ListsFragment.COLUMN_MANGA_NAME)
                 };
-        holder.name.setText(manga[1]);
-        holder.chapter.setText("Ch:" + cursor.getString(ListsFragment.COLUMN_CHAPTER));
+        holder.name.setText(manga[1] + " Ch" + cursor.getString(ListsFragment.COLUMN_CHAPTER));
         holder.date.setText(cursor.getString(ListsFragment.COLUMN_DATE));
 
         holder.name.setTag(manga);

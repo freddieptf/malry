@@ -9,23 +9,16 @@
 
     <TextView
         android:id="@+id/name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
         style="@style/MediumTextAppearance.Condensed"
         />
 
     <TextView
-        android:id="@+id/chapter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/MediumTextAppearance.Condensed"
-        />
-
-    <TextView
         android:id="@+id/date"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_width="wrap_content"
         android:gravity="right|end"
         android:layout_height="wrap_content"
         style="@style/SmallTextAppearance"

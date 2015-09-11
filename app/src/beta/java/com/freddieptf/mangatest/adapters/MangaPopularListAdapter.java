@@ -32,16 +32,18 @@ public class MangaPopularListAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-        viewHolder.position.setText("" +cursor.getPosition());
+        viewHolder.position.setText("" + (cursor.getPosition() + 1));
         viewHolder.name.setText(cursor.getString(ListsFragment.COLUMN_MANGA_NAME));
+        viewHolder.author.setText(cursor.getString(ListsFragment.COLUMN_MANGA_AUTHOR));
         viewHolder.genre.setText(cursor.getString(ListsFragment.COLUMN_MANGA_GENRE));
         viewHolder.chapters.setText(cursor.getString(ListsFragment.COLUMN_CHAPTER_DETAILS));
     }
 
     class ViewHolder {
-        TextView name, position, genre, chapters;
+        TextView name, position, genre, chapters, author;
         public ViewHolder(View view){
             name = (TextView) view.findViewById(R.id.name);
+            author = (TextView) view.findViewById(R.id.author);
             position = (TextView) view.findViewById(R.id.position);
             genre = (TextView) view.findViewById(R.id.genre);
             chapters = (TextView) view.findViewById(R.id.chapters);
