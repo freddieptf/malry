@@ -70,8 +70,7 @@ public class MangaLatestListAdapter extends CursorAdapter implements View.OnClic
                 Cursor c = view.getContext().getContentResolver().query(m,
                         new String[]{
                                 Contract.MangaReaderMangaList.COLUMN_MANGA_ID}, null, null, null);
-                if(c != null){
-                    c.moveToFirst();
+                if(c != null && c.moveToFirst()){
                     onMangaClick.onMangaClicked(manga[0], manga[1], c.getString(0));
                     c.close();
                 }

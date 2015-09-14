@@ -155,6 +155,7 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
         c = getActivity().getContentResolver().query(Contract.MangaReaderPopularList.CONTENT_URI,
                 POPULAR_COLUMNS, null, null, null);
         popularListAdapter = new MangaPopularListAdapter(getActivity(), c);
+        popularListAdapter.setOnMangaClickedListener(this);
 
     }
 
