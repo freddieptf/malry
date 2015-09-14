@@ -13,7 +13,7 @@ import static com.freddieptf.mangatest.data.Contract.MyManga;
  */
 public class DbHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "manga.db";
 
     public DbHelper(Context context) {
@@ -35,12 +35,13 @@ public class DbHelper extends SQLiteOpenHelper {
                 + Contract.MangaReaderLatestList.COLUMN_CHAPTER + " TEXT NOT NULL, "
                 + Contract.MangaReaderLatestList.COLUMN_DATE + " TEXT NOT NULL );";
 
-        final String CREATE_MANGAREADER_POPULAR_LIST = "CREATE TABLE " + Contract.MangaReaderPopularList.TABLE_NAME
-                + " (" + Contract.MangaReaderPopularList._ID + " INTEGER PRIMARY KEY, "
-                + Contract.MangaReaderPopularList.COLUMN_MANGA_NAME + " TEXT NOT NULL, "
-                + Contract.MangaReaderPopularList.COLUMN_MANGA_AUTHOR + " TEXT NOT NULL, "
-                + Contract.MangaReaderPopularList.COLUMN_CHAPTER_DETAILS + " TEXT NOT NULL, "
-                + Contract.MangaReaderPopularList.COLUMN_MANGA_GENRE + " TEXT NOT NULL );";
+        final String CREATE_MANGAREADER_POPULAR_LIST = "CREATE VIRTUAL TABLE "
+                + Contract.MangaReaderPopularList.TABLE_NAME
+                + " USING fts3 (" + Contract.MangaReaderPopularList._ID + " INTEGER PRIMARY KEY, "
+                + Contract.MangaReaderPopularList.COLUMN_MANGA_NAME + ", "
+                + Contract.MangaReaderPopularList.COLUMN_MANGA_AUTHOR + ", "
+                + Contract.MangaReaderPopularList.COLUMN_CHAPTER_DETAILS + ", "
+                + Contract.MangaReaderPopularList.COLUMN_MANGA_GENRE + ");";
 
         final String CREATE_VIRTUAL_TABLE = "CREATE VIRTUAL TABLE "
                 + Contract.VirtualTable.TABLE_NAME + " USING fts3 ("

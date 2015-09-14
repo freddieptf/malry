@@ -46,7 +46,6 @@ public class Contract {
     }
 
 
-
     //MangaReader Manga List
     public static class MangaReaderMangaList implements BaseColumns {
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_MANGAREADER_LIST).build();
@@ -111,6 +110,14 @@ public class Contract {
 
         public static Uri buildListUri(long id){
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildListWithGenreUri(String genre){
+            return CONTENT_URI.buildUpon().appendPath(genre).build();
+        }
+
+        public static String getGenreFromUri(Uri uri){
+            return uri.getPathSegments().get(1);
         }
 
     }

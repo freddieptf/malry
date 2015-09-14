@@ -31,6 +31,7 @@ public class MangaProvider extends ContentProvider {
     private static final int MANGA_IN_READER_LIST_WITH_NAME = 301;
     private static final int MANGAREADER_LATEST_LIST = 302;
     private static final int MANGAREADER_POPULAR_LIST = 303;
+    private static final int MANGAREADER_POPULAR_LIST_WITH_GENRE = 304;
     private static final int MANGA_EDEN = 500;
     private static final int MANGA_EDEN_WITH_NAME = 501;
     private static final int MANGAFOX_LIST = 700;
@@ -52,6 +53,7 @@ public class MangaProvider extends ContentProvider {
         matcher.addURI(AUTH, Contract.PATH_MANGAREADER_LATEST_LIST, MANGAREADER_LATEST_LIST);
 
         matcher.addURI(AUTH, Contract.PATH_MANGAREADER_POPULAR_LIST, MANGAREADER_POPULAR_LIST);
+        matcher.addURI(AUTH, Contract.PATH_MANGAREADER_POPULAR_LIST + "/*", MANGAREADER_POPULAR_LIST_WITH_GENRE);
 
         matcher.addURI(AUTH, Contract.PATH_MANGAFOX_LIST, MANGAFOX_LIST);
         matcher.addURI(AUTH, Contract.PATH_MANGAFOX_LIST + "/*", MANGA_IN_FOX_LIST_WITH_NAME);
@@ -117,6 +119,18 @@ public class MangaProvider extends ContentProvider {
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         builder.setTables(VirtualTable.TABLE_NAME);
 
+        return builder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
+    }
+
+    private Cursor getMangaInReaderListByGenre(Uri uri, String[] projection, String sortOrder){
+        SQLiteDatabase db = myDbHelper.getReadableDatabase();
+        String genre_query = MangaReaderPopularList.getGenreFromUri(uri);
+
+        String selection = MangaReaderPopularList.TABLE_NAME + "." +
+                MangaReaderPopularList.COLUMN_MANGA_GENRE + " MATCH ?";
+        String[] selectionArgs = new String[]{genre_query + "*"};
+        SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+        builder.setTables(MangaReaderPopularList.TABLE_NAME);
         return builder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
     }
 
@@ -237,6 +251,11 @@ public class MangaProvider extends ContentProvider {
                         selectionArgs,
                         null, null,
                         sortOrder);
+                break;
+            }
+
+            case MANGAREADER_POPULAR_LIST_WITH_GENRE:{
+                returnCursor = getMangaInReaderListByGenre(uri, projection, sortOrder);
                 break;
             }
 
