@@ -23,6 +23,16 @@
         app:spb_progressiveStart_activated="true"
         app:spb_colors="@array/gplus_colors" />
 
+    <com.freddieptf.mangatest.mainUi.widgets.genreview.GenresView
+        android:id="@+id/genre_view"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_gravity="bottom"
+        android:background="@android:color/white"
+        android:visibility="gone"
+        app:genreStringList="@array/genres"/>
+
+
 
 </FrameLayout>
 

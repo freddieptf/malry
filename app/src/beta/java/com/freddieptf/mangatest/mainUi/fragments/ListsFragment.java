@@ -35,6 +35,8 @@ import com.freddieptf.mangatest.adapters.MangaPopularListAdapter;
 import com.freddieptf.mangatest.data.Contract;
 import com.freddieptf.mangatest.mainUi.MainActivity;
 import com.freddieptf.mangatest.mainUi.baseUi.BaseFragment;
+import com.freddieptf.mangatest.mainUi.widgets.genreview.GenreViewUtils;
+import com.freddieptf.mangatest.mainUi.widgets.genreview.GenresView;
 import com.freddieptf.mangatest.service.DownloadMangaDatabase;
 import com.freddieptf.mangatest.utils.Utilities;
 
@@ -44,7 +46,7 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
  * Created by fred on 1/30/15.
  */
 public class ListsFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>,
-        ListsPagerAdapter.PagerHelper, MangaListAdapter.OnMangaClicked{
+        ListsPagerAdapter.PagerHelper, MangaListAdapter.OnMangaClicked, GenreViewUtils{
 
     private static final int MANGA_LOADER = 0;
     MangaListAdapter mangaListAdapter;
@@ -53,11 +55,13 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
     String source = "";
     private final String LOG_TAG = getClass().getSimpleName();
     public static final String SORT_ORDER = "sort_order";
+    boolean GENRE_VIEW_VISIBLE;
 
     Uri PREF_CONTENT_URI;
     MaterialDialog materialDialog;
 
     SmoothProgressBar progressBar;
+    GenresView genresView;
     Cursor searchCursor = null;
     SearchManager searchManager;
     SearchView searchView;
@@ -119,9 +123,7 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
         getLoaderManager().initLoader(MANGA_LOADER, null, this);
         searchManager = (SearchManager)getActivity().getSystemService(MainActivity.SEARCH_SERVICE);
 
-        if(Utilities.isFirstStart(getActivity())){
-            showWelcomeDialog();
-        }
+        if(Utilities.isFirstStart(getActivity())) showWelcomeDialog();
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getResources().getString(R.string.myMangaList));
 
@@ -134,11 +136,18 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
         PREF_CONTENT_URI = Utilities.getPrefContentUri(getActivity());
 
         progressBar = (SmoothProgressBar) view.findViewById(R.id.progress);
+        genresView = (GenresView) view.findViewById(R.id.genre_view);
+        genresView.setVisibilityListener(this);
+
+        if(savedInstanceState != null && savedInstanceState.containsKey("genre")){
+            GENRE_VIEW_VISIBLE = savedInstanceState.getBoolean("genre");
+            genresView.setVisible(GENRE_VIEW_VISIBLE);
+        }
+
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.pager);
         viewPager.setAdapter(new ListsPagerAdapter(this, getActivity()));
         TabLayout tabLayout = getMainActivityHelper().getTabs();
         tabLayout.setupWithViewPager(viewPager);
-
 
 
         mangaListAdapter = new MangaListAdapter(getActivity(), null);
@@ -152,12 +161,14 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
         latestListAdapter.setOnMangaClickListener(this);
 
 
+        Uri m = Contract.MangaReaderPopularList.buildListWithGenreUri("Ecchi School life");
         c = getActivity().getContentResolver().query(Contract.MangaReaderPopularList.CONTENT_URI,
                 POPULAR_COLUMNS, null, null, null);
         popularListAdapter = new MangaPopularListAdapter(getActivity(), c);
         popularListAdapter.setOnMangaClickedListener(this);
 
     }
+
 
     @Override
     public void getListView(ListView listView) {
@@ -197,6 +208,16 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
     }
 
     @Override
+    public void isGenreViewVisible(boolean isVisible) {
+        GENRE_VIEW_VISIBLE = isVisible;
+    }
+
+    @Override
+    public void onGenreChange() {
+
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         if(!Utilities.getCurrentSource(getActivity()).equals(source)) refreshLoaderOnPrefChange();
@@ -213,6 +234,11 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
         getActivity().unregisterReceiver(broadCastReceiver);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("genre", GENRE_VIEW_VISIBLE);
+    }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
@@ -234,6 +260,7 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
         menu.findItem(R.id.menu_search).setVisible(true);
         menu.findItem(R.id.menu_sourceReader).setVisible(true);
         menu.findItem(R.id.menu_sourceFox).setVisible(true);
+        menu.findItem(R.id.menu_filter).setVisible(true);
 
         searchView = (SearchView)menu.findItem(R.id.menu_search).getActionView();
 
@@ -317,6 +344,10 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
                 refreshLoaderOnPrefChange();
                 break;
             }
+            case R.id.menu_filter: {
+                genresView.show();
+                break;
+            }
         }
 
         return true;
@@ -335,7 +366,6 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
             sortOrder = getArguments().getString(SORT_ORDER);
         }catch (NullPointerException e){}
 
-        Utilities.Log(LOG_TAG, PREF_CONTENT_URI.toString());
         return new CursorLoader(getActivity(),
                 PREF_CONTENT_URI,
                 MANGA_COLUMNS,

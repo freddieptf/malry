@@ -70,7 +70,7 @@ public class GetDocuments {
             public void run() {
                 GetPopularListDoc getPopularListDoc = new GetPopularListDoc();
                 List<String> urls = new ArrayList<String>();
-                for(int i = 0; i < 1000; i+=30){
+                for(int i = 0; i < 1800; i+=30){
                     if(i > 0) urls.add(base + "/" + i);
                     else urls.add(base);
                 }

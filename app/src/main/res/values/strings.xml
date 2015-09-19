@@ -12,11 +12,6 @@
     <string name="no_internet">No internet Connection</string>
     <string name="dead_internet">Your internets is being a BAKA!</string>
 
-    <string name="FirstMangaPagePref">first_manga_page_pref</string>
-    <string name="SecondMangaPagePref">second_manga_page_pref</string>
-    <string name="ThirdMangaPagePref">third_manga_page_pref</string>
-
-
 
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
@@ -40,6 +35,31 @@
     <string name="pref_fix_database_title">Fix/Update</string>
     <string name="contentAuthority">com.freddieptf.mangatest</string>
     <string name="account_type">mangatest</string>
+
+    <string-array name="genres">
+        <item>All</item>
+        <item>Action</item>
+        <item>Adventure</item>
+        <item>Comedy</item>
+        <item>Drama</item>
+        <item>Demons</item>
+        <item>Ecchi</item>
+        <item>Fantasy</item>
+        <item>Gender Bender</item>
+        <item>Harem</item>
+        <item>Josei</item>
+        <item>Martial Arts</item>
+        <item>Magic</item>
+        <item>Mystery</item>
+        <item>Psychological</item>
+        <item>Romance</item>
+        <item>School Life</item>
+        <item>Sci-Fi</item>
+        <item>Seinen</item>
+        <item>Shounen</item>
+        <item>Slice of Life</item>
+        <item>Supernatural</item>
+    </string-array>
 
 
 </resources>

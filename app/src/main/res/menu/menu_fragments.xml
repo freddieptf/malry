@@ -14,6 +14,12 @@
         android:visible="false"
         />
 
+    <item android:title="Filter by Genre"
+        android:id="@+id/menu_filter"
+        android:icon="@drawable/ic_filter_list_white_24dp"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="200"
+        android:visible="false" />
 
     <group android:checkableBehavior="single"
         android:id="@+id/menusourceGroup"
