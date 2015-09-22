@@ -29,7 +29,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.toolbox.ImageLoader;
-import com.freddieptf.mangatest.MangaFoxAndReader.FetchMangaChapter;
+import com.freddieptf.mangatest.api.FetchMangaChapter;
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.adapters.MangaChapterAdapter;
 import com.freddieptf.mangatest.api.GetManga;

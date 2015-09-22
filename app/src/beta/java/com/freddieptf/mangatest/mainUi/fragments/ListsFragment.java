@@ -1,10 +1,8 @@
 package com.freddieptf.mangatest.mainUi.fragments;
 
 import android.app.SearchManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,6 +30,7 @@ import com.freddieptf.mangatest.adapters.ListsPagerAdapter;
 import com.freddieptf.mangatest.adapters.MangaLatestListAdapter;
 import com.freddieptf.mangatest.adapters.MangaListAdapter;
 import com.freddieptf.mangatest.adapters.MangaPopularListAdapter;
+import com.freddieptf.mangatest.api.workers.WorkerThread;
 import com.freddieptf.mangatest.data.Contract;
 import com.freddieptf.mangatest.mainUi.MainActivity;
 import com.freddieptf.mangatest.mainUi.baseUi.BaseFragment;
@@ -48,7 +47,10 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 public class ListsFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>,
         ListsPagerAdapter.PagerHelper, MangaListAdapter.OnMangaClicked, GenreViewUtils{
 
-    private static final int MANGA_LOADER = 0;
+    private static final int MANGA_LOADER = 100331;
+    private static final int LATEST_MANGA_LOADER = 100332;
+    private static final int POPULAR_MANGA_LOADER = 100333;
+
     MangaListAdapter mangaListAdapter;
     MangaLatestListAdapter latestListAdapter;
     MangaPopularListAdapter popularListAdapter;
@@ -56,9 +58,10 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
     private final String LOG_TAG = getClass().getSimpleName();
     public static final String SORT_ORDER = "sort_order";
     boolean GENRE_VIEW_VISIBLE;
+    String genres = "";
+    final String GENRE_VIEW_VISIBILITY = "genre";
 
     Uri PREF_CONTENT_URI;
-    MaterialDialog materialDialog;
 
     SmoothProgressBar progressBar;
     GenresView genresView;
@@ -120,7 +123,10 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        getLoaderManager().initLoader(LATEST_MANGA_LOADER, null, latestListLoader);
+        getLoaderManager().initLoader(POPULAR_MANGA_LOADER, null, popularListLoader);
         getLoaderManager().initLoader(MANGA_LOADER, null, this);
+
         searchManager = (SearchManager)getActivity().getSystemService(MainActivity.SEARCH_SERVICE);
 
         if(Utilities.isFirstStart(getActivity())) showWelcomeDialog();
@@ -137,11 +143,18 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
 
         progressBar = (SmoothProgressBar) view.findViewById(R.id.progress);
         genresView = (GenresView) view.findViewById(R.id.genre_view);
-        genresView.setVisibilityListener(this);
+        genresView.setGenreViewUtils(this);
+        genres = genresView.getSelectedGenres();
 
-        if(savedInstanceState != null && savedInstanceState.containsKey("genre")){
-            GENRE_VIEW_VISIBLE = savedInstanceState.getBoolean("genre");
-            genresView.setVisible(GENRE_VIEW_VISIBLE);
+        if(!genres.isEmpty()){
+            restartPopularLoader(genres);
+        }
+
+        if(savedInstanceState != null){
+            if(savedInstanceState.containsKey(GENRE_VIEW_VISIBILITY)) {
+                GENRE_VIEW_VISIBLE = savedInstanceState.getBoolean(GENRE_VIEW_VISIBILITY);
+                genresView.setVisible(GENRE_VIEW_VISIBLE);
+            }
         }
 
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.pager);
@@ -153,20 +166,17 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
         mangaListAdapter = new MangaListAdapter(getActivity(), null);
         mangaListAdapter.setOnMangaClickListener(this);
 
-        //on the main thread, like a boss
-        Cursor c = getActivity().getContentResolver().query(Contract.MangaReaderLatestList.CONTENT_URI,
-                LATEST_COLUMNS, null, null, null);
-
-        latestListAdapter = new MangaLatestListAdapter(getActivity(), c, 0);
+        latestListAdapter = new MangaLatestListAdapter(getActivity(), null);
         latestListAdapter.setOnMangaClickListener(this);
 
-
-        Uri m = Contract.MangaReaderPopularList.buildListWithGenreUri("Ecchi School life");
-        c = getActivity().getContentResolver().query(Contract.MangaReaderPopularList.CONTENT_URI,
-                POPULAR_COLUMNS, null, null, null);
-        popularListAdapter = new MangaPopularListAdapter(getActivity(), c);
+        popularListAdapter = new MangaPopularListAdapter(getActivity(), null);
         popularListAdapter.setOnMangaClickedListener(this);
+    }
 
+    private void restartPopularLoader(String genres) {
+        Bundle bundle = new Bundle();
+        bundle.putString("uri", Contract.MangaReaderPopularList.buildListWithGenreUri(genres).toString());
+        getLoaderManager().restartLoader(POPULAR_MANGA_LOADER, bundle, popularListLoader);
     }
 
 
@@ -213,17 +223,15 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
     }
 
     @Override
-    public void onGenreChange() {
-
+    public void onGenreChange(String genres) {
+        this.genres = genres;
+        restartPopularLoader(genres);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         if(!Utilities.getCurrentSource(getActivity()).equals(source)) refreshLoaderOnPrefChange();
-
-        getActivity().registerReceiver(broadCastReceiver,
-                new IntentFilter(DownloadMangaDatabase.class.getSimpleName()));
     }
 
     @Override
@@ -231,13 +239,12 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
         super.onPause();
         if(searchCursor != null)searchCursor.close();
         source = Utilities.getCurrentSource(getActivity());
-        getActivity().unregisterReceiver(broadCastReceiver);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean("genre", GENRE_VIEW_VISIBLE);
+        outState.putBoolean(GENRE_VIEW_VISIBILITY, GENRE_VIEW_VISIBLE);
     }
 
     @Override
@@ -250,7 +257,6 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
             menu.findItem(R.id.menu_sourceFox).setChecked(true);
 
     }
-
 
     @Override
     public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
@@ -309,31 +315,6 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
 
     }
 
-//    public void loadVirtual(){
-//        Cursor cursor = getActivity().getContentResolver().query(Contract.MangaReaderMangaList.CONTENT_URI,
-//                new String[]{Contract.MangaReaderMangaList._ID,
-//                        Contract.MangaReaderMangaList.COLUMN_MANGA_NAME,
-//                        Contract.MangaReaderMangaList.COLUMN_MANGA_ID}, null, null, null);
-//        getActivity().getContentResolver().bulkInsert(Contract.VirtualTable.CONTENT_URI, unpack(cursor));
-//        cursor = getActivity().getContentResolver().query(Contract.MangaFoxMangaList.CONTENT_URI,
-//                new String[]{Contract.MangaReaderMangaList._ID,
-//                        Contract.MangaReaderMangaList.COLUMN_MANGA_NAME,
-//                        Contract.MangaReaderMangaList.COLUMN_MANGA_ID}, null, null, null);
-//        getActivity().getContentResolver().bulkInsert(Contract.VirtualTable.CONTENT_URI, unpack(cursor));
-//    }
-//
-//    ContentValues[] unpack(Cursor cursor){
-//        ContentValues[] cv = new ContentValues[cursor.getCount()];
-//        for(int i = 0; i<cursor.getCount(); i++){
-//            cursor.moveToPosition(i);
-//            ContentValues contentValues = new ContentValues();
-//            contentValues.put(Contract.MangaReaderMangaList.COLUMN_MANGA_NAME, cursor.getString(1));
-//            contentValues.put(Contract.MangaReaderMangaList.COLUMN_MANGA_ID, cursor.getString(2));
-//            cv[i] = contentValues;
-//        }
-//        return cv;
-//    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -360,7 +341,6 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Utilities.Log(LOG_TAG, " onCreateLoader");
         String sortOrder = null;
         try {
             sortOrder = getArguments().getString(SORT_ORDER);
@@ -395,42 +375,54 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
     public void onLoaderReset(Loader<Cursor> loader) {
     }
 
-
-    private BroadcastReceiver broadCastReceiver = new BroadcastReceiver() {
+    private LoaderManager.LoaderCallbacks<Cursor> latestListLoader = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return new CursorLoader(getActivity(),
+                    Contract.MangaReaderLatestList.CONTENT_URI,
+                    LATEST_COLUMNS,
+                    null, null, null);
 
-            if(intent.getExtras() != null) {
-                Bundle bundle = intent.getExtras();
-                String status = bundle.getString(DownloadMangaDatabase.STATUS);
-                String operation = bundle.getString(DownloadMangaDatabase.OP);
+        }
 
-                Utilities.Log(LOG_TAG, "onReceive op: " + operation + " status: " + status);
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            latestListAdapter.swapCursor(data);
+            Utilities.Log(LOG_TAG, "onLoadFinshed: " + data.getCount() + " items");
+        }
 
-                if (materialDialog != null) materialDialog.dismiss();
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
 
-                if(operation.equals("Done!")){
-                    materialDialog = new MaterialDialog.Builder(getActivity())
-                            .title(operation)
-                            .content(status)
-                            .build();
-                }
-                else{
-                    materialDialog = new MaterialDialog.Builder(getActivity())
-                            .title(operation)
-                            .content(status)
-                            .progress(true, 0)
-                            .build();
-                }
-            }
-
-            materialDialog.show();
-
-            }
-
+        }
     };
 
+    private LoaderManager.LoaderCallbacks<Cursor> popularListLoader = new LoaderManager.LoaderCallbacks<Cursor>() {
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            if(args != null && args.containsKey("uri"))
+                return new CursorLoader(getActivity(),
+                    Uri.parse(args.getString("uri")),
+                    POPULAR_COLUMNS,
+                    null, null, null);
 
+            return new CursorLoader(getActivity(),
+                    Contract.MangaReaderPopularList.CONTENT_URI,
+                    POPULAR_COLUMNS,
+                    null, null, null);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            popularListAdapter.swapCursor(data);
+            Utilities.Log(LOG_TAG, "onLoadFinshed: " + data.getCount() + " items");
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+
+        }
+    };
 
     private void showWelcomeDialog() {
         MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
@@ -447,6 +439,7 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
                         dialog.dismiss();
                         showProgressBar();
                         Intent intent = new Intent(getActivity(), DownloadMangaDatabase.class);
+                        intent.putExtra(DownloadMangaDatabase.FIX_SELECTION, WorkerThread.ALL_LIST);
                         getActivity().startService(intent);
                         Utilities.setFirstStart(getActivity(), false);
                     }

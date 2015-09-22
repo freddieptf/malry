@@ -19,8 +19,8 @@ import com.freddieptf.mangatest.mainUi.fragments.ListsFragment;
  */
 public class MangaLatestListAdapter extends CursorAdapter implements View.OnClickListener {
 
-    public MangaLatestListAdapter(Context context, Cursor c, int flags) {
-        super(context, c, flags);
+    public MangaLatestListAdapter(Context context, Cursor c) {
+        super(context, c, 0);
     }
 
     class ViewHolder{
