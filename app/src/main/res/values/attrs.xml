@@ -14,10 +14,5 @@
     <attr name="transparent_background_1" format="color"/>
     <attr name="transparent_background_2" format="color"/>
 
-    <attr name="genreStringList" format="reference"/>
-    <declare-styleable name="GenresView">
-        <attr name="genreStringList"/>
-    </declare-styleable>
-
 
 </resources>

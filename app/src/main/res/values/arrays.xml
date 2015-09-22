@@ -4,6 +4,9 @@
     <string-array name="pref_manga_sources_Entries">
         <item>@string/pref_manga_reader</item>
         <item>@string/pref_manga_fox</item>
+        <item>@string/pref_manga_reader_latest</item>
+        <item>@string/pref_manga_reader_popular</item>
+        <item>@string/pref_all_dbs</item>
     </string-array>
 
     <string-array name="pref_theme_entries">
@@ -30,5 +33,30 @@
         <item>@color/blue_secondary</item>
         <item>@color/accent</item>
     </integer-array>
+
+    <string-array name="genres">
+        <item>All</item>
+        <item>Action</item>
+        <item>Adventure</item>
+        <item>Comedy</item>
+        <item>Drama</item>
+        <item>Demons</item>
+        <item>Ecchi</item>
+        <item>Fantasy</item>
+        <item>Gender Bender</item>
+        <item>Harem</item>
+        <item>Josei</item>
+        <item>Martial Arts</item>
+        <item>Magic</item>
+        <item>Mystery</item>
+        <item>Psychological</item>
+        <item>Romance</item>
+        <item>School Life</item>
+        <item>Sci-Fi</item>
+        <item>Seinen</item>
+        <item>Shounen</item>
+        <item>Slice of Life</item>
+        <item>Supernatural</item>
+    </string-array>
 
 </resources>

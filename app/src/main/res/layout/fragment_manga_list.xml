@@ -30,7 +30,7 @@
         android:layout_gravity="bottom"
         android:background="@android:color/white"
         android:visibility="gone"
-        app:genreStringList="@array/genres"/>
+        />
 
 
 
