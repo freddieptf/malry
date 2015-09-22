@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.MangaEden;
+package com.freddieptf.mangatest.api.mangaeden;
 
 import android.content.ContentValues;
 import android.content.Context;
