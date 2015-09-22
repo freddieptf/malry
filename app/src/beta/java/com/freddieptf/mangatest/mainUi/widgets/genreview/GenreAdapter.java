@@ -23,31 +23,55 @@ import java.util.List;
 public class GenreAdapter extends RecyclerView.Adapter<GenreAdapter.GenreViewHolder>
     implements View.OnClickListener{
 
-    CharSequence[] genres = null;
+    CharSequence[] genres;
+    String genrePositions;
     SharedPreferences sharedPreferences;
     List<String> pref_list;
     MyColorUtils myColorUtils;
     final String PREF_GENRE = "pref_genre";
+    OnGenreChange genreChange;
 
-    public void setStringSource(CharSequence[] genres){
-        this.genres = genres;
-    }
 
-    public GenreAdapter(Context context){
+    public GenreAdapter(Context context, OnGenreChange genreChange){
+        genres = context.getResources().getTextArray(R.array.genres);
+        this.genreChange = genreChange;
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         pref_list = new ArrayList<>();
-        stringTolist(sharedPreferences.getString(PREF_GENRE, ""));
+        genrePositions = genreStringTolist(sharedPreferences.getString(PREF_GENRE, ""));
         myColorUtils = new MyColorUtils(context);
     }
 
-    void stringTolist(String s){
+    String genreStringTolist(String s){
         if(!s.isEmpty()) {
             String[] r = s.split(",");
             for (String t : r) {
-                if (!t.isEmpty()) pref_list.add(t);
+                if (!t.isEmpty()) pref_list.add(t.trim());
                 Utilities.Log("string to list", t);
             }
         }
+        Utilities.Log("string to list", s);
+
+        return s;
+    }
+
+    String posToString(String genrePositions){
+        if(!genrePositions.isEmpty()) {
+            String gs = "";
+            try {
+                String[] pos = genrePositions.split(",");
+                for (String s : pos) {
+                    gs = gs.concat(genres[Integer.parseInt(s.trim())].toString() + " ");
+                    Utilities.Log("pos to string", gs);
+                }
+            }catch (NumberFormatException | ArrayIndexOutOfBoundsException e){}
+
+            return gs;
+        }
+        return "";
+    }
+
+    public String getSelectedGenres(){
+        return posToString(genrePositions);
     }
 
     void processPos(int pos){
@@ -64,11 +88,13 @@ public class GenreAdapter extends RecyclerView.Adapter<GenreAdapter.GenreViewHol
             pref_list.add(pos + "");
         }
         for(String s : pref_list){
-            Utilities.Log("process pos", s);
-            store = store.concat(s + ",");
+            if(!s.trim().isEmpty()) {
+                store = store.concat(s + ", ");
+            }
         }
         editor.putString(PREF_GENRE, store);
         editor.apply();
+        genreChange.onGenreChange(posToString(store));
     }
 
     @Override
@@ -89,11 +115,15 @@ public class GenreAdapter extends RecyclerView.Adapter<GenreAdapter.GenreViewHol
         holder.textView.setText(genres[position]);
         holder.itemView.setOnClickListener(this);
         holder.itemView.setTag(position);
-
+// shoulda just used a list of ints gadddamit
         if(pref_list.size() > 0 && pref_list.contains(position + "")){
             holder.textView.setChecked(true);
             holder.textView.setTextColor(Color.WHITE);
             holder.textView.setBackgroundColor(myColorUtils.getAccentColor());
+        }else{
+            holder.textView.setChecked(false);
+            holder.textView.setTextColor(Color.DKGRAY);
+            holder.textView.setBackgroundColor(Color.TRANSPARENT);
         }
 
     }
@@ -108,9 +138,6 @@ public class GenreAdapter extends RecyclerView.Adapter<GenreAdapter.GenreViewHol
         public GenreViewHolder(View itemView) {
             super(itemView);
             textView = (CheckedTextView) itemView.findViewById(R.id.g_text);
-            textView.setChecked(false);
-            textView.setTextColor(Color.DKGRAY);
-            textView.setBackgroundColor(Color.TRANSPARENT);
         }
     }
 }

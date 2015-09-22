@@ -111,12 +111,20 @@ public class Settings extends BaseActivity implements Preference.OnPreferenceCha
                                 public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
 
                                     Intent intent = new Intent(getActivity(), DownloadMangaDatabase.class);
+                                    if(integers[0] == 4) materialDialog.setSelectedIndices(
+                                            new Integer[]{0, 1, 2, 3, 4});
 
-                                    //@TODO need options for the other lists
                                     if (integers.length == 1) {
-                                        intent.putExtra(DownloadMangaDatabase.FIX_SELECTION, integers[0]+1);
+                                        intent.putExtra(DownloadMangaDatabase.FIX_SELECTION, integers[0] + 1);
                                         startMeService(intent);
-                                    } else if (integers.length == 2) {
+                                    } else if (integers.length > 1) {
+                                        int[] ints = new int[integers.length];
+                                        int inc = 0;
+                                        for(Integer i : integers){
+                                            ints[inc] = i + 1;
+                                            inc++;
+                                        }
+                                        intent.putExtra(DownloadMangaDatabase.FIX_MULTIPLE_SELECTION, ints);
                                         startMeService(intent);
                                     } else {
                                         Toast.makeText(getActivity(), "Baka, you didn't choose anything!", Toast.LENGTH_SHORT).show();
@@ -126,7 +134,7 @@ public class Settings extends BaseActivity implements Preference.OnPreferenceCha
                                     return true;
                                 }
                             })
-                            .positiveText(getString(R.string.pref_fix_database_title))
+                            .positiveText(getString(R.string.download))
                             .negativeText("Cancel")
                             .build();
 

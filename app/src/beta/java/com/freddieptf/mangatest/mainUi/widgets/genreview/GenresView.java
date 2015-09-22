@@ -3,7 +3,6 @@ package com.freddieptf.mangatest.mainUi.widgets.genreview;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.support.v7.widget.GridLayoutManager;
@@ -20,7 +19,6 @@ import com.freddieptf.mangatest.R;
 public class GenresView extends FrameLayout {
 
     RecyclerView recyclerView;
-    CharSequence[] genres;
     GenreAdapter adapter;
     GenreViewUtils genreViewUtils;
 
@@ -28,7 +26,7 @@ public class GenresView extends FrameLayout {
         this(context, null);
     }
 
-    public void setVisibilityListener(GenreViewUtils genreViewUtils){
+    public void setGenreViewUtils(GenreViewUtils genreViewUtils){
         this.genreViewUtils = genreViewUtils;
     }
 
@@ -44,16 +42,19 @@ public class GenresView extends FrameLayout {
         recyclerView.setLayoutManager(new GridLayoutManager(context, 3));
         recyclerView.setHasFixedSize(true);
 
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.GenresView);
-        genres = typedArray.getTextArray(R.styleable.GenresView_genreStringList);
-        typedArray.recycle();
+        adapter = new GenreAdapter(context, new OnGenreChange() {
+            @Override
+            public void onGenreChange(String genres) {
+                genreViewUtils.onGenreChange(genres);
+            }
+        });
 
-        recyclerView.setItemViewCacheSize(genres.length);
-
-        adapter = new GenreAdapter(context);
-        adapter.setStringSource(genres);
         recyclerView.setAdapter(adapter);
 
+    }
+
+    public String getSelectedGenres(){
+        return adapter.getSelectedGenres();
     }
 
     public void show(){

@@ -5,5 +5,5 @@ package com.freddieptf.mangatest.mainUi.widgets.genreview;
  */
 public interface GenreViewUtils {
     void isGenreViewVisible(boolean isVisible);
-    void onGenreChange();
+    void onGenreChange(String genres);
 }
