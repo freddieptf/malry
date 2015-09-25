@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -39,7 +40,7 @@ import com.freddieptf.mangatest.data.Contract;
 import com.freddieptf.mangatest.mainUi.MainActivity;
 import com.freddieptf.mangatest.mainUi.MangaViewerActivity;
 import com.freddieptf.mangatest.mainUi.baseUi.BaseFragment;
-import com.freddieptf.mangatest.service.MangaRequestService;
+import com.freddieptf.mangatest.service.MangaDetailsRequestService;
 import com.freddieptf.mangatest.utils.PaletteHelper;
 import com.freddieptf.mangatest.utils.Utilities;
 import com.freddieptf.mangatest.volleyStuff.FadeInNetworkImageView;
@@ -138,7 +139,6 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
         MangaExists mangaExists = new MangaExists();
 
         if(savedInstanceState != null && savedInstanceState.containsKey(DETAILS_OBJECT)){
-            Utilities.Log(LOG_TAG, "save instance not null");
             cacheMangaDetailsObject = savedInstanceState.getParcelable(DETAILS_OBJECT);
             new PopulateViewsWithData(listView, cacheMangaDetailsObject).execute();
         }else if(savedInstanceState != null && savedInstanceState.containsKey("Faker")){
@@ -148,7 +148,7 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
         }
 
         if(savedInstanceState != null
-                && (savedInstanceState.containsKey(MANGA_COLOR) || savedInstanceState.containsKey(DARK_MANGA_COLOR))){
+                && (savedInstanceState.containsKey(MANGA_COLOR) && savedInstanceState.containsKey(DARK_MANGA_COLOR))){
             getMyColorUtils().setStatusBarColor(savedInstanceState.getInt(DARK_MANGA_COLOR));
             MainActivity.toolbarBig.setBackgroundColor(savedInstanceState.getInt(MANGA_COLOR));
             animate = false;
@@ -185,7 +185,7 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
                         public void onPositive(MaterialDialog dialog) {
                             super.onPositive(dialog);
                             FetchMangaChapter fetchMangaChapter = new FetchMangaChapter(getActivity());
-                            fetchMangaChapter.execute(name, ch.chapter_id);
+                            fetchMangaChapter.execute(name, ch.chapter_id, source);
                         }
 
                         @Override
@@ -238,13 +238,13 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().registerReceiver(broadcastReceiver, new IntentFilter(MangaRequestService.LOG_TAG));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver, new IntentFilter(MangaDetailsRequestService.LOG_TAG));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        getActivity().unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
     }
 
     @Override
@@ -322,7 +322,7 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
             if(!mangaExists){
                 if(Utilities.isOnline(getActivity())) {
                     showProgressBar();
-                    Intent intent = new Intent(getActivity(), MangaRequestService.class);
+                    Intent intent = new Intent(getActivity(), MangaDetailsRequestService.class);
                     intent.putExtra("ID", mangaId);
                     intent.putExtra("SOURCE", source);
                     getActivity().startService(intent);
