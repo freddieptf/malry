@@ -3,9 +3,8 @@ package com.freddieptf.mangatest.mainUi.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -13,11 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.freddieptf.mangatest.R;
-import com.freddieptf.mangatest.adapters.DownloadsPagerAdapter;
 import com.freddieptf.mangatest.adapters.FilesAdapter;
 import com.freddieptf.mangatest.mainUi.MainActivity;
 import com.freddieptf.mangatest.mainUi.MangaViewerActivity;
 import com.freddieptf.mangatest.mainUi.baseUi.BaseFragment;
+import com.freddieptf.mangatest.recyclerviewdecor.DividerItemDecoration;
 import com.freddieptf.mangatest.recyclerviewdecor.swipestuff.ItemDismissedHelper;
 import com.freddieptf.mangatest.recyclerviewdecor.swipestuff.ItemTouchHelperCallback;
 
@@ -26,8 +25,7 @@ import java.io.File;
 /**
  * Created by fred on 2/23/15.
  */
-public class DownloadsFragment extends BaseFragment implements FilesAdapter.SwipeListener,
-        DownloadsPagerAdapter.DonwloadsPagerHelper {
+public class DownloadsFragment extends BaseFragment implements FilesAdapter.SwipeListener {
 
     FilesAdapter filesAdapter;
     String[] filePaths;
@@ -37,13 +35,7 @@ public class DownloadsFragment extends BaseFragment implements FilesAdapter.Swip
     public final String LOG_TAG = getClass().getSimpleName();
     ItemDismissedHelper itemDismissedHelper;
     boolean lockdrawer;
-    ViewPager viewPager;
     ItemTouchHelper itemTouchHelper;
-
-    @Override
-    protected boolean showTabs() {
-        return !lockdrawer;
-    }
 
     @Override
     protected boolean lockDrawer() {
@@ -132,24 +124,12 @@ public class DownloadsFragment extends BaseFragment implements FilesAdapter.Swip
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(filesAdapter);
         itemTouchHelper = new ItemTouchHelper(callback);
 
-        TabLayout tabLayout = getMainActivityHelper().getTabs();
-        viewPager = (ViewPager) view.findViewById(R.id.pager);
-        viewPager.setAdapter(new DownloadsPagerAdapter(this));
-        tabLayout.setupWithViewPager(viewPager);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
+        recyclerView.setAdapter(filesAdapter);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
 
-
-    }
-
-    @Override
-    public void getRecyclerView(int position, RecyclerView recyclerView) {
-        switch (position){
-            case 0:
-                recyclerView.setAdapter(filesAdapter);
-                itemTouchHelper.attachToRecyclerView(recyclerView);
-                break;
-            case 1:
-                break;
-        }
     }
 
     @Override

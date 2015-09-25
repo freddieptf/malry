@@ -1,149 +1,106 @@
 package com.freddieptf.mangatest.service;
 
-import android.app.IntentService;
+import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.Service;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.Environment;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.freddieptf.mangatest.R;
+import com.freddieptf.mangatest.api.Downloader;
 import com.freddieptf.mangatest.beans.NetworkChapterAttrs;
+import com.freddieptf.mangatest.utils.MyColorUtils;
 import com.freddieptf.mangatest.utils.Utilities;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
- * Created by fred on 2/25/15.
+ * Created by fred on 9/7/15.
  */
-public class MangaDownloadService extends IntentService {
+public class MangaDownloadService extends Service implements Downloader.PublishProgress {
 
     public static final String ARRAY_LIST = "array_list";
-    NotificationManager notificationManager;
+    String LOG_TAG = getClass().getSimpleName();
+    Downloader downloader;
     NotificationCompat.Builder builder;
-    final int NOTIFICATION_ID = 1001;
-    public static final String FILTER = "com.freddieptf.mangatest";
-    private final String LOG_TAG = getClass().getSimpleName();
-    File parent;
+    NotificationManager notificationManager;
+    final int queued = new Random().nextInt(100000);
 
-    public MangaDownloadService() {
-        super("MangaDownloadService");
-    }
-
-
+    @Nullable
     @Override
-    protected void onHandleIntent(Intent intent) {
-
-        Log.d(LOG_TAG, "Handling intent");
-        notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        builder = new NotificationCompat.Builder(getApplicationContext());
-
-
-        final ArrayList<NetworkChapterAttrs> mangaChapterAttrs = (ArrayList<NetworkChapterAttrs>) intent.getExtras().get(ARRAY_LIST);
-        final String parentDirectory = Environment.getExternalStorageDirectory().toString();
-        final String manga = mangaChapterAttrs.get(0).getName();
-
-        final String chapter = mangaChapterAttrs.get(0).getChapter();
-        final String chapterTitle = mangaChapterAttrs.get(0).getChapterTitle();
-
-        builder.setContentTitle(manga + " " + chapter).setSmallIcon(R.drawable.ic_stat_maps_local_library);
-        builder.setContentText("connecting...").setProgress(0, 0, true);
-        notificationManager.notify(NOTIFICATION_ID, builder.build());
-
-        if (Utilities.externalStorageMounted()) {
-
-            parent = new File(parentDirectory + "/MangaTest/" + manga + "/" + chapter + ": " + chapterTitle);
-            ArrayList<ImageData> imageDataArrayList = new ArrayList<>();
-
-            if (!parent.exists() || parent.listFiles().length != mangaChapterAttrs.size() - 1) {
-                parent.mkdirs();
-
-                for (int i = 1; i < mangaChapterAttrs.size(); i++) {
-                    Log.i("Page " + i, mangaChapterAttrs.get(i).getImageUrl());
-                    ImageData imageData = new ImageData();
-                    imageData.setImageUrl(mangaChapterAttrs.get(i).getImageUrl());
-                    imageData.setPageId(mangaChapterAttrs.get(i).getPageId());
-                    imageDataArrayList.add(imageData);
-                }
-
-                Log.d(LOG_TAG + "1st size Test, ", "Size: " + imageDataArrayList.size());
-
-                downloadStuff(imageDataArrayList);
-
-            } else{
-                Toast.makeText(getApplicationContext(), "Already there", Toast.LENGTH_SHORT).show();
-            }
-
-        }
-
-
-    }
-
-
-    @SafeVarargs
-    protected final Void downloadStuff(ArrayList<ImageData>... arrayLists) {
-
-        ArrayList<ImageData> imageDatas = arrayLists[0];
-        Log.i(LOG_TAG + " 2nd Test DoInBacG", "Size: " + imageDatas.size());
-
-        for(int i = 0; i < imageDatas.size(); i++){
-            Bitmap bitmap = Utilities.DownloadBitmapFromUrl(imageDatas.get(i).getImageUrl());
-            String pageId = imageDatas.get(i).getPageId();
-
-            File file = new File(parent, pageId + ".jpg");
-
-            try {
-                FileOutputStream fileOutputStream = new FileOutputStream(file);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, fileOutputStream);
-                fileOutputStream.flush();
-                fileOutputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e(LOG_TAG + " ImageRequest: ", e.toString());
-            }
-
-            builder.setContentText("downloading").setProgress(imageDatas.size(), i, false).setPriority(2);
-            notificationManager.notify(NOTIFICATION_ID, builder.build());
-        }
-
-        builder.setContentText("Download complete.").setProgress(0, 0, false);
-        notificationManager.notify(NOTIFICATION_ID, builder.build());
-        Log.d(LOG_TAG, "Download Complete");
-
-        Intent intent = new Intent(FILTER);
-        intent.putExtra("DONE", "Download Complete!");
-        sendBroadcast(intent);
-
+    public IBinder onBind(Intent intent) {
         return null;
     }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        downloader = Downloader.getInstance();
+        downloader.setProgressListener(this);
+        builder = new NotificationCompat.Builder(this);
+        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+    }
 
-    private class ImageData{
-        String imageUrl, pageId;
+    @Override
+    public void onPublishProgress(Downloader.ProgressData progressData) {
+        int max = progressData.getMax();
+        int progress = progressData.getProgress() + 1;
 
-        public String getImageUrl() {
-            return imageUrl;
-        }
+        builder.setContentTitle(progressData.getMangaName() + " " + progressData.getChapter());
+        builder.setContentText("downloading " + progress + "/" + max)
+                .setProgress(max, progress, false);
+        notificationManager.notify(progressData.getId(), builder.build());
+        if(progress == max) notificationManager.cancel(progressData.getId());
+    }
 
-        public void setImageUrl(String imageUrl) {
-            this.imageUrl = imageUrl;
-        }
-
-        public String getPageId() {
-            return pageId;
-        }
-
-        public void setPageId(String pageId) {
-            this.pageId = pageId;
-        }
+    @Override
+    public void activeDownloads(int numOfActiveDownloads) {
+        Utilities.Log(LOG_TAG, "downloads: " + numOfActiveDownloads);
+        if(numOfActiveDownloads > Downloader.MAX_RUNNING_DOWNLOADS) {
+            builder.setContentTitle("Added to Queue");
+            builder.setContentText((downloader.getJobs() - 3) + " download(s) queued.")
+                    .setProgress(0, 0, true);
+            builder.setPriority(Notification.PRIORITY_LOW);
+            notificationManager.notify(queued, builder.build());
+        } else
+            notificationManager.cancel(queued);
 
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Utilities.Log(LOG_TAG, "start command");
 
+        final ArrayList<NetworkChapterAttrs> mangaChapterAttrs =
+                (ArrayList<NetworkChapterAttrs>) intent.getExtras().get(ARRAY_LIST);
+
+        Random random = new Random();
+        int id = random.nextInt(100);
+
+        builder.setContentTitle(mangaChapterAttrs.get(0).getName() + " " +
+                mangaChapterAttrs.get(0).getChapter()).setSmallIcon(R.drawable.ic_stat_maps_local_library);
+        builder.setColor(new MyColorUtils(this).getAccentColor());
+        builder.setContentText("connecting...").setProgress(0, 0, true);
+        builder.setPriority(Notification.PRIORITY_HIGH);
+
+        downloader.submitDownload(mangaChapterAttrs, id);
+
+        if(downloader.getJobs() <= Downloader.MAX_RUNNING_DOWNLOADS){
+            notificationManager.notify(id, builder.build());
+        }
+
+
+        return START_NOT_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Utilities.Log(LOG_TAG, "destroyed");
+        downloader.shutdownDownloader();
+    }
 
 }

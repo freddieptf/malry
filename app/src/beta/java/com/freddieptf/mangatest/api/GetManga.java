@@ -159,14 +159,7 @@ public class GetManga {
             mangaDetailsObject.setCover(cover);
             mangaDetailsObject.setChapters(chapters);
 
-
-            Log.d(LOG_TAG, "Manga Chapters: " + chapters);
-            Log.d(LOG_TAG, "Manga author: " + author);
-            Log.d(LOG_TAG, "Manga lastUpdate: " + lastUpdate);
             Log.d(LOG_TAG, "Manga Name: " + name);
-            Log.d(LOG_TAG, "Manga status: " + status);
-            Log.d(LOG_TAG, "Manga info: " + info);
-            Log.d(LOG_TAG, "Manga cover: " + cover);
 
 
         } catch (JSONException e) {

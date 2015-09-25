@@ -73,6 +73,16 @@ public class MangaDetailsObject implements Parcelable {
     String chapters;
     String lastUpdate;
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    String source;
+
     @Override
     public int describeContents() {
         return 0;
@@ -87,6 +97,7 @@ public class MangaDetailsObject implements Parcelable {
         parcel.writeString(author);
         parcel.writeString(chapters);
         parcel.writeString(lastUpdate);
+        parcel.writeString(source);
 
     }
 
@@ -106,6 +117,7 @@ public class MangaDetailsObject implements Parcelable {
         author = in.readString();
         chapters = in.readString();
         lastUpdate = in.readString();
+        source = in.readString();
     }
 
     public static final Creator<MangaDetailsObject> CREATOR = new Creator<MangaDetailsObject>() {

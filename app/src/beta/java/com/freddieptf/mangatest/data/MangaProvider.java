@@ -329,53 +329,6 @@ public class MangaProvider extends ContentProvider {
                 break;
             }
 
-//            case MANGAREADER_LIST: {
-//                long id = db.insert(MangaReaderMangaList.TABLE_NAME, null, contentValues);
-//                if(id > 0) {
-//                    returnUri = MangaReaderMangaList.buildMangaListUri(id);
-//                }else{
-//                    throw new android.database.SQLException("Failed to insert: " + uri);
-//                }
-//                break;
-//            }
-//
-//            case MANGAREADER_LATEST_LIST: {
-//                long id = db.insert(MangaReaderLatestList.TABLE_NAME, null, contentValues);
-//                if(id > 0) returnUri = MangaReaderLatestList.buildMangaReaderLatestListUri(id);
-//                else throw new android.database.SQLException("Failed to insert: " + uri);
-//                break;
-//            }
-//
-//            case MANGAFOX_LIST: {
-//                long id = db.insert(MangaFoxMangaList.TABLE_NAME, null, contentValues);
-//                if(id > 0) {
-//                    returnUri = MangaFoxMangaList.buildMangaListUri(id);
-//                }else{
-//                    throw new android.database.SQLException("Failed to insert: " + uri);
-//                }
-//                break;
-//            }
-//
-//            case MANGA_EDEN: {
-//                long id = db.insert(MangaEden.TABLE_NAME, null, contentValues);
-//                if(id > 0) {
-//                    returnUri = MangaEden.buildMangaUri(id);
-//                }else{
-//                    throw new android.database.SQLException("Failed to insert: " + uri);
-//                }
-//                break;
-//            }
-//
-//            case VIRTUAL_TABLE: {
-//                long id = db.insert(VirtualTable.TABLE_NAME, null, contentValues);
-//                if(id > 0){
-//                    returnUri = VirtualTable.buildVirtualMangaUri(id);
-//                }else {
-//                    throw new android.database.SQLException("Failed to insert: " + uri);
-//                }
-//                break;
-//            }
-
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
@@ -449,7 +402,8 @@ public class MangaProvider extends ContentProvider {
 
         }
 
-        getContext().getContentResolver().notifyChange(MangaReaderMangaList.CONTENT_URI, null);
+        //notify so the cursor loaders can restart with the new data
+        getContext().getContentResolver().notifyChange(uri, null);
         return inserted;
     }
 

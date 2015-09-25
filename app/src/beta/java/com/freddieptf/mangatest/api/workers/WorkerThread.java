@@ -6,10 +6,10 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
-import com.freddieptf.mangatest.api.helperInterfaces.GetListListener;
-import com.freddieptf.mangatest.api.helperInterfaces.InsertListener;
 import com.freddieptf.mangatest.api.MangaFox;
 import com.freddieptf.mangatest.api.MangaReader;
+import com.freddieptf.mangatest.api.helperInterfaces.GetListListener;
+import com.freddieptf.mangatest.api.helperInterfaces.InsertListener;
 import com.freddieptf.mangatest.data.Contract;
 import com.freddieptf.mangatest.utils.Utilities;
 
@@ -31,7 +31,7 @@ public class WorkerThread extends Thread {
     NotificationManager notificationManager;
 
     final String LOG_TAG = getClass().getSimpleName();
-    public static final int ALL_LIST = 0;
+    public static final int ALL_LIST = 5;
     public static final int READER_ALPHA_LIST = 1;
     public static final int FOX_ALPHA_LIST = 2;
     public static final int READER_LATEST_LIST = 3;
@@ -50,9 +50,6 @@ public class WorkerThread extends Thread {
     public void run() {
         for(int task : tasks) {
             switch (task) {
-                case 0:
-                    Utilities.Log(LOG_TAG, "ALL BLUE");
-                    break;
                 case READER_ALPHA_LIST:
                     mangaReader.getMangaList(new GetListListener() {
                         @Override
@@ -60,7 +57,8 @@ public class WorkerThread extends Thread {
                             Utilities.Log(LOG_TAG, "Reader Alphabet list: " + list.size());
                             if(list.size() > 0) {
                                 context.getContentResolver().delete(Contract.MangaReaderMangaList.CONTENT_URI, null, null);
-                                InsertCall insertCall = new InsertCall(list, Contract.MangaReaderMangaList.CONTENT_URI, context);
+                                context.getContentResolver().delete(Contract.VirtualTable.CONTENT_URI, null, null);
+                                final InsertCall insertCall = new InsertCall(list, Contract.MangaReaderMangaList.CONTENT_URI, context);
                                 service.submit(insertCall);
 
                                 insertCall.setInsertDoneListener(new InsertListener() {
@@ -81,6 +79,8 @@ public class WorkerThread extends Thread {
                             Utilities.Log(LOG_TAG, "Fox Alphabet: " + list.size());
                             if (list.size() > 0) {
                                 context.getContentResolver().delete(Contract.MangaFoxMangaList.CONTENT_URI, null, null);
+//                                context.getContentResolver().delete(Contract.VirtualTable.CONTENT_URI, null, null);
+
                                 InsertCall insertCall = new InsertCall(list, Contract.MangaFoxMangaList.CONTENT_URI, context);
                                 service.submit(insertCall);
 
@@ -144,6 +144,7 @@ public class WorkerThread extends Thread {
         //calling service.shutdown here causes the executor service to
         // shutdown (almost immediately) before anything is submitted to it...wut?
         shutdown();
+
 
     }
 

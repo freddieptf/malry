@@ -5,7 +5,7 @@
 
     <!--mangalist fragment menu-->
 
-    <item android:title="Search"
+    <item android:title="@string/string_search"
         android:id="@+id/menu_search"
         android:icon="@drawable/ic_action_search"
         app:showAsAction="always"
@@ -14,7 +14,7 @@
         android:visible="false"
         />
 
-    <item android:title="Filter by Genre"
+    <item android:title="@string/string_filter"
         android:id="@+id/menu_filter"
         android:icon="@drawable/ic_filter_list_white_24dp"
         app:showAsAction="ifRoom"
@@ -42,14 +42,14 @@
     <!--my manga fragment menu-->
 
     <item android:checkable="true"
-        android:title="Compact cards"
+        android:title="@string/pref_my_manga_cards_compact"
         android:id="@+id/menu_prefCompactCards"
         app:showAsAction="never"
         android:orderInCategory="100"
         android:visible="false"
         />
 
-    <item android:title="Update"
+    <item android:title="@string/string_check4updates"
         android:id="@+id/menu_updateManga"
         android:orderInCategory="200"
         android:visible="false"

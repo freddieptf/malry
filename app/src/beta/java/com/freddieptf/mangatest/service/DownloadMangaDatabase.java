@@ -27,6 +27,7 @@ public class DownloadMangaDatabase extends Service {
     public static final String OP = "operation";
     public static final String STATUS = "status";
     public static final String FIX_SELECTION = "fix_selection";
+    public static final String FIX_MULTIPLE_SELECTION = "fix_multiple_selection";
 
     @Override
     public void onCreate() {
@@ -50,32 +51,36 @@ public class DownloadMangaDatabase extends Service {
             Worker worker = Worker.getInstance();
 
             if (intent.getExtras() != null) {
-                switch (intent.getIntExtra(FIX_SELECTION, 100)) {
-                    case WorkerThread.READER_ALPHA_LIST:
-                        service.submit(worker.getWorkerThread(this, WorkerThread.READER_ALPHA_LIST));
-                        break;
-                    case WorkerThread.FOX_ALPHA_LIST:
-                        service.submit(worker.getWorkerThread(this, WorkerThread.FOX_ALPHA_LIST));
-                        break;
-                    case WorkerThread.READER_LATEST_LIST:
-                        service.submit(worker.getWorkerThread(this, WorkerThread.READER_LATEST_LIST));
-                        break;
-                    case WorkerThread.READER_POPULAR_LIST:
-                        service.submit(worker.getWorkerThread(this, WorkerThread.READER_POPULAR_LIST));
-                        break;
-                    default:
-                        Utilities.Log(LOG_TAG, "default");
-                        break;
+                if(intent.getExtras().containsKey(FIX_SELECTION)) {
+                    switch (intent.getIntExtra(FIX_SELECTION, 100)) {
+                        case WorkerThread.READER_ALPHA_LIST:
+                            service.submit(worker.getWorkerThread(this, WorkerThread.READER_ALPHA_LIST));
+                            break;
+                        case WorkerThread.FOX_ALPHA_LIST:
+                            service.submit(worker.getWorkerThread(this, WorkerThread.FOX_ALPHA_LIST));
+                            break;
+                        case WorkerThread.READER_LATEST_LIST:
+                            service.submit(worker.getWorkerThread(this, WorkerThread.READER_LATEST_LIST));
+                            break;
+                        case WorkerThread.READER_POPULAR_LIST:
+                            service.submit(worker.getWorkerThread(this, WorkerThread.READER_POPULAR_LIST));
+                            break;
+                        case WorkerThread.ALL_LIST:
+                            service.submit(worker.getWorkerThread(this,
+                                    WorkerThread.FOX_ALPHA_LIST,
+                                    WorkerThread.READER_POPULAR_LIST,
+                                    WorkerThread.READER_LATEST_LIST,
+                                    WorkerThread.READER_ALPHA_LIST
+                            ));
+                            break;
+                        default:
+                            Utilities.Log(LOG_TAG, "default");
+                            break;
+                    }
+                }else if(intent.getExtras().containsKey(FIX_MULTIPLE_SELECTION)){
+                    service.submit(worker.getWorkerThread(this, intent.getIntArrayExtra(FIX_MULTIPLE_SELECTION)));
                 }
-            } else {
-                service.submit(worker.getWorkerThread(this,
-                        WorkerThread.FOX_ALPHA_LIST,
-                        WorkerThread.READER_POPULAR_LIST,
-                        WorkerThread.READER_LATEST_LIST,
-                        WorkerThread.READER_ALPHA_LIST
-                        ));
             }
-
 
             service.shutdown();
         }

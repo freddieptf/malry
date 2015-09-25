@@ -2,7 +2,6 @@ package com.freddieptf.mangatest.mainUi;
 
 import android.graphics.Color;
 import android.net.http.HttpResponseCache;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
@@ -30,8 +29,6 @@ import com.freddieptf.mangatest.utils.ThemeUtilities;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
 
 public class MainActivity extends BaseActivity implements FragmentManager.OnBackStackChangedListener,
@@ -92,25 +89,25 @@ public class MainActivity extends BaseActivity implements FragmentManager.OnBack
 
         setDrawerUp();
 
-        try {
-
-            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH){
-                File httpCacheDir = new File(this.getCacheDir(), "http");
-                long httpCacheSize = 10 * 1024 * 1024; // 10 MiB
-                HttpResponseCache.install(httpCacheDir, httpCacheSize);
-
-            }else {
-
-                File httpCacheDir = new File(this.getCacheDir(), "http");
-                long httpCacheSize = 10 * 1024 * 1024; // 10 MiB
-                Class.forName("android.net.http.HttpResponseCache")
-                        .getMethod("install", File.class, long.class)
-                        .invoke(null, httpCacheDir, httpCacheSize);
-            }
-        } catch (IOException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException
-                | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+//        try {
+//
+//            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH){
+//                File httpCacheDir = new File(this.getCacheDir(), "http");
+//                long httpCacheSize = 10 * 1024 * 1024; // 10 MiB
+//                HttpResponseCache.install(httpCacheDir, httpCacheSize);
+//
+//            }else {
+//
+//                File httpCacheDir = new File(this.getCacheDir(), "http");
+//                long httpCacheSize = 10 * 1024 * 1024; // 10 MiB
+//                Class.forName("android.net.http.HttpResponseCache")
+//                        .getMethod("install", File.class, long.class)
+//                        .invoke(null, httpCacheDir, httpCacheSize);
+//            }
+//        } catch (IOException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException
+//                | IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
 
 
 

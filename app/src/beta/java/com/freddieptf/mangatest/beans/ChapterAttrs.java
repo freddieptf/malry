@@ -1,5 +1,7 @@
 package com.freddieptf.mangatest.beans;
 
+import com.freddieptf.mangatest.utils.Utilities;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
  */
 public class ChapterAttrs {
 
+    final String LOG_TAG = getClass().getSimpleName();
     public String chapter_id, chapter_title;
 
     public ChapterAttrs(JSONObject object){
@@ -18,7 +21,7 @@ public class ChapterAttrs {
             chapter_id = object.getString("chapterId");
             chapter_title = object.getString("name");
         } catch (JSONException e) {
-            e.printStackTrace();
+            Utilities.Log(LOG_TAG, e.getMessage());
         }
 
 
@@ -33,7 +36,7 @@ public class ChapterAttrs {
                      chapters.add(c);
 
                 }catch (JSONException e) {
-                        e.printStackTrace();
+                    Utilities.Log("chapterAttrs", e.getMessage());
                     }
 
         }

@@ -18,24 +18,17 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.freddieptf.mangatest.R;
+import com.freddieptf.mangatest.api.GetManga;
+import com.freddieptf.mangatest.beans.MangaDetailsObject;
 import com.freddieptf.mangatest.data.Contract;
 import com.freddieptf.mangatest.mainUi.MainActivity;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,227 +42,91 @@ public class MangaTestSyncAdapter extends AbstractThreadedSyncAdapter {
     final public static String NOTIFY_UPDATE = "notify_update";
     public static final int SYNC_INTERVAL = 60 * 720; // 12 hours...i think
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 2;
-    ContentResolver mContentResolver;
 
-    String ls;
-
+    final int MANGA_ID = 1;
+    final int MANGA_NAME = 2;
+    final int MANGA_CHAPTER_JSON = 3;
+    final int MANGA_SOURCE = 4;
+    final int MANGA_COVER = 5;
 
     public MangaTestSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
-        mContentResolver = context.getContentResolver();
-
     }
 
     @Override
     public void onPerformSync(Account account, Bundle bundle, String s, ContentProviderClient contentProviderClient, SyncResult syncResult) {
 
-        Cursor cursor = mContentResolver
-                .query(Contract.MyManga.CONTENT_URI,
-                        new String[]{Contract.MyManga._ID, Contract.MyManga.COLUMN_MANGA_NAME, Contract.MyManga.COLUMN_MANGA_CHAPTER_JSON},
-                        null, null, null);
+        List<String> updated = new ArrayList<>();
+        GetManga getManga = new GetManga(getContext());
 
-        String[] mangaTitles;
-        String[] mangaChapterJsonLocal;
-        String[] mangaChapterJsonUpdate;
+        Cursor cursor = getContext().getContentResolver().query(
+                Contract.MyManga.CONTENT_URI,
+                new String[]{Contract.MyManga._ID,
+                        Contract.MyManga.COLUMN_MANGA_ID,
+                        Contract.MyManga.COLUMN_MANGA_NAME,
+                        Contract.MyManga.COLUMN_MANGA_CHAPTER_JSON,
+                        Contract.MyManga.COLUMN_MANGA_SOURCE,
+                        Contract.MyManga.COLUMN_MANGA_COVER},
+                null, null, null);
 
-        if (cursor.moveToFirst()) {
-            mangaTitles = new String[cursor.getCount()];
-            mangaChapterJsonLocal = new String[cursor.getCount()];
 
-            Log.d(LOG_TAG, "cursor: " + cursor.getCount());
-
-            for (int i = 0; i < cursor.getCount(); i++) {
-                mangaTitles[i] = cursor.getString(1);
-                mangaChapterJsonLocal[i] = cursor.getString(2);
-                Log.d(LOG_TAG, mangaChapterJsonLocal[i]);
-                cursor.moveToNext();
-            }
-
-            Log.d(LOG_TAG, "mangaTitles: " + mangaTitles.length);
-
-            Cursor[] mangaIdCursors = new Cursor[mangaTitles.length];
-
-            for (int i = 0; i < mangaTitles.length; i++) {
-
-                Uri mangaUri = Contract.MangaFoxMangaList.buildMangaInListWithNameUri(mangaTitles[i]);
-                mangaIdCursors[i] = mContentResolver.query(mangaUri,
-                        new String[]{Contract.MangaFoxMangaList.COLUMN_MANGA_ID},
-                        null, null, null);
-
-                if (mangaIdCursors[i].moveToFirst()) {
-                    Log.d(LOG_TAG, "1: " + mangaIdCursors[i].getString(0));
-                }
-
-                if (!mangaIdCursors[i].moveToFirst() || mangaIdCursors[i] == null) {
-                    mangaUri = Contract.MangaReaderMangaList.buildMangaInListWithNameUri(mangaTitles[i]);
-                    mangaIdCursors[i] = mContentResolver.query(mangaUri,
-                            new String[]{Contract.MangaReaderMangaList.COLUMN_MANGA_ID},
-                            null, null, null);
-                    mangaIdCursors[i].moveToFirst();
-                    Log.d(LOG_TAG, "2: " + mangaIdCursors[i].getString(0));
-
-                }
-
-            }
-
-            Log.d(LOG_TAG, "Cursor(mangaIds): " + mangaIdCursors.length);
-
-            mangaChapterJsonUpdate = new String[mangaIdCursors.length];
-            String[] coverUrl = new String[mangaIdCursors.length];
-
-            for (int i = 0; i < mangaIdCursors.length; i++) {
-
+        if(cursor != null && cursor.moveToFirst()){
+            do{
                 try {
-                    mangaIdCursors[i].moveToFirst();
+                    MangaDetailsObject detailsObject =
+                            getManga.getManga(cursor.getString(MANGA_ID), cursor.getString(MANGA_SOURCE));
+                    JSONArray localChapters = new JSONArray(cursor.getString(MANGA_CHAPTER_JSON));
+                    JSONArray freshChapters = new JSONArray(detailsObject.getChapters());
 
-                    URL url =
-                            new URL("https://doodle-manga-scraper.p.mashape.com/mangafox.me/manga/"
-                                    + mangaIdCursors[i].getString(0) + "/");
+                    String last_local = localChapters.getJSONObject(localChapters.length() - 1).getString("chapterId");
+                    String last_fresh = freshChapters.getJSONObject(freshChapters.length() - 1).getString("chapterId");
 
-                    URL url1 = new URL("https://doodle-manga-scraper.p.mashape.com/mangareader.net/manga/"
-                            + mangaIdCursors[i].getString(0) + "/");
+                    Uri uri = Contract.MyManga.buildMangaWithNameUri(detailsObject.getName());
 
+                    if(!last_local.equals(last_fresh)) {
+                        ContentValues cv = new ContentValues();
+                        cv.put(Contract.MyManga.COLUMN_MANGA_CHAPTER_JSON, detailsObject.getChapters());
+                        getContext().getContentResolver().update(uri, cv, null, null);
+                        getContext().getContentResolver().notifyChange(uri, null);
 
-                    mangaChapterJsonUpdate[i] = getMangaJson(url);
-
-                    if (mangaChapterJsonUpdate[i].isEmpty()){
-                        mangaChapterJsonUpdate[i] = getMangaJson(url1);
+                        Utilities.writeMangaPageToPrefs(getContext(), cursor.getString(MANGA_ID),
+                                (Integer.parseInt(last_fresh.trim()) - Integer.parseInt(last_local.trim())));
+                        updated.add(detailsObject.getName());
+                        Utilities.Log(LOG_TAG, detailsObject.getName() + ": updated");
+                    }else{
+                        Utilities.Log(LOG_TAG, detailsObject.getName() + ": No update");
                     }
 
-
-
-
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            Log.d(LOG_TAG, "mangaChaptersJsonUpdate: " + mangaChapterJsonUpdate.length);
-            String change = "noChange";
-            int updates = 0;
-            List<String> updatedMangalist = new ArrayList<>();
-
-            for (int i = 0; i < mangaChapterJsonUpdate.length; i++) {
-
-                try {
-                    if (new JSONArray(mangaChapterJsonUpdate[i]).length()
-                            > new JSONArray(mangaChapterJsonLocal[i]).length()) {
-
-                        JSONArray array = new JSONArray(mangaChapterJsonLocal[i]);
-                        JSONArray array2 = new JSONArray(mangaChapterJsonUpdate[i]);
-
-                        if (!array.getJSONObject((array.length() - 1)).getString("chapterId")
-                                .equals(array2.getJSONObject((array2.length() - 1)).getString("chapterId"))) {
-
-                            Log.d(LOG_TAG, array.getJSONObject((array.length() - 1)).toString());
-                            Log.d(LOG_TAG, array2.getJSONObject((array2.length() - 1)).toString());
-
-                            String oldId = array.getJSONObject((array.length() - 1)).getString("chapterId");
-                            String newId = array2.getJSONObject((array2.length() - 1)).getString("chapterId");
-                            double o = Double.parseDouble(oldId);
-                            double n = Double.parseDouble(newId);
-
-                            if (n > o) {
-
-                                Log.d(LOG_TAG, mangaTitles[i] + ": updated");
-                                change = "change";
-
-                                int updateMargin = (int) (n - o);
-                                Log.d(LOG_TAG, oldId + " " + newId);
-
-                                Uri uri = Contract.MyManga.buildMangaWithNameUri(mangaTitles[i]);
-                                ContentValues contentValues = new ContentValues();
-                                contentValues.put(Contract.MyManga.COLUMN_MANGA_CHAPTER_JSON, mangaChapterJsonUpdate[i]);
-
-                                mContentResolver.update(uri, contentValues, null, null);
-                                mContentResolver.notifyChange(uri, null, false);
-
-                                Cursor c = mContentResolver.query(uri, new String[]{Contract.MyManga.COLUMN_MANGA_ID},
-                                        null, null, null);
-
-                                c.moveToFirst();
-                                String result = c.getString(0);
-                                Utilities.writeMangaPageToPrefs(getContext(), result, updateMargin);
-                                c.close();
-
-                                updates++;
-                                updatedMangalist.add(mangaTitles[i]);
-
-                            }
-
-                        }
-
+                    if(!cursor.getString(MANGA_COVER).equals(detailsObject.getCover())){
+                        ContentValues cv = new ContentValues();
+                        cv.put(Contract.MyManga.COLUMN_MANGA_COVER, detailsObject.getCover());
+                        getContext().getContentResolver().update(uri, cv, null, null);
                     }
-                } catch (JSONException e) {
+
+                }catch (JSONException e){
                     e.printStackTrace();
                 }
 
-            }
 
-            mContentResolver.notifyChange(Contract.MyManga.CONTENT_URI, null, false);
+            } while(cursor.moveToNext());
 
-            //@TODO broadcast receiver in main activity just incase it updates while the app is active..SET THIS UP
-            Intent broadCastIntent = new Intent(LOG_TAG);
-            broadCastIntent.putExtra(NOTIFY_UPDATE, change);
-            getContext().sendBroadcast(broadCastIntent);
-
-            if (updates > 0) notify(updates + " Manga in your library have been updated.", updatedMangalist);
-
+            cursor.close();
+            if(updated.size() > 0) notifyUser(updated);
+            Utilities.Log(LOG_TAG, "Updates: " + updated.size());
         }
-
-        cursor.close();
-
 
     }
 
-
-    private String getMangaJson(URL url) {
-
-        String result = "";
-        Log.d(LOG_TAG, "url: " + url.toString());
-
-        try {
-            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-            httpURLConnection.setRequestMethod("GET");
-            httpURLConnection.addRequestProperty("X-Mashape-Key", "8Fp0bd39gLmshw7qSKtW61cjlK6Ip1V1Z5Fjsnhpy813RcQflk");
-            httpURLConnection.connect();
-
-            if (httpURLConnection.getResponseCode() != 200) return "";
-
-            InputStream inputStream = httpURLConnection.getInputStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder stringBuilder = new StringBuilder();
-
-            String line, r;
-
-            while ((line = bufferedReader.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-
-            r = stringBuilder.toString();
-
-            JSONObject object = new JSONObject(r);
-
-            if (object.has("chapters")) result = object.getJSONArray("chapters").toString();
-
-
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-        }
-
-
-        return result;
-    }
-
-
-    private void notify(String contextText, List<String> list) {
+    private void notifyUser(List<String> list) {
         Intent intent = new Intent(getContext(), MainActivity.class);
         intent.setAction(MainActivity.ACTION_UPDATE);
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(getContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         String bigString = "Updated: ";
-        int i = 0;
+        String contextText = list.size() + (list.size() == 1 ? " Manga in your library has been updated." :
+                " Manga in your library have been updated.");
+        int i = 1;
         for(String s : list) {
             bigString = bigString.concat(s + (i != list.size() ? ", " : "."));
             i++;

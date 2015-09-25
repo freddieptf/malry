@@ -39,5 +39,8 @@
     <string name="download">Download</string>
     <string name="contentAuthority">com.freddieptf.mangatest</string>
     <string name="account_type">mangatest</string>
+    <string name="string_search">Search</string>
+    <string name="string_filter">Filter by Genre</string>
+    <string name="string_check4updates">Check for Updates</string>
 
 </resources>

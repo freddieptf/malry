@@ -8,6 +8,7 @@ import com.freddieptf.mangatest.api.helperInterfaces.InsertListener;
 import com.freddieptf.mangatest.beans.MangaInfoBean;
 import com.freddieptf.mangatest.beans.MangaLatestInfoBean;
 import com.freddieptf.mangatest.beans.MangaPopularInfoBean;
+import com.freddieptf.mangatest.data.Contract;
 import com.freddieptf.mangatest.data.Contract.MangaFoxMangaList;
 import com.freddieptf.mangatest.data.Contract.MangaReaderLatestList;
 import com.freddieptf.mangatest.data.Contract.MangaReaderMangaList;
@@ -74,7 +75,9 @@ public class InsertCall extends Thread {
             contentValuesList.toArray(contentValuesArray);
             contentValuesList.clear();
             int rowsInserted = context.getContentResolver().bulkInsert(destination, contentValuesArray);
+            int virtualRowsInserted = context.getContentResolver().bulkInsert(Contract.VirtualTable.CONTENT_URI, contentValuesArray);
             Utilities.Log(LOG_TAG, "Rows inserted: " + rowsInserted);
+            Utilities.Log(LOG_TAG, "Virtual rows inserted: " + virtualRowsInserted);
         }
 
     }
