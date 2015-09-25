@@ -2,10 +2,11 @@ package com.freddieptf.mangatest.api;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.os.Handler;
+import android.database.Cursor;
+import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
 
+import com.freddieptf.mangatest.API_KEYS;
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.beans.MangaDetailsObject;
 import com.freddieptf.mangatest.data.Contract;
@@ -32,12 +33,9 @@ public class GetManga {
     BufferedReader bufferedReader;
     String LOG_TAG = getClass().getSimpleName();
     String result, mangaId, source;
-    Handler handler;
-    MangaDetailsObject mangaDetailsObject;
     Context context;
 
     public GetManga(Context context){
-        handler = new Handler();
         this.context = context;
     }
 
@@ -76,12 +74,12 @@ public class GetManga {
     }
 
 
-    private String getResultString(URL baseUrl){
+    public String getResultString(URL baseUrl){
         try {
             Utilities.Log(LOG_TAG, "Url: " + baseUrl);
             httpURLConnection = (HttpURLConnection)baseUrl.openConnection();
             httpURLConnection.setRequestMethod("GET");
-            httpURLConnection.addRequestProperty("X-Mashape-Key", "8Fp0bd39gLmshw7qSKtW61cjlK6Ip1V1Z5Fjsnhpy813RcQflk");
+            httpURLConnection.addRequestProperty("X-Mashape-Key", API_KEYS.API_KEY);
             httpURLConnection.connect();
 
             int statusCode = httpURLConnection.getResponseCode();
@@ -104,12 +102,6 @@ public class GetManga {
         } catch (IOException e) {
             e.printStackTrace();
             Log.d(LOG_TAG, e.getMessage());
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(context, "No internet Connection", Toast.LENGTH_LONG).show();
-                }
-            });
             return "";
         }
 
@@ -186,6 +178,13 @@ public class GetManga {
     }
 
     public static void insertToDb(Context context, MangaDetailsObject mangaDetailsObject, String mangaId, String source){
+        Uri uri = Contract.MyManga.buildMangaWithNameUri(mangaDetailsObject.getName());
+        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+        if(cursor != null && cursor.moveToFirst()) {
+            cursor.close();
+            return;
+        }
+
         ContentValues contentValues = new ContentValues();
         contentValues.put(Contract.MyManga.COLUMN_MANGA_NAME, mangaDetailsObject.getName());
         contentValues.put(Contract.MyManga.COLUMN_MANGA_ID, mangaId);
