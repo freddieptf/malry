@@ -1,5 +1,6 @@
 package com.freddieptf.mangatest.api;
 
+import com.freddieptf.mangatest.API_KEYS;
 import com.freddieptf.mangatest.api.helperInterfaces.GetListListener;
 import com.freddieptf.mangatest.api.helperInterfaces.OnDocumentReceived;
 import com.freddieptf.mangatest.api.mangareader.GetDocuments;
@@ -54,7 +55,7 @@ public class MangaReader {
                     URL mangaFox_baseUrl = new URL("https://doodle-manga-scraper.p.mashape.com/mangareader.net/");
                     httpURLConnection = (HttpURLConnection) mangaFox_baseUrl.openConnection();
                     httpURLConnection.setRequestMethod("GET");
-                    httpURLConnection.addRequestProperty("X-Mashape-Key", "8Fp0bd39gLmshw7qSKtW61cjlK6Ip1V1Z5Fjsnhpy813RcQflk");
+                    httpURLConnection.addRequestProperty("X-Mashape-Key", API_KEYS.API_KEY);
                     httpURLConnection.connect();
 
                     int StatusCode = httpURLConnection.getResponseCode();
