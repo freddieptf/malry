@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.MangaFoxAndReader;
+package com.freddieptf.mangatest.api;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,18 +9,13 @@ import android.widget.Toast;
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.beans.NetworkChapterAttrs;
 import com.freddieptf.mangatest.service.MangaDownloadService;
-import com.freddieptf.mangatest.service.MangaDownloadServiceTest;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -30,30 +25,23 @@ import java.util.ArrayList;
 public class FetchMangaChapter extends AsyncTask<String, Void, String> {
 
     ArrayList<NetworkChapterAttrs> mangaChapterAttrs;
-    HttpURLConnection httpURLConnection = null;
-    BufferedReader bufferedReader = null;
     Context context;
+    final String LOG_TAG = getClass().getSimpleName();
 
     public FetchMangaChapter(Context c){
         context = c;
-
     }
-
 
     @Override
     protected String doInBackground(String... strings) {
-
-        Log.d(getClass().getSimpleName(), "doInBackground");
 
         ArrayList arrayList = getMangaUrls(strings);
 
         String connected;
 
         if (arrayList != null && arrayList.size() > 1) {
-            Log.d(getClass().getSimpleName(), "size: " + arrayList.size());
-//            Intent downloadIntent = new Intent(context, MangaDownloadService.class);
-
-            Intent downloadIntent = new Intent(context, MangaDownloadServiceTest.class);
+            Log.d(LOG_TAG, "size: " + arrayList.size());
+            Intent downloadIntent = new Intent(context, MangaDownloadService.class);
 
             downloadIntent.putExtra(MangaDownloadService.ARRAY_LIST, arrayList);
             context.startService(downloadIntent);
@@ -61,7 +49,7 @@ public class FetchMangaChapter extends AsyncTask<String, Void, String> {
 
         }else if(arrayList != null && arrayList.size() == 1){
             connected = "No";
-            Log.d(getClass().getSimpleName(), "size: " + arrayList.size());
+            Log.d(LOG_TAG, "size: " + arrayList.size());
         }else{
             connected = "Not available";
         }
@@ -74,7 +62,7 @@ public class FetchMangaChapter extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String connected) {
         super.onPostExecute(connected);
 
-        Log.d(getClass().getSimpleName(), "onPostExecute" + " - Connected " + connected);
+        Log.d(LOG_TAG, "onPostExecute" + " - Connected " + connected);
 
         if(connected.equals("No")) {
             Toast.makeText(context,
@@ -103,26 +91,19 @@ public class FetchMangaChapter extends AsyncTask<String, Void, String> {
             return arrayList;
         }
 
-        String baseUrlReader, baseUrlFox;
-        baseUrlReader = "https://doodle-manga-scraper.p.mashape.com/mangareader.net/manga/";
-        baseUrlFox = "https://doodle-manga-scraper.p.mashape.com/mangafox.me/manga/";
+        String baseUrl;
+        if(strings[2].equals(context.getString(R.string.pref_manga_reader)))
+            baseUrl = "https://doodle-manga-scraper.p.mashape.com/mangareader.net/manga/";
+        else
+            baseUrl = "https://doodle-manga-scraper.p.mashape.com/mangafox.me/manga/";
 
-        arrayList = fetch(strings, baseUrlReader);
-
-        if(arrayList == null || arrayList.size() < 1){
-            arrayList = fetch(strings, baseUrlFox);
-            Log.d(getClass().getSimpleName(), "FOX UP TI IT");
-        }
-
+        arrayList = fetch(strings, baseUrl);
         return arrayList;
     }
 
     private ArrayList fetch(String[] strings, String baseUrl) {
 
         baseUrl = baseUrl.concat(strings[0] + "/" + strings[1]);
-
-        Log.d(getClass().getSimpleName(), baseUrl);
-
         mangaChapterAttrs = new ArrayList<>();
         NetworkChapterAttrs a = new NetworkChapterAttrs();
         String name = strings[0];
@@ -130,34 +111,9 @@ public class FetchMangaChapter extends AsyncTask<String, Void, String> {
         a.setName(name);
 
         try {
-            URL url = new URL(baseUrl);
-            httpURLConnection = (HttpURLConnection)url.openConnection();
-            httpURLConnection.setRequestMethod("GET");
-            httpURLConnection.addRequestProperty("X-Mashape-Key", "8Fp0bd39gLmshw7qSKtW61cjlK6Ip1V1Z5Fjsnhpy813RcQflk");
-            httpURLConnection.connect();
+            String results = new GetManga(context).getResultString(new URL(baseUrl));
 
-            int status = httpURLConnection.getResponseCode();
-
-            Log.i(getClass().getSimpleName() + " Status", "" + status);
-
-            if(status != 200) return null;
-
-            InputStream inputStream = httpURLConnection.getInputStream();
-
-            if(inputStream == null) return null;
-
-            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder stringBuilder = new StringBuilder();
-
-            String l;
-            while((l = bufferedReader.readLine()) != null){
-               stringBuilder.append(l);
-                Log.i("Line", l);
-            }
-
-            String results = stringBuilder.toString();
-            Log.i(getClass().getSimpleName()+ " TESTS: ", results);
-
+            if(results.isEmpty()) return null;
 
             JSONObject mangaStuff = new JSONObject(results);
 
@@ -171,7 +127,7 @@ public class FetchMangaChapter extends AsyncTask<String, Void, String> {
             String chapter = "ch" + strings[1];
             Log.i("chapter: ", chapter);
 
-            Log.i(getClass().getSimpleName()+ " chapter: ", chapter);
+            Log.i(LOG_TAG + " chapter: ", chapter);
 
             a.setChapter(chapter);
             a.setChapterTitle(chapterTitle);
@@ -188,33 +144,14 @@ public class FetchMangaChapter extends AsyncTask<String, Void, String> {
                 attr.setPageId(singlePageContent.getString("pageId"));
                 attr.setImageUrl(singlePageContent.getString("url"));
                 mangaChapterAttrs.add(attr);
-
             }
 
             Log.i(getClass().getSimpleName() + " Size: ", mangaChapterAttrs.size() + "");
-
-
             Log.i(getClass().getSimpleName()+ " Chapter", chapter);
 
 
-
-
-
-
-
-
         } catch (JSONException | IOException e) {
-            e.printStackTrace();
-        } finally {
-            if(httpURLConnection != null) httpURLConnection.disconnect();
-        }
-
-        if(bufferedReader != null) {
-            try {
-                bufferedReader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Utilities.Log(LOG_TAG, e.getMessage());
         }
 
         return mangaChapterAttrs;
