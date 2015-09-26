@@ -3,6 +3,7 @@ package com.freddieptf.mangatest.mainUi.widgets.genreview;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.support.v7.widget.GridLayoutManager;
@@ -20,14 +21,15 @@ public class GenresView extends FrameLayout {
 
     RecyclerView recyclerView;
     GenreAdapter adapter;
-    GenreViewUtils genreViewUtils;
+    OnGenreChangedListener onGenreChanged;
+    final String GENRE_VIEW_VISIBILITY = "genre";
 
     public GenresView(Context context) {
         this(context, null);
     }
 
-    public void setGenreViewUtils(GenreViewUtils genreViewUtils){
-        this.genreViewUtils = genreViewUtils;
+    public void setOnGenreChangedListener(OnGenreChangedListener onGenreChangedListener){
+        this.onGenreChanged = onGenreChangedListener;
     }
 
     public GenresView(Context context, AttributeSet attrs) {
@@ -42,10 +44,10 @@ public class GenresView extends FrameLayout {
         recyclerView.setLayoutManager(new GridLayoutManager(context, 3));
         recyclerView.setHasFixedSize(true);
 
-        adapter = new GenreAdapter(context, new OnGenreChange() {
+        adapter = new GenreAdapter(context, new OnGenreChangedListener() {
             @Override
             public void onGenreChange(String genres) {
-                genreViewUtils.onGenreChange(genres);
+                onGenreChanged.onGenreChange(genres);
             }
         });
 
@@ -55,6 +57,15 @@ public class GenresView extends FrameLayout {
 
     public String getSelectedGenres(){
         return adapter.getSelectedGenres();
+    }
+
+    public void saveState(Bundle bundle){
+        bundle.putBoolean(GENRE_VIEW_VISIBILITY, isVisible());
+    }
+
+    public void restoreState(Bundle bundle){
+        if(bundle.containsKey(GENRE_VIEW_VISIBILITY))
+            setVisible(bundle.getBoolean(GENRE_VIEW_VISIBILITY));
     }
 
     public void show(){
@@ -73,48 +84,55 @@ public class GenresView extends FrameLayout {
             }
 
             setVisibility(VISIBLE);
-            genreViewUtils.isGenreViewVisible(true);
-
-        } else if(getVisibility() == VISIBLE){
-            Animator[] a = new Animator[]{
-                    ObjectAnimator.ofFloat(this, "alpha", 1f, 0f),
-                    ObjectAnimator.ofFloat(this, "translationY", 0f, 34f)
-            };
-
-                a[0].setDuration(175).setInterpolator(new LinearOutSlowInInterpolator());
-                a[0].addListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        setVisibility(GONE);
-                        genreViewUtils.isGenreViewVisible(false);
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
-
-                    }
-                });
-            a[1].setDuration(200).setInterpolator(new LinearOutSlowInInterpolator());
-            a[0].start();
-            a[1].start();
 
         }
 
     }
 
-    public void setVisible(boolean visible){
+    public void hide() {
+        if(getVisibility() == VISIBLE) {
+            Animator[] a = new Animator[]{
+                    ObjectAnimator.ofFloat(this, "alpha", 1f, 0f),
+                    ObjectAnimator.ofFloat(this, "translationY", 0f, 34f)
+            };
+
+            a[0].setDuration(175).setInterpolator(new LinearOutSlowInInterpolator());
+            a[0].addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animator) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animator) {
+                    setVisibility(GONE);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animator) {
+
+                }
+            });
+            a[1].setDuration(200).setInterpolator(new LinearOutSlowInInterpolator());
+            a[0].start();
+            a[1].start();
+        }
+    }
+
+    private void setVisible(boolean visible){
         if(visible) setVisibility(VISIBLE);
         else setVisibility(GONE);
     }
+
+    public boolean isVisible(){
+        if(getVisibility() == VISIBLE) return true;
+        return false;
+    }
+
 
 
 }

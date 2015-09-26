@@ -34,8 +34,9 @@ import com.freddieptf.mangatest.api.workers.WorkerThread;
 import com.freddieptf.mangatest.data.Contract;
 import com.freddieptf.mangatest.mainUi.MainActivity;
 import com.freddieptf.mangatest.mainUi.baseUi.BaseFragment;
-import com.freddieptf.mangatest.mainUi.widgets.genreview.GenreViewUtils;
+import com.freddieptf.mangatest.mainUi.widgets.Cab;
 import com.freddieptf.mangatest.mainUi.widgets.genreview.GenresView;
+import com.freddieptf.mangatest.mainUi.widgets.genreview.OnGenreChangedListener;
 import com.freddieptf.mangatest.service.DownloadMangaDatabase;
 import com.freddieptf.mangatest.utils.Utilities;
 
@@ -45,7 +46,7 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
  * Created by fred on 1/30/15.
  */
 public class ListsFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>,
-        ListsPagerAdapter.PagerHelper, MangaListAdapter.OnMangaClicked, GenreViewUtils{
+        ListsPagerAdapter.PagerHelper, MangaListAdapter.OnMangaClicked, OnGenreChangedListener {
 
     private static final int MANGA_LOADER = 100331;
     private static final int LATEST_MANGA_LOADER = 100332;
@@ -57,9 +58,8 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
     String source = "";
     private final String LOG_TAG = getClass().getSimpleName();
     public static final String SORT_ORDER = "sort_order";
-    boolean GENRE_VIEW_VISIBLE;
     String genres = "";
-    final String GENRE_VIEW_VISIBILITY = "genre";
+    Cab cab;
 
     Uri PREF_CONTENT_URI;
 
@@ -114,6 +114,11 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
     }
 
     @Override
+    protected boolean lockDrawer() {
+        return cab.isVisible();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_manga_list, container, false);
@@ -143,18 +148,17 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
 
         progressBar = (SmoothProgressBar) view.findViewById(R.id.progress);
         genresView = (GenresView) view.findViewById(R.id.genre_view);
-        genresView.setGenreViewUtils(this);
+        cab = getMainActivityHelper().getCab();
+        cab.setOnCloseListener(onActionClose);
+
+        genresView.setOnGenreChangedListener(this);
         genres = genresView.getSelectedGenres();
 
-        if(!genres.isEmpty()){
-            restartPopularLoader(genres);
-        }
+        if(!genres.isEmpty()) restartPopularLoader(genres);
 
         if(savedInstanceState != null){
-            if(savedInstanceState.containsKey(GENRE_VIEW_VISIBILITY)) {
-                GENRE_VIEW_VISIBLE = savedInstanceState.getBoolean(GENRE_VIEW_VISIBILITY);
-                genresView.setVisible(GENRE_VIEW_VISIBLE);
-            }
+            genresView.restoreState(savedInstanceState);
+            cab.restoreState(savedInstanceState);
         }
 
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.pager);
@@ -218,11 +222,6 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
     }
 
     @Override
-    public void isGenreViewVisible(boolean isVisible) {
-        GENRE_VIEW_VISIBLE = isVisible;
-    }
-
-    @Override
     public void onGenreChange(String genres) {
         this.genres = genres;
         restartPopularLoader(genres);
@@ -244,7 +243,8 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean(GENRE_VIEW_VISIBILITY, GENRE_VIEW_VISIBLE);
+        genresView.saveState(outState);
+        if(cab != null) cab.saveState(outState);
     }
 
     @Override
@@ -326,7 +326,7 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
                 break;
             }
             case R.id.menu_filter: {
-                genresView.show();
+                startMyActionMode();
                 break;
             }
         }
@@ -338,6 +338,28 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
         PREF_CONTENT_URI = Utilities.getPrefContentUri(getActivity());
         getLoaderManager().restartLoader(MANGA_LOADER, null, this);
     }
+
+    private void startMyActionMode() {
+        cab.startCabMode(true);
+        getMainActivityHelper().getToolBar().setVisibility(View.GONE);
+        cab.setTitle(getString(R.string.pick_genre));
+        genresView.show();
+        getMainActivityHelper().lockDrawer(true);
+    }
+
+    private void stopMyActionMode(){
+        getMainActivityHelper().getToolBar().setVisibility(View.VISIBLE);
+        cab.startCabMode(false);
+        genresView.hide();
+        getMainActivityHelper().lockDrawer(false);
+    }
+
+    private Cab.OnActionClose onActionClose = new Cab.OnActionClose() {
+        @Override
+        public void onClose() {
+            stopMyActionMode();
+        }
+    };
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -415,6 +437,7 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             popularListAdapter.swapCursor(data);
+            if(cab != null) cab.setExtraText("" + data.getCount());
             Utilities.Log(LOG_TAG, "onLoadFinshed: " + data.getCount() + " items");
         }
 

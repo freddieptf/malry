@@ -23,6 +23,7 @@ import com.freddieptf.mangatest.mainUi.baseUi.BaseActivity;
 import com.freddieptf.mangatest.mainUi.fragments.DownloadsFragment;
 import com.freddieptf.mangatest.mainUi.fragments.ListsFragment;
 import com.freddieptf.mangatest.mainUi.fragments.MyMangaFragment;
+import com.freddieptf.mangatest.mainUi.widgets.Cab;
 import com.freddieptf.mangatest.sync.MangaTestSyncAdapter;
 import com.freddieptf.mangatest.utils.MyColorUtils;
 import com.freddieptf.mangatest.utils.ThemeUtilities;
@@ -43,6 +44,7 @@ public class MainActivity extends BaseActivity implements FragmentManager.OnBack
     Fragment currentFrag;
     Toolbar toolbar;
     TabLayout tabLayout;
+    Cab cab;
     View toolBarShadow;
     public static boolean DEBUG = true;
     final String LOG_TAG = this.getClass().getSimpleName();
@@ -76,6 +78,7 @@ public class MainActivity extends BaseActivity implements FragmentManager.OnBack
         setSupportActionBar(toolbar);
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
+        cab = (Cab) findViewById(R.id.cab);
 
         int navBarFrameMargin = getResources().getDimensionPixelSize(R.dimen.myNavBarMargin);
         DisplayMetrics metrics = getResources().getDisplayMetrics();
@@ -108,8 +111,6 @@ public class MainActivity extends BaseActivity implements FragmentManager.OnBack
 //                | IllegalAccessException e) {
 //            e.printStackTrace();
 //        }
-
-
 
     }
 
@@ -224,6 +225,11 @@ public class MainActivity extends BaseActivity implements FragmentManager.OnBack
     @Override
     public MainActivityHelper getMainActivityHelper() {
         return this;
+    }
+
+    @Override
+    public Cab getCab() {
+        return cab;
     }
 
     public void setDrawerUp(){

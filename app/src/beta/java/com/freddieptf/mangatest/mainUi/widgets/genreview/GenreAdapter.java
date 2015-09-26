@@ -29,10 +29,10 @@ public class GenreAdapter extends RecyclerView.Adapter<GenreAdapter.GenreViewHol
     List<String> pref_list;
     MyColorUtils myColorUtils;
     final String PREF_GENRE = "pref_genre";
-    OnGenreChange genreChange;
+    OnGenreChangedListener genreChange;
 
 
-    public GenreAdapter(Context context, OnGenreChange genreChange){
+    public GenreAdapter(Context context, OnGenreChangedListener genreChange){
         genres = context.getResources().getTextArray(R.array.genres);
         this.genreChange = genreChange;
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);

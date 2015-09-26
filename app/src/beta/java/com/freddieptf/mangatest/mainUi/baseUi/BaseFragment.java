@@ -36,6 +36,10 @@ public class BaseFragment extends Fragment {
         return false;
     }
 
+    protected int useNavigationIcon(){
+        return R.drawable.ic_menu_white_24dp;
+    }
+
     protected MainActivityHelper getMainActivityHelper(){
         return ((MainActivityHelper) getActivity()).getMainActivityHelper();
     }
@@ -67,26 +71,15 @@ public class BaseFragment extends Fragment {
                 getMyColorUtils().setStatusBarColor(getResources().getColor(R.color.primary_dark));
         }
 
+        getMainActivityHelper().getToolBar().setNavigationIcon(useNavigationIcon());
+
         if(showTabs()) showTabsNow();
         else hideTabsNow();
 
-        if(lockDrawer()){
-            getMainActivityHelper().lockDrawer(true);
-            useBackIcon();
-        }
-        else{
-            getMainActivityHelper().lockDrawer(false);
-            useHamburgerIcon();
-        }
+        if(lockDrawer()) getMainActivityHelper().lockDrawer(true);
+        else getMainActivityHelper().lockDrawer(false);
 
-    }
 
-    private void useHamburgerIcon(){
-        getMainActivityHelper().getToolBar().setNavigationIcon(R.drawable.ic_menu_white_24dp);
-    }
-
-    private void useBackIcon(){
-        getMainActivityHelper().getToolBar().setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
     }
 
     private void showTabsNow(){
