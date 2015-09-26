@@ -8,4 +8,6 @@
 
     <dimen name="noDp">0dp</dimen>
 
+    <integer name="grid_columns">3</integer>
+
 </resources>

@@ -11,6 +11,7 @@
 
     <string name="no_internet">No internet Connection</string>
     <string name="dead_internet">Your internets is being a BAKA!</string>
+    <string name="pick_genre">Pick a Genre</string>
 
 
     <string name="drawer_open">Open navigation drawer</string>
