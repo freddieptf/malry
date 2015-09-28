@@ -2,7 +2,7 @@ package com.freddieptf.mangatest.mainUi;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -14,7 +14,7 @@ import com.freddieptf.mangatest.utils.Utilities;
 /**
  * Created by fred on 3/24/15.
  */
-public class MangaViewerActivity extends ActionBarActivity {
+public class MangaViewerActivity extends AppCompatActivity {
 
 
     int posFromPrefs;
@@ -40,10 +40,15 @@ public class MangaViewerActivity extends ActionBarActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
+        if(savedInstanceState != null && savedInstanceState.containsKey("pos"))
+            posFromPrefs = savedInstanceState.getInt("pos");
+
         if(posFromPrefs == 0){
+            posFromPrefs = -1;
             getSupportFragmentManager()
                     .beginTransaction().replace(R.id.container, new MangaGridFragment()).commit();
-        }else{
+        } else if(posFromPrefs == -1){}
+        else{
             MangaViewerFragment mangaViewerFragment = new MangaViewerFragment();
             Bundle b = new Bundle();
             b.putInt("pos", posFromPrefs);
@@ -51,7 +56,6 @@ public class MangaViewerActivity extends ActionBarActivity {
             getSupportFragmentManager()
                     .beginTransaction().replace(R.id.container, mangaViewerFragment, "viewer").commit();
         }
-
 
     }
 
@@ -73,5 +77,9 @@ public class MangaViewerActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("pos", posFromPrefs);
+    }
 }
