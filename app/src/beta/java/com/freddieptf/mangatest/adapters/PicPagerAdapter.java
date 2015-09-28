@@ -15,8 +15,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.mainUi.widgets.CustomViewPager;
-import com.freddieptf.mangatest.volleyStuff.FadeInNetworkImageView;
 import com.freddieptf.mangatest.volleyStuff.VolleySingletonClass;
+
+import uk.co.senab.photoview.PhotoView;
 
 /**
  * Created by fred on 3/22/15.
@@ -27,7 +28,6 @@ public class PicPagerAdapter extends PagerAdapter {
     Context context;
     ViewHolder viewHolder;
     Boolean offline;
-    ViewGroup mContainer;
     CustomViewPager customViewPager;
     RequestQueue requestQueue;
     ImageLoader imageLoader;
@@ -42,12 +42,11 @@ public class PicPagerAdapter extends PagerAdapter {
         requestQueue = VolleySingletonClass.getInstance(context).getRequestQueue();
     }
 
-
     class ViewHolder{
-        FadeInNetworkImageView imageView;
+        PhotoView imageView;
         TextView pageNumber;
         public ViewHolder(View view){
-            imageView = (FadeInNetworkImageView) view.findViewById(R.id.pager_ImageView_item);
+            imageView = (PhotoView) view.findViewById(R.id.pager_ImageView_item);
             pageNumber = (TextView) view.findViewById(R.id.tv_mangaPageNumber);
         }
     }
@@ -67,27 +66,19 @@ public class PicPagerAdapter extends PagerAdapter {
         container.removeView((View) object);
     }
 
-
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        mContainer = container;
         View view = LayoutInflater.from(context).inflate(R.layout.pager_pic_item, container, false);
         viewHolder = new ViewHolder(view);
 
-//        String orientation = viewHolder.imageView.getTag().toString();
-//        if(orientation.equals("landscape")) customViewPager.setVertical(true);
+        String orientation = viewHolder.imageView.getTag().toString();
+        if(orientation.equals("landscape")) customViewPager.setVertical(true);
         viewHolder.pageNumber.setText("p" + (position + 1));
 
         final String pic = picUris[position];
-        Log.d("Pager Instantiate", pic);
+        if(offline) new LoadImage(viewHolder, pic).execute();
 
-
-        if(offline) {
-            LoadImage loadImage =  new LoadImage(viewHolder, pic);
-            loadImage.execute();
-        }else{
-            //@TODO implement online reading. ImageLoader, cache and stuff...(NetworkImageView probably..)
-        }
+        //@TODO implement online reading. ImageLoader, cache and stuff...(NetworkImageView probably..)
 
         container.addView(view);
         return view;
@@ -109,8 +100,7 @@ public class PicPagerAdapter extends PagerAdapter {
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
-            viewHolder.imageView.setLocalBitmap(bitmap);
-//            viewHolder.imageView.setImageBitmap(bitmap);
+            viewHolder.imageView.setImageBitmap(bitmap);
             viewHolder.imageView.setAlpha(0f);
             viewHolder.imageView.setVisibility(View.VISIBLE);
             viewHolder.imageView.animate().alpha(1f).setDuration(200).start();
