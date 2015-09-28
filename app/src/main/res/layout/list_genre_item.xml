@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?selectableItemBackground"
+    android:background="?list_selector"
     android:layout_margin="2dp">
 
     <CheckedTextView

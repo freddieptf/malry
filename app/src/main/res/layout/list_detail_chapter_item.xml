@@ -4,7 +4,7 @@
     android:orientation="horizontal"
     android:padding="16dp"
     android:layout_height="match_parent"
-    android:background="?selectableItemBackground">
+    android:background="?list_selector">
 
     <TextView
         android:id="@+id/tv_Chapter_id"

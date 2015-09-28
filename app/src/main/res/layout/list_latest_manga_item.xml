@@ -5,8 +5,7 @@
     android:layout_height="match_parent"
     android:minHeight="?attr/listPreferredItemHeightSmall"
     android:padding="16dp"
-    android:background="?selectableItemBackground">
-
+    android:background="?list_selector">
     <TextView
         android:id="@+id/name"
         android:layout_width="0dp"
