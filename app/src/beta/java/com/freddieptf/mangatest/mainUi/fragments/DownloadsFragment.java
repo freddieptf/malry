@@ -43,13 +43,17 @@ public class DownloadsFragment extends BaseFragment implements FilesAdapter.Swip
     }
 
     @Override
+    protected int useNavigationIcon() {
+        if(lockdrawer) return R.drawable.abc_ic_ab_back_mtrl_am_alpha;
+        return super.useNavigationIcon();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView  = inflater.inflate(R.layout.fragment_donwloads, container, false);
 
         if(getArguments() != null){
             lockdrawer = true;
-            getMainActivityHelper().getToolBar().setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-
             //chapter files string paths
             filePaths = getArguments().getStringArray(CHAPTERS);
             mangaName = getArguments().getString(MANGA_NAME);

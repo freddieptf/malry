@@ -72,6 +72,11 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
         return false;
     }
 
+    @Override
+    protected int useNavigationIcon() {
+        return R.drawable.abc_ic_ab_back_mtrl_am_alpha;
+    }
+
     String mangaTitle, mangaId, source, imgUrl, mangaAuthor, mangaInfo, mangaStatus, chapterCount;
     public static String DIS_FRAGMENT = "Details";
     public static final String TITLE_KEY = "manga_title";
@@ -100,7 +105,6 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_manga_details, container, false);
     }
-
 
     @Override
     protected boolean lockDrawer() {
@@ -141,8 +145,6 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
         if(savedInstanceState != null && savedInstanceState.containsKey(DETAILS_OBJECT)){
             cacheMangaDetailsObject = savedInstanceState.getParcelable(DETAILS_OBJECT);
             new PopulateViewsWithData(listView, cacheMangaDetailsObject).execute();
-        }else if(savedInstanceState != null && savedInstanceState.containsKey("Faker")){
-            showProgressBar();
         }else {
             mangaExists.execute(mangaTitle);
         }
