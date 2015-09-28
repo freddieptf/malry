@@ -13,6 +13,7 @@ import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.beans.DrawerListItems;
 import com.freddieptf.mangatest.utils.MyColorUtils;
 import com.freddieptf.mangatest.utils.ThemeUtilities;
+import com.freddieptf.mangatest.utils.Utilities;
 
 import java.util.ArrayList;
 
@@ -25,11 +26,13 @@ public class NavAdapter extends RecyclerView.Adapter<NavAdapter.DrawerViewHolder
     DrawerItemClick drawerItemClick;
     Context context;
     int activePos = -1;
+    MyColorUtils myColorUtils;
 
     public NavAdapter(ArrayList<DrawerListItems> arrayList, Context context, DrawerItemClick drawerItemClick){
         this.arrayList = arrayList;
         this.context = context;
         this.drawerItemClick = drawerItemClick;
+        myColorUtils = new MyColorUtils(context);
     }
 
     public void setActivePostion(int position){
@@ -37,8 +40,8 @@ public class NavAdapter extends RecyclerView.Adapter<NavAdapter.DrawerViewHolder
         activePos = position;
 
         if(beforeChange > -1)notifyItemChanged(beforeChange);
-
         notifyItemChanged(activePos);
+        Utilities.Log("SetActivePosition", "a: " + activePos + " b: " + beforeChange);
     }
 
     @Override
@@ -53,18 +56,18 @@ public class NavAdapter extends RecyclerView.Adapter<NavAdapter.DrawerViewHolder
         holder.drawerItem.setOnClickListener(this);
 
 
-        int activeColor = activePos == position ? context.getResources().getColor(R.color.accent)
-                : new MyColorUtils(context).getPrimaryTextColor();
+        int activeColor = activePos == position ? myColorUtils.getAccentColor()
+                : myColorUtils.getPrimaryTextColor();
 
         DrawerListItems drawerListItems = arrayList.get(position);
         holder.title.setText(drawerListItems.getTitle());
         holder.imageView.setImageResource(drawerListItems.getIcon());
 
         if(!new ThemeUtilities(context).isLight())
-            holder.imageView.setColorFilter(context.getResources().getColor(android.R.color.secondary_text_dark));
+            holder.imageView.setColorFilter(myColorUtils.getPrimaryTextColor());
 
-        if(activePos == position && activePos < 3) {
-            holder.drawerItem.setActivated(true);
+        if(activePos < 3) {
+            holder.drawerItem.setSelected(activePos == position);
             holder.title.setTextColor(activeColor);
             holder.imageView.setColorFilter(activeColor);
         }

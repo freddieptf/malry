@@ -22,7 +22,7 @@ import java.util.ArrayList;
  */
 public class NavDrawerFrag extends Fragment {
 
-    int activePosition = 1;
+    int activePosition = -1;
     final String ACTIVE_POSITION = "active_position";
     final String LOG_TAG = getClass().getSimpleName();
 
@@ -44,15 +44,16 @@ public class NavDrawerFrag extends Fragment {
 
         view.setFitsSystemWindows(true);
 
+        activePosition = 1;
         if(savedInstanceState != null){
             activePosition = savedInstanceState.getInt(ACTIVE_POSITION);
         }
 
         String[] fragmentTitles = getResources().getStringArray(R.array.drawer_list);
-        int[] icons = {R.drawable.ic_action_book,
-                R.drawable.ic_list_grey600_24dp,
-                R.drawable.ic_file_download_grey600_24dp,
-                R.drawable.ic_settings_grey600_24dp };
+        int[] icons = {R.drawable.ic_stat_maps_local_library,
+                R.drawable.ic_list,
+                R.drawable.ic_action_download,
+                R.drawable.ic_settings};
 
         ArrayList<DrawerListItems> arrayList = new ArrayList<>();
         DrawerListItems drawerListItems;
