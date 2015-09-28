@@ -72,7 +72,7 @@ public class CustomViewPager extends ViewPager {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return true;
+        return super.onInterceptTouchEvent(swapXY(ev));
     }
 
     private MotionEvent swapXY(MotionEvent ev) {
