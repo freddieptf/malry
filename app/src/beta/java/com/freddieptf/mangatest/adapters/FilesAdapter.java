@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.recyclerviewdecor.swipestuff.DismissedItem;
@@ -88,7 +87,6 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.MyViewHolder
             public void onUndoDismiss() {
                 fileList.add(item.getPos(), item.getFile());
                 notifyItemInserted(pos);
-                Toast.makeText(context, "undo", Toast.LENGTH_SHORT).show();
             }
         });
 

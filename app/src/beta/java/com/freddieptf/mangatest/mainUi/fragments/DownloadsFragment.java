@@ -3,6 +3,7 @@ package com.freddieptf.mangatest.mainUi.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +22,8 @@ import com.freddieptf.mangatest.recyclerviewdecor.swipestuff.ItemDismissedHelper
 import com.freddieptf.mangatest.recyclerviewdecor.swipestuff.ItemTouchHelperCallback;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by fred on 2/23/15.
@@ -30,12 +33,15 @@ public class DownloadsFragment extends BaseFragment implements FilesAdapter.Swip
     FilesAdapter filesAdapter;
     String[] filePaths;
     String mangaName;
+    RecyclerView recyclerView;
     public final static String CHAPTERS = "chapters";
     public static final String MANGA_NAME = "name";
     public final String LOG_TAG = getClass().getSimpleName();
     ItemDismissedHelper itemDismissedHelper;
     boolean lockdrawer;
     ItemTouchHelper itemTouchHelper;
+    List<File> toDelete;
+
 
     @Override
     protected boolean lockDrawer() {
@@ -73,6 +79,7 @@ public class DownloadsFragment extends BaseFragment implements FilesAdapter.Swip
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        toDelete = new ArrayList<>();
 
         String parentDirectory = Environment.getExternalStorageDirectory().toString();
         File myMangaParent = new File(parentDirectory + "/MangaTest");
@@ -128,7 +135,7 @@ public class DownloadsFragment extends BaseFragment implements FilesAdapter.Swip
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(filesAdapter);
         itemTouchHelper = new ItemTouchHelper(callback);
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
+        recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
         recyclerView.setAdapter(filesAdapter);
@@ -137,8 +144,51 @@ public class DownloadsFragment extends BaseFragment implements FilesAdapter.Swip
     }
 
     @Override
-    public void onSwipeToDelete(File file, ItemDismissedHelper itemDismissedHelper) {
+    public void onSwipeToDelete(final File file, final ItemDismissedHelper itemDismissedHelper) {
         this.itemDismissedHelper = itemDismissedHelper;
+        Snackbar.make(recyclerView, "Item deleted", Snackbar.LENGTH_LONG)
+                .setAction("Undo", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        itemDismissedHelper.onUndoDismiss();
+                    }
+                })
+                .setCallback(new Snackbar.Callback() {
+                    @Override
+                    public void onDismissed(Snackbar snackbar, int event) {
+                        super.onDismissed(snackbar, event);
+                        if (event == DISMISS_EVENT_TIMEOUT) {
+                            toDelete.add(file);
+                            delete();
+                        }
+                    }
+                })
+                .show();
+    }
+
+    //meh..the deepest we can go is 2 anyway
+    public void delete(){
+        if(toDelete != null && toDelete.size() >0) {
+            for (File file : toDelete) {
+
+                if (file != null && file.isDirectory() && file.listFiles().length > 0) {
+                    for (File f : file.listFiles()) {
+
+                        if (f.isDirectory()) {
+                            for (File child : f.listFiles()) child.delete();
+                            f.delete();
+                        }
+                        else f.delete();
+                    }
+
+                    file.delete();
+
+                } else {
+                    if (file != null) file.delete();
+                }
+
+            }
+        }
     }
 
 
