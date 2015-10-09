@@ -10,10 +10,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,9 +31,10 @@ import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.adapters.MyMangaListAdapter;
 import com.freddieptf.mangatest.data.Contract;
 import com.freddieptf.mangatest.mainUi.baseUi.BaseFragment;
-import com.freddieptf.mangatest.service.MangaUpdateService;
 import com.freddieptf.mangatest.sync.MangaTestSyncAdapter;
 import com.freddieptf.mangatest.utils.Utilities;
+
+import java.util.Arrays;
 
 /**
  * Created by fred on 2/14/15.
@@ -44,6 +48,7 @@ public class MyMangaFragment extends BaseFragment implements LoaderManager.Loade
 
     public final int MY_MANGA_LOADER = 0;
     MyMangaListAdapter adapter;
+    MaterialDialog dialog;
 
     public static final String[] columns = {
             Contract.MyManga._ID,
@@ -67,10 +72,7 @@ public class MyMangaFragment extends BaseFragment implements LoaderManager.Loade
     public static final int COLUMN_MANGA_SOURCE = 7;
     public static final int COLUMN_MANGA_LAST_UPDATE = 8;
 
-
-
     ListView listView;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -150,6 +152,25 @@ public class MyMangaFragment extends BaseFragment implements LoaderManager.Loade
         });
 
         listView.setAdapter(adapter);
+        final MaterialDialog.Builder builder = new MaterialDialog.Builder(getActivity());
+
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(Utilities.isOnline(getActivity())) {
+                    MangaTestSyncAdapter.syncImmediately(getActivity());
+                    dialog = builder.title(R.string.string_check4updates)
+                            .content("Wait a sec while i check for updates")
+                            .progress(true, 0)
+                            .autoDismiss(false)
+                            .build();
+                    dialog.show();
+                }else {
+                    Snackbar.make(view, R.string.no_internet, Snackbar.LENGTH_SHORT).show();
+                }
+            }
+        });
 
     }
 
@@ -158,7 +179,6 @@ public class MyMangaFragment extends BaseFragment implements LoaderManager.Loade
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_fragments, menu);
         menu.findItem(R.id.menu_prefCompactCards).setVisible(true);
-        menu.findItem(R.id.menu_updateManga).setVisible(true);
     }
 
     @Override
@@ -181,12 +201,6 @@ public class MyMangaFragment extends BaseFragment implements LoaderManager.Loade
                 adapter.notifyDataSetChanged();
                 break;
 
-            case R.id.menu_updateManga:
-//                Intent intent = new Intent(getActivity(), MangaUpdateService.class);
-//                getActivity().startService(intent);
-                MangaTestSyncAdapter.syncImmediately(getActivity());
-                break;
-
         }
         return super.onOptionsItemSelected(item);
 
@@ -195,7 +209,7 @@ public class MyMangaFragment extends BaseFragment implements LoaderManager.Loade
     @Override
     public void onPause() {
         super.onPause();
-        getActivity().unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
     }
 
     public void restart(){
@@ -205,11 +219,10 @@ public class MyMangaFragment extends BaseFragment implements LoaderManager.Loade
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().registerReceiver(broadcastReceiver, new IntentFilter(MangaUpdateService.class.getSimpleName()));
         if (!Utilities.compactCards(getActivity()) || Utilities.compactCards(getActivity())) {
             adapter.notifyDataSetChanged();
         }
-
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter(MangaTestSyncAdapter.INTENT_FILTER));
     }
 
     @Override
@@ -233,7 +246,7 @@ public class MyMangaFragment extends BaseFragment implements LoaderManager.Loade
         adapter.swapCursor(data);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(data.getCount() + " items");
         listView.setAlpha(0f);
-        listView.animate().alpha(1f).setDuration(300);
+        listView.animate().alpha(1f).setDuration(250);
     }
 
     @Override
@@ -246,15 +259,24 @@ public class MyMangaFragment extends BaseFragment implements LoaderManager.Loade
         return true;
     }
 
-    final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getExtras() != null){
+            String[] s = intent.getStringArrayExtra(MangaTestSyncAdapter.UPDATE_LIST_EXTRA);
+            MaterialDialog.Builder builder = new MaterialDialog.Builder(getActivity());
+            builder.title(R.string.string_check4updates);
 
-                String change = intent.getStringExtra(MangaUpdateService.NOTIFY_UPDATE);
-                if(change.equals("change")) adapter.notifyDataSetChanged();
+            if(s != null && s.length > 0) {
+                String static_content = "Found " + s.length + " manga updates.";
+                String c = Arrays.toString(s);
+                builder.content(static_content + "\n" + c);
+                adapter.notifyDataSetChanged();
+            } else builder.content("No updates yet mate.");
 
-            }
+            if(dialog != null) dialog.dismiss();
+            dialog = builder.build();
+            dialog.show();
         }
     };
 
