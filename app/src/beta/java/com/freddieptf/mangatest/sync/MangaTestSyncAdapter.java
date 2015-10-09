@@ -18,12 +18,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.api.GetManga;
 import com.freddieptf.mangatest.beans.MangaDetailsObject;
 import com.freddieptf.mangatest.data.Contract;
 import com.freddieptf.mangatest.mainUi.MainActivity;
+import com.freddieptf.mangatest.utils.MyColorUtils;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import org.json.JSONArray;
@@ -39,7 +41,8 @@ public class MangaTestSyncAdapter extends AbstractThreadedSyncAdapter {
 
     final String LOG_TAG = getClass().getSimpleName();
     final int NOTIFICATION_ID = 1000;
-    final public static String NOTIFY_UPDATE = "notify_update";
+    final public static String INTENT_FILTER = "com.mangatest.SYNC";
+    final public static String UPDATE_LIST_EXTRA = "list_extra";
     public static final int SYNC_INTERVAL = 60 * 720; // 12 hours...i think
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 2;
 
@@ -89,8 +92,11 @@ public class MangaTestSyncAdapter extends AbstractThreadedSyncAdapter {
                         getContext().getContentResolver().update(uri, cv, null, null);
                         getContext().getContentResolver().notifyChange(uri, null);
 
-                        Utilities.writeMangaPageToPrefs(getContext(), cursor.getString(MANGA_ID),
-                                (Integer.parseInt(last_fresh.trim()) - Integer.parseInt(last_local.trim())));
+                        //get number of updates if user didn't go through them already
+                        int updates = Utilities.readMangaPageFromPrefs(getContext(), cursor.getString(MANGA_ID));
+                        updates += (Integer.parseInt(last_fresh.trim()) - Integer.parseInt(last_local.trim()));
+                        Utilities.writeMangaPageToPrefs(getContext(), cursor.getString(MANGA_ID), updates);
+
                         updated.add(detailsObject.getName());
                         Utilities.Log(LOG_TAG, detailsObject.getName() + ": updated");
                     }else{
@@ -112,7 +118,12 @@ public class MangaTestSyncAdapter extends AbstractThreadedSyncAdapter {
 
             cursor.close();
             if(updated.size() > 0) notifyUser(updated);
+
+            Intent intent = new Intent(INTENT_FILTER);
+            intent.putExtra(UPDATE_LIST_EXTRA, updated.toArray());
+            LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
             Utilities.Log(LOG_TAG, "Updates: " + updated.size());
+
         }
 
     }
@@ -141,6 +152,7 @@ public class MangaTestSyncAdapter extends AbstractThreadedSyncAdapter {
                         .setDefaults(Notification.DEFAULT_ALL)
                         .setContentIntent(pendingIntent)
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(bigString))
+                        .setColor(new MyColorUtils(getContext()).getAccentColor())
                         .setAutoCancel(true);
 
         NotificationManager notificationManager = (NotificationManager)
