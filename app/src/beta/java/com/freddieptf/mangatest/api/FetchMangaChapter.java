@@ -111,7 +111,7 @@ public class FetchMangaChapter extends AsyncTask<String, Void, String> {
         a.setName(name);
 
         try {
-            String results = new GetManga(context).getResultString(new URL(baseUrl));
+            String results = ApiUtils.getResultString(new URL(baseUrl));
 
             if(results.isEmpty()) return null;
 

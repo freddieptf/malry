@@ -7,14 +7,14 @@ import com.freddieptf.mangatest.api.workers.WorkerThread;
 /**
  * Created by fred on 8/24/15.
  */
-public class Worker {
+public class AutoApiWorker {
 
-    private  static Worker worker = null;
+    private  static AutoApiWorker worker = null;
 
-    protected Worker(){}
+    protected AutoApiWorker(){}
 
-    public static Worker getInstance(){
-        if(worker == null) worker = new Worker();
+    public static AutoApiWorker getInstance(){
+        if(worker == null) worker = new AutoApiWorker();
         return worker;
     }
 

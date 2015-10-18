@@ -55,7 +55,7 @@ public class InsertCall extends Thread {
             Utilities.Log(LOG_TAG, "Bitch where?");
         }
 
-        insertListener.onInsertDone();
+        if(insertListener != null) insertListener.onInsertDone();
     }
 
 

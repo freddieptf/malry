@@ -8,7 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 
 import com.freddieptf.mangatest.R;
-import com.freddieptf.mangatest.api.Worker;
+import com.freddieptf.mangatest.api.AutoApiWorker;
 import com.freddieptf.mangatest.api.workers.WorkerThread;
 import com.freddieptf.mangatest.utils.Utilities;
 
@@ -48,7 +48,7 @@ public class DownloadMangaDatabase extends Service {
         if(Utilities.isOnline(this)) {
 
             ExecutorService service = Executors.newFixedThreadPool(2);
-            Worker worker = Worker.getInstance();
+            AutoApiWorker worker = AutoApiWorker.getInstance();
 
             if (intent.getExtras() != null) {
                 if(intent.getExtras().containsKey(FIX_SELECTION)) {

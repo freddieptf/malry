@@ -6,8 +6,8 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
-import com.freddieptf.mangatest.api.MangaFox;
-import com.freddieptf.mangatest.api.MangaReader;
+import com.freddieptf.mangatest.api.mangafox.MangaFox;
+import com.freddieptf.mangatest.api.mangareader.MangaReader;
 import com.freddieptf.mangatest.api.helperInterfaces.GetListListener;
 import com.freddieptf.mangatest.api.helperInterfaces.InsertListener;
 import com.freddieptf.mangatest.data.Contract;

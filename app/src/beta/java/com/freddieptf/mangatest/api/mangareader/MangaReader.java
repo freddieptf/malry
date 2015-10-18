@@ -1,19 +1,12 @@
-package com.freddieptf.mangatest.api;
+package com.freddieptf.mangatest.api.mangareader;
 
-import com.freddieptf.mangatest.API_KEYS;
+import com.freddieptf.mangatest.api.ApiUtils;
 import com.freddieptf.mangatest.api.helperInterfaces.GetListListener;
 import com.freddieptf.mangatest.api.helperInterfaces.OnDocumentReceived;
-import com.freddieptf.mangatest.api.mangareader.GetDocuments;
-import com.freddieptf.mangatest.api.mangareader.Processor;
-import com.freddieptf.mangatest.utils.Utilities;
 
 import org.jsoup.nodes.Document;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
@@ -22,7 +15,7 @@ import java.util.List;
  * MangaReader Class:
  *
  * Class providing methods that process the Jsoup documents
- * and return Lists with objects containing the relevant manga data.
+ * and return Lists with objects containing manga list data.
  */
 public class MangaReader {
 
@@ -48,35 +41,11 @@ public class MangaReader {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                HttpURLConnection httpURLConnection;
-                BufferedReader bufferedReader;
-
                 try {
-                    URL mangaFox_baseUrl = new URL("https://doodle-manga-scraper.p.mashape.com/mangareader.net/");
-                    httpURLConnection = (HttpURLConnection) mangaFox_baseUrl.openConnection();
-                    httpURLConnection.setRequestMethod("GET");
-                    httpURLConnection.addRequestProperty("X-Mashape-Key", API_KEYS.API_KEY);
-                    httpURLConnection.connect();
-
-                    int StatusCode = httpURLConnection.getResponseCode();
-                    if (StatusCode != 200) return;
-                    Utilities.Log(LOG_TAG, "Status code: " + StatusCode);
-
-                    InputStream inputStream = httpURLConnection.getInputStream();
-                    bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-
-                    String line;
-                    String result;
-                    StringBuilder stringBuilder = new StringBuilder();
-
-                    while ((line = bufferedReader.readLine()) != null) {
-                        stringBuilder.append(line);
-                    }
-
-                    result = stringBuilder.toString();
+                    URL baseUrl = new URL("https://doodle-manga-scraper.p.mashape.com/mangareader.net/");
+                    String result = ApiUtils.getResultString(baseUrl);
                     listener.onGetList(new com.freddieptf.mangatest.api.mangafox.Processor().processList(result));
-
-                } catch (IOException e) {
+                } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
 

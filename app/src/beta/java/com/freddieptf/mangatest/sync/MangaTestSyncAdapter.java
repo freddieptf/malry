@@ -17,12 +17,17 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.api.GetManga;
+import com.freddieptf.mangatest.api.helperInterfaces.GetListListener;
+import com.freddieptf.mangatest.api.mangareader.MangaReader;
+import com.freddieptf.mangatest.api.workers.InsertCall;
 import com.freddieptf.mangatest.beans.MangaDetailsObject;
+import com.freddieptf.mangatest.beans.MangaLatestInfoBean;
 import com.freddieptf.mangatest.data.Contract;
 import com.freddieptf.mangatest.mainUi.MainActivity;
 import com.freddieptf.mangatest.utils.MyColorUtils;
@@ -58,7 +63,11 @@ public class MangaTestSyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle bundle, String s, ContentProviderClient contentProviderClient, SyncResult syncResult) {
+        checkForUpdates();
+        updateLatestMangaList();
+    }
 
+    private void checkForUpdates() {
         List<String> updated = new ArrayList<>();
         GetManga getManga = new GetManga(getContext());
 
@@ -78,36 +87,39 @@ public class MangaTestSyncAdapter extends AbstractThreadedSyncAdapter {
                 try {
                     MangaDetailsObject detailsObject =
                             getManga.getManga(cursor.getString(MANGA_ID), cursor.getString(MANGA_SOURCE));
-                    JSONArray localChapters = new JSONArray(cursor.getString(MANGA_CHAPTER_JSON));
-                    JSONArray freshChapters = new JSONArray(detailsObject.getChapters());
 
-                    String last_local = localChapters.getJSONObject(localChapters.length() - 1).getString("chapterId");
-                    String last_fresh = freshChapters.getJSONObject(freshChapters.length() - 1).getString("chapterId");
+                    if(detailsObject != null) {
+                        JSONArray localChapters = new JSONArray(cursor.getString(MANGA_CHAPTER_JSON));
+                        JSONArray freshChapters = new JSONArray(detailsObject.getChapters());
 
-                    Uri uri = Contract.MyManga.buildMangaWithNameUri(detailsObject.getName());
+                        String last_local = localChapters.getJSONObject(localChapters.length() - 1).getString("chapterId");
+                        String last_fresh = freshChapters.getJSONObject(freshChapters.length() - 1).getString("chapterId");
 
-                    if(!last_local.equals(last_fresh)) {
-                        ContentValues cv = new ContentValues();
-                        cv.put(Contract.MyManga.COLUMN_MANGA_CHAPTER_JSON, detailsObject.getChapters());
-                        getContext().getContentResolver().update(uri, cv, null, null);
-                        getContext().getContentResolver().notifyChange(uri, null);
+                        Uri uri = Contract.MyManga.buildMangaWithNameUri(detailsObject.getName());
 
-                        //get number of updates if user didn't go through them already
-                        int updates = Utilities.readMangaPageFromPrefs(getContext(), cursor.getString(MANGA_ID));
-                        updates += (Integer.parseInt(last_fresh.trim()) - Integer.parseInt(last_local.trim()));
-                        Utilities.writeMangaPageToPrefs(getContext(), cursor.getString(MANGA_ID), updates);
+                        if (!last_local.equals(last_fresh)) {
+                            ContentValues cv = new ContentValues();
+                            cv.put(Contract.MyManga.COLUMN_MANGA_CHAPTER_JSON, detailsObject.getChapters());
+                            getContext().getContentResolver().update(uri, cv, null, null);
+                            getContext().getContentResolver().notifyChange(uri, null);
 
-                        updated.add(detailsObject.getName());
-                        Utilities.Log(LOG_TAG, detailsObject.getName() + ": updated");
-                    }else{
-                        Utilities.Log(LOG_TAG, detailsObject.getName() + ": No update");
-                    }
+                            //get number of updates if user didn't go through them already
+                            int updates = Utilities.readMangaPageFromPrefs(getContext(), cursor.getString(MANGA_ID));
+                            updates += (Integer.parseInt(last_fresh.trim()) - Integer.parseInt(last_local.trim()));
+                            Utilities.writeMangaPageToPrefs(getContext(), cursor.getString(MANGA_ID), updates);
 
-                    if(!cursor.getString(MANGA_COVER).equals(detailsObject.getCover())){
-                        ContentValues cv = new ContentValues();
-                        cv.put(Contract.MyManga.COLUMN_MANGA_COVER, detailsObject.getCover());
-                        getContext().getContentResolver().update(uri, cv, null, null);
-                    }
+                            updated.add(detailsObject.getName());
+                            Utilities.Log(LOG_TAG, detailsObject.getName() + ": updated");
+                        } else {
+                            Utilities.Log(LOG_TAG, detailsObject.getName() + ": No update");
+                        }
+
+                        if (!cursor.getString(MANGA_COVER).equals(detailsObject.getCover())) {
+                            ContentValues cv = new ContentValues();
+                            cv.put(Contract.MyManga.COLUMN_MANGA_COVER, detailsObject.getCover());
+                            getContext().getContentResolver().update(uri, cv, null, null);
+                        }
+                    } else break;
 
                 }catch (JSONException e){
                     e.printStackTrace();
@@ -125,7 +137,34 @@ public class MangaTestSyncAdapter extends AbstractThreadedSyncAdapter {
             Utilities.Log(LOG_TAG, "Updates: " + updated.size());
 
         }
+    }
 
+    private void updateLatestMangaList(){
+        final Cursor cursor = getContext().getContentResolver().query(
+                Contract.MangaReaderLatestList.CONTENT_URI,
+                new String[]{Contract.MangaReaderLatestList._ID, //0
+                        Contract.MangaReaderLatestList.COLUMN_MANGA_NAME, //1
+                        Contract.MangaReaderLatestList.COLUMN_CHAPTER}, //2
+                null, null, null);
+
+        if(cursor != null && cursor.moveToFirst()) {
+            MangaReader mangaReader = new MangaReader();
+            mangaReader.getLatestList(new GetListListener() {
+                @Override
+                public void onGetList(@NonNull List list) {
+                    if(list.size() > 0) {
+                        MangaLatestInfoBean latestInfoBean = (MangaLatestInfoBean) list.get(0);
+                        if (!cursor.getString(1).equals(latestInfoBean.getMangaTitle())) {
+                            InsertCall insertCall = new InsertCall(list, Contract.MangaReaderLatestList.CONTENT_URI, getContext());
+                            int rows = getContext().getContentResolver().delete(Contract.MangaReaderLatestList.CONTENT_URI, null, null);
+                            Utilities.Log(LOG_TAG, "latestRowsDeleted: " + rows);
+                            insertCall.start();
+                            cursor.close();
+                        }
+                    }
+                }
+            });
+        }
     }
 
     private void notifyUser(List<String> list) {
