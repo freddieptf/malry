@@ -22,8 +22,9 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-        return makeMovementFlags(0, ItemTouchHelper.RIGHT);
+        return makeMovementFlags(0, ItemTouchHelper.LEFT);
     }
+
 
 
     @Override
@@ -37,9 +38,8 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 //            itemView.setAlpha(alpha);
 //        }
 
-
         Drawable drawable = ContextCompat.getDrawable(itemView.getContext(), R.drawable.swipe_background);
-        drawable.setBounds(itemView.getLeft(), itemView.getTop(), (int) dX, itemView.getBottom());
+        drawable.setBounds((int) dX, itemView.getTop(), itemView.getRight(), itemView.getBottom());
         drawable.draw(c);
 
     }
