@@ -56,6 +56,10 @@ public class PicPagerAdapter extends PagerAdapter {
         return picUris.length;
     }
 
+    public String getCurrentPicUri(){
+        return picUris[customViewPager.getCurrentItem()];
+    }
+
     @Override
     public boolean isViewFromObject(View view, Object object) {
         return view.equals(object);
@@ -72,7 +76,9 @@ public class PicPagerAdapter extends PagerAdapter {
         viewHolder = new ViewHolder(view);
 
         String orientation = viewHolder.imageView.getTag().toString();
-        if(orientation.equals("landscape")) customViewPager.setVertical(true);
+        if(orientation.equals("landscape")) {
+            customViewPager.setVertical(true);
+        }
         viewHolder.pageNumber.setText("p" + (position + 1));
 
         final String pic = picUris[position];

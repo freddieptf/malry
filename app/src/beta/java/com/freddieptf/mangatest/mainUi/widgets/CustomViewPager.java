@@ -6,10 +6,12 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.pixplicity.multiviewpager.MultiViewPager;
+
 /**
  * Created by fred on 5/19/15.
  */
-public class CustomViewPager extends ViewPager {
+public class CustomViewPager extends MultiViewPager {
 
     public void setVertical(boolean vertical) {
         this.vertical = vertical;

@@ -53,7 +53,7 @@ public class Utilities {
         return firstStart;
     }
 
-    public static void setFirstStart(Context context, Boolean b){
+    public static void setFirstStart(Context context, boolean b){
         SharedPreferences prefs = context.getSharedPreferences("firstStart", 0);
         SharedPreferences.Editor editor = prefs.edit();
         if(b){

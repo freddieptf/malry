@@ -1,10 +1,20 @@
 package com.freddieptf.mangatest.mainUi.fragments;
 
+import android.app.WallpaperManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -12,6 +22,8 @@ import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.adapters.PicPagerAdapter;
 import com.freddieptf.mangatest.mainUi.widgets.CustomViewPager;
 import com.freddieptf.mangatest.utils.Utilities;
+
+import java.io.IOException;
 
 /**
  * Created by fred on 3/22/15.
@@ -30,7 +42,11 @@ public class MangaViewerFragment extends Fragment {
     int pageCount = -1;
     CustomViewPager viewPager;
     String chapterTitle;
+    WallpaperManager wallpaperManager;
 
+    public MangaViewerFragment(){
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,7 +55,7 @@ public class MangaViewerFragment extends Fragment {
         Bundle bundle = getActivity().getIntent().getBundleExtra("bundle");
         chapterTitle = bundle.getString("chapter_title");
         if(getArguments() != null && getArguments().getInt("pos") != 0) pos = getArguments().getInt("pos");
-        Utilities.Log(LOG_TAG, "pos: " + pos + "chpterName: " + chapterTitle);
+        Utilities.Log(LOG_TAG, "pos: " + pos + " chpterName: " + chapterTitle);
 
     }
 
@@ -70,6 +86,7 @@ public class MangaViewerFragment extends Fragment {
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(pos, false);
 
+        wallpaperManager = WallpaperManager.getInstance(getActivity());
 
 //        Utilities.changeSystemUiOnTap(viewPager, getActivity());
 //        new Handler().postDelayed(new Runnable() {
@@ -81,10 +98,17 @@ public class MangaViewerFragment extends Fragment {
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().registerReceiver(broadcastReceiver, new IntentFilter(Intent.ACTION_WALLPAPER_CHANGED));
+    }
 
     @Override
     public void onPause() {
         super.onPause();
+
+        getActivity().unregisterReceiver(broadcastReceiver);
 
         if((pageCount - 1) != viewPager.getCurrentItem() && viewPager.getCurrentItem() != 0) {
             Utilities.writeMangaPageToPrefs(getActivity(),
@@ -100,10 +124,35 @@ public class MangaViewerFragment extends Fragment {
 
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(SCROLL_POSITION, viewPager.getCurrentItem());
-        Utilities.Log(LOG_TAG, "save: " + viewPager.getCurrentItem());
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_viewer, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_wallpaper:
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            wallpaperManager.setBitmap(BitmapFactory.decodeFile(adapter.getCurrentPicUri()));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Snackbar.make(viewPager, "Wallpaper set", Snackbar.LENGTH_LONG).show();
+        }
+    };
 }
