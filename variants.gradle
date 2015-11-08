@@ -1,21 +1,33 @@
 ext {
 
-    basePackageName = "com.freddieptf.mangatest"
-    resAppName = "appName"
+    basePackageName = 'com.freddieptf.mangatest'
+    resAppName = 'appName'
 
     beta = [
             packageName: "${basePackageName}.beta",
-            appName: "My Manga Beta",
+            appName: 'My Manga Beta',
             version: 1,
-            versionName: "0.6.0"
+            versionName: '0.6.0'
 
     ]
 
     stable = [
             packageName: "${basePackageName}.stable",
-            appName: "My Manga",
+            appName: 'My Manga',
             version: 1,
-            versionName: "0.5"
+            versionName: '0.5'
     ]
+
+    compileSdkVersion = 23
+    buildToolsVersion = '23.0.1'
+    minSdkVersion = 16
+    targetSdkVersion = 23
+
+    def supportVersion = '23.0.1'
+    appCompat = "com.android.support:appcompat-v7:$supportVersion"
+    cardView = "com.android.support:cardview-v7:$supportVersion"
+    recyclerView = "com.android.support:recyclerview-v7:$supportVersion"
+    designLib = "com.android.support:design:$supportVersion"
+    palette =  "com.android.support:palette-v7:$supportVersion"
 
 }

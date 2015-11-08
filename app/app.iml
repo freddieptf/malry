@@ -102,6 +102,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.chrisbanes.photoview/library/1.2.3/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.hannesdorfmann.smoothprogressbar/library/1.0.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.melnykov/floatingactionbutton/1.3.0/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.pixplicity.multiviewpager/library/1.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jacoco" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaResources" />
@@ -123,6 +124,7 @@
     <orderEntry type="library" exported="" name="library-1.2.3" level="project" />
     <orderEntry type="library" exported="" name="library-1.0.0" level="project" />
     <orderEntry type="library" exported="" name="material-dialogs-0.7.2.7" level="project" />
+    <orderEntry type="library" exported="" name="library-1.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-23.0.1" level="project" />
     <orderEntry type="library" exported="" name="palette-v7-23.0.1" level="project" />
     <orderEntry type="library" exported="" name="cardview-v7-23.0.1" level="project" />
