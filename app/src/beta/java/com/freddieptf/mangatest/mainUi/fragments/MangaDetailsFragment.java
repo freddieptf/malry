@@ -63,20 +63,6 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 public class MangaDetailsFragment extends BaseFragment implements ListView.OnScrollListener,
        MangaChapterAdapter.OnChapterClicked {
 
-    public MangaDetailsFragment(){
-        setRetainInstance(false);
-    }
-
-    @Override
-    protected boolean showToolBarWithDefaultAppColor() {
-        return false;
-    }
-
-    @Override
-    protected int useNavigationIcon() {
-        return R.drawable.abc_ic_ab_back_mtrl_am_alpha;
-    }
-
     String mangaTitle, mangaId, source, imgUrl, mangaAuthor, mangaInfo, mangaStatus, chapterCount;
     public static String DIS_FRAGMENT = "Details";
     public static final String TITLE_KEY = "manga_title";
@@ -100,6 +86,21 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
     MangaDetailsObject cacheMangaDetailsObject;
     public int myMangaColor = -1, myDarkMangaColor = -1;
     boolean animate;
+
+
+    public MangaDetailsFragment(){
+        setRetainInstance(false);
+    }
+
+    @Override
+    protected boolean showToolBarWithDefaultAppColor() {
+        return false;
+    }
+
+    @Override
+    protected int useNavigationIcon() {
+        return R.drawable.abc_ic_ab_back_mtrl_am_alpha;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -127,6 +128,17 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
         mangaTitle = getArguments().getString(TITLE_KEY);
         mangaId = getArguments().getString(ID_KEY);
         source = getArguments().getString(SOURCE_KEY);
+
+        if(source == null){
+            Uri uri = Contract.MyManga.buildMangaWithNameUri(mangaTitle);
+            Cursor c = getActivity().getContentResolver().query(uri,
+                    new String[]{Contract.MyManga._ID, Contract.MyManga.COLUMN_MANGA_SOURCE},
+                    null, null, null);
+            if(c != null && c.moveToFirst()) {
+                source = c.getString(1);
+                c.close();
+            }
+        }
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(mangaTitle);
         Toast.makeText(getActivity(), mangaTitle + "\n" + mangaId + "\n" + source, Toast.LENGTH_SHORT).show();
@@ -163,7 +175,7 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
             @Override
             public void onClick(View view) {
                 if (cacheMangaDetailsObject != null) {
-                    GetManga.insertToDb(getActivity(), cacheMangaDetailsObject, mangaId, source);
+                    GetManga.insertToLibrary(getActivity(), cacheMangaDetailsObject, mangaId, source);
                     view.animate().scaleX(0).scaleY(0).setInterpolator(new OvershootInterpolator()).setDuration(250);
                 }
             }
@@ -174,7 +186,7 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
     @Override
     public void onChapterClicked(final ChapterAttrs ch) {
         final String name = mangaId;
-        String path = viewIfExistsOnDisk(name.replace("-", " "), ch.chapter_id, ch.chapter_title);
+        String path = viewIfOnDisk(name.replace("-", " "), ch.chapter_id, ch.chapter_title);
 
         if(path == null){
             MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
@@ -262,7 +274,7 @@ public class MangaDetailsFragment extends BaseFragment implements ListView.OnScr
     }
 
 
-    public String viewIfExistsOnDisk(String mangaName, String chapterId, String chapterTitle){
+    public String viewIfOnDisk(String mangaName, String chapterId, String chapterTitle){
 
         String path = null;
         if(chapterTitle == null) chapterTitle = "Chapter";
