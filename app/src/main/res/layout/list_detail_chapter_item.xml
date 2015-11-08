@@ -4,7 +4,7 @@
     android:orientation="horizontal"
     android:padding="16dp"
     android:layout_height="match_parent"
-    android:background="?list_selector">
+    android:background="@drawable/list_detail_item">
 
     <TextView
         android:id="@+id/tv_Chapter_id"
@@ -22,7 +22,6 @@
         android:layout_height="match_parent"
         style="@style/SmallTextAppearance"
         android:textSize="16sp"
-
         />
 
 

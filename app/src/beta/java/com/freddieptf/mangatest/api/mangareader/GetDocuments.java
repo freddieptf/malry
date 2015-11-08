@@ -81,7 +81,7 @@ public class GetDocuments {
                     List<Document> document = documentObject.getDocumentList();
                     if(document.isEmpty()) throw new NullPointerException();
                     documentReceived.onDocumentReceived(document);
-                    document.clear();
+                    documentObject.clearList();
                 } catch (InterruptedException | ExecutionException | NullPointerException e) {
                     Utilities.Log(LOG_TAG, "Popular doc: " + e.getMessage());
                 }

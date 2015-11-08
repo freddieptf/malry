@@ -35,7 +35,6 @@
     </integer-array>
 
     <string-array name="genres">
-        <item>All</item>
         <item>Action</item>
         <item>Adventure</item>
         <item>Comedy</item>

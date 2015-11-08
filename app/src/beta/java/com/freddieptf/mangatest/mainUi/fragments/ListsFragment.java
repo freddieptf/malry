@@ -60,6 +60,7 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
     public static final String SORT_ORDER = "sort_order";
     String genres = "";
     Cab cab;
+    ViewPager viewPager;
 
     Uri PREF_CONTENT_URI;
 
@@ -161,7 +162,7 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
             cab.restoreState(savedInstanceState);
         }
 
-        ViewPager viewPager = (ViewPager) view.findViewById(R.id.pager);
+        viewPager = (ViewPager) view.findViewById(R.id.pager);
         viewPager.setAdapter(new ListsPagerAdapter(this, getActivity()));
         TabLayout tabLayout = getMainActivityHelper().getTabs();
         tabLayout.setupWithViewPager(viewPager);
@@ -341,6 +342,7 @@ public class ListsFragment extends BaseFragment implements LoaderManager.LoaderC
 
     private void startMyActionMode() {
         cab.startCabMode(true);
+        viewPager.setCurrentItem(1, true);
         getMainActivityHelper().getToolBar().setVisibility(View.GONE);
         cab.setTitle(getString(R.string.pick_genre));
         genresView.show();

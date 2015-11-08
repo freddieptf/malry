@@ -49,12 +49,6 @@
         android:visible="false"
         />
 
-    <item android:title="@string/string_check4updates"
-        android:id="@+id/menu_updateManga"
-        android:orderInCategory="200"
-        android:visible="false"
-        />
-
     <!--my manga fragment menu-->
 
 

@@ -41,7 +41,7 @@ public class MangaGridFragment extends Fragment {
 
         recyclerView = (RecyclerView)view.findViewById(R.id.staggered_recyclerView);
 
-        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), getResources().getInteger(R.integer.grid_columns)));
 
         GridAdapter adapter = new GridAdapter(picUris, new GridAdapter.OnItemClick() {
             @Override

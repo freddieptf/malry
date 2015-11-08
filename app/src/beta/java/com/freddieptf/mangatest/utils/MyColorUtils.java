@@ -13,7 +13,6 @@ import com.freddieptf.mangatest.R;
 public class MyColorUtils {
 
     Context context;
-    final String LOG_TAG = getClass().getSimpleName();
 
     public MyColorUtils(Context context){
         this.context = context;
@@ -21,9 +20,9 @@ public class MyColorUtils {
 
     public int getPrimaryTextColor(){
         if(new ThemeUtilities(context).isLight()){
-            return R.color.primary_text;
+            return context.getResources().getColor(R.color.primary_text);
         }else{
-            return android.R.color.white;
+            return context.getResources().getColor(android.R.color.white);
         }
     }
 
@@ -37,6 +36,9 @@ public class MyColorUtils {
 
     public int getPrimaryDarkColor(){
         return context.getResources().getColor(R.color.primary_dark);
+    }
+    public int getSecondaryTextColor(){
+        return context.getResources().getColor(R.color.secondary_text);
     }
 
     @TargetApi(21)

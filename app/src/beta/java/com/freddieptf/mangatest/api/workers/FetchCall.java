@@ -84,6 +84,10 @@ public class FetchCall implements Callable<FetchCall.DocumentObject> {
             documents.add(document);
         }
 
+        public void clearList(){
+            documents = null;
+        }
+
         List<Document> documents;
         int id;
     }
