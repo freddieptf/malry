@@ -7,7 +7,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.freddieptf.mangatest.R;
-import com.freddieptf.mangatest.mainUi.fragments.MangaGridFragment;
 import com.freddieptf.mangatest.mainUi.fragments.MangaViewerFragment;
 import com.freddieptf.mangatest.utils.Utilities;
 
@@ -43,19 +42,13 @@ public class MangaViewerActivity extends AppCompatActivity {
         if(savedInstanceState != null && savedInstanceState.containsKey("pos"))
             posFromPrefs = savedInstanceState.getInt("pos");
 
-        if(posFromPrefs == 0){
-            posFromPrefs = -1;
-            getSupportFragmentManager()
-                    .beginTransaction().replace(R.id.container, new MangaGridFragment()).commit();
-        } else if(posFromPrefs == -1){}
-        else{
-            MangaViewerFragment mangaViewerFragment = new MangaViewerFragment();
-            Bundle b = new Bundle();
-            b.putInt("pos", posFromPrefs);
-            mangaViewerFragment.setArguments(b);
+        MangaViewerFragment mangaViewerFragment = new MangaViewerFragment();
+        Bundle b = new Bundle();
+        b.putInt("pos", posFromPrefs);
+        mangaViewerFragment.setArguments(b);
+        if(savedInstanceState == null)
             getSupportFragmentManager()
                     .beginTransaction().replace(R.id.container, mangaViewerFragment, "viewer").commit();
-        }
 
     }
 
