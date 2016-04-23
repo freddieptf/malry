@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 
 import com.freddieptf.mangatest.R;
 
@@ -43,7 +44,9 @@ public class MyColorUtils {
 
     @TargetApi(21)
     public void setStatusBarColor(int statusBarColor){
-        ((Activity) context).getWindow().setStatusBarColor(statusBarColor);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ((Activity) context).getWindow().setStatusBarColor(statusBarColor);
+        }
     }
 
     public int darken(int color, int defaultDarkColor){
