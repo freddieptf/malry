@@ -1,5 +1,6 @@
 package com.freddieptf.mangatest.mainUi.baseUi;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -65,10 +66,12 @@ public class BaseFragment extends Fragment {
         if(showToolBarWithDefaultAppColor()){
             MainActivity.toolbarBig.setBackgroundColor(new MyColorUtils(getActivity()).getPrimaryColor());
 
-            if(((BaseActivity) getActivity()).hasNavDrawer())
-                getMyColorUtils().setStatusBarColor(getResources().getColor(android.R.color.transparent));
-            else
-                getMyColorUtils().setStatusBarColor(getResources().getColor(R.color.primary_dark));
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (((BaseActivity) getActivity()).hasNavDrawer())
+                    getMyColorUtils().setStatusBarColor(getResources().getColor(android.R.color.transparent));
+                else
+                    getMyColorUtils().setStatusBarColor(getResources().getColor(R.color.primary_dark));
+            }
         }
 
         getMainActivityHelper().getToolBar().setNavigationIcon(useNavigationIcon());
