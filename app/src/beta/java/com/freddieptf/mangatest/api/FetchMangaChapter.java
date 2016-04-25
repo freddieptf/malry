@@ -93,7 +93,7 @@ public class FetchMangaChapter extends AsyncTask<String, Void, String> {
 
         String baseUrl;
         if(strings[2].equals(context.getString(R.string.pref_manga_reader)))
-            baseUrl = "https://doodle-manga-scraper.p.mashape.com/mangareader.net/manga/";
+            baseUrl = "http://mapi-freddieptf.rhcloud.com/api/mr/manga/";
         else
             baseUrl = "https://doodle-manga-scraper.p.mashape.com/mangafox.me/manga/";
 

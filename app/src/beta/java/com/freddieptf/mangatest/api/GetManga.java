@@ -36,7 +36,7 @@ public class GetManga {
 
         try {
             URL readerUrl = new URL
-                    ("https://doodle-manga-scraper.p.mashape.com/mangareader.net/manga/" + mangaId + "/");
+                    ("http://mapi-freddieptf.rhcloud.com/api/mr/manga/" + mangaId);
             URL foxUrl = new URL
                     ("https://doodle-manga-scraper.p.mashape.com/mangafox.me/manga/" + mangaId + "/");
 
