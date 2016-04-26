@@ -1,4 +1,6 @@
-# MyManga
+# MyManga 
+*Needs major rewrite..dat api package is a mess*
+
 Yet another "My Manga" manga downloader and offline reader app for android, to keep you up to date with
 your favourite Manga. A Work In Progress.
 
