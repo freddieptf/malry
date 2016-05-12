@@ -8,8 +8,8 @@ import android.test.AndroidTestCase;
 
 import com.freddieptf.mangatest.data.Contract;
 
-import static com.freddieptf.mangatest.data.Contract.MyManga;
 import static com.freddieptf.mangatest.data.Contract.MangaReaderMangaList;
+import static com.freddieptf.mangatest.data.Contract.MyManga;
 
 /**
  * Created by fred on 1/30/15.
@@ -20,7 +20,6 @@ public class TestProvider extends AndroidTestCase {
     public void deleteAllRecords(){
         mContext.getContentResolver().delete(MyManga.CONTENT_URI, null, null);
         mContext.getContentResolver().delete(MangaReaderMangaList.CONTENT_URI, null, null);
-        mContext.getContentResolver().delete(Contract.MangaEden.CONTENT_URI, null, null);
         mContext.getContentResolver().delete(Contract.VirtualTable.CONTENT_URI, null, null);
 
         Cursor c = mContext.getContentResolver().query(MyManga.CONTENT_URI, null, null, null, null);
@@ -30,10 +29,6 @@ public class TestProvider extends AndroidTestCase {
         Cursor c1 = mContext.getContentResolver().query(Contract.MangaReaderMangaList.CONTENT_URI, null, null, null, null);
         assertEquals(0, c1.getCount());
         c1.close();
-
-        Cursor c2 = mContext.getContentResolver().query(Contract.MangaEden.CONTENT_URI, null, null, null, null);
-        assertEquals(0, c2.getCount());
-        c2.close();
 
         Cursor c3 = mContext.getContentResolver().query(Contract.VirtualTable.CONTENT_URI, null, null, null, null);
         assertEquals(0, c3.getCount());

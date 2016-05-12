@@ -3,9 +3,9 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="MyMangaTheme">
         <!-- Customize your theme here. -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowTranslucentStatus">true</item>
+        <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
+        <!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
+        <!--<item name="android:windowTranslucentStatus">true</item>-->
 
         <!--<item name="toolBar_shadow">@null</item>-->
         <!--<item name="list_selector"></item>-->

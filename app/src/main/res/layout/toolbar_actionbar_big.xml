@@ -1,31 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.AppBarLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/appBarLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/appBarLayout"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <include layout="@layout/toolbar_actionbar"/>
-
-        <com.freddieptf.mangatest.mainUi.widgets.Cab
-            android:id="@+id/cab"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"/>
-
-    </FrameLayout>
+    <include layout="@layout/toolbar_actionbar" />
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-
 
 </android.support.design.widget.AppBarLayout>

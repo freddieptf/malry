@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         applicationId 'com.freddieptf.mangatest'
@@ -42,11 +42,12 @@ dependencies {
     compile rootProject.ext.recyclerView
     compile rootProject.ext.palette
     compile rootProject.ext.designLib
-    compile 'com.afollestad:material-dialogs:0.7.2.7'
+    compile 'com.github.afollestad.material-dialogs:commons:0.8.5.1'
     compile 'com.hannesdorfmann.smoothprogressbar:library:1.0.0'
     compile 'com.melnykov:floatingactionbutton:1.3.0'
     compile 'com.github.chrisbanes.photoview:library:1.2.3'
     compile 'com.mcxiaoke.volley:library:1.0.19'
-    compile 'org.jsoup:jsoup:1.8.2'
+//    compile 'org.jsoup:jsoup:1.8.2'
     compile 'com.pixplicity.multiviewpager:library:1.0'
+    compile 'com.roughike:bottom-bar:1.3.3'
 }

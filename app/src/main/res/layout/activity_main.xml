@@ -1,17 +1,13 @@
-<android.support.v4.widget.DrawerLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/drawerLayout"
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:fitsSystemWindows="true"
-    xmlns:tools="http://schemas.android.com/tools">
-
+    android:id="@+id/coordinator"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <include layout="@layout/toolbar_actionbar_big"/>
 
@@ -39,24 +35,4 @@
 
     </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/navdrawer_frame"
-        android:layout_width="1dp"
-        android:fitsSystemWindows="true"
-        android:layout_height="match_parent"
-        android:layout_gravity="start">
-
-        <fragment
-            android:id="@+id/navigation_drawer_fragment"
-            android:name="com.freddieptf.mangatest.mainUi.fragments.NavDrawerFrag"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:tag="NAV_DRAWER"
-            />
-
-    </FrameLayout>
-
-
-
-
-</android.support.v4.widget.DrawerLayout>
+</android.support.design.widget.CoordinatorLayout>

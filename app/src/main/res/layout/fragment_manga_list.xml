@@ -6,33 +6,22 @@
 
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"/>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <fr.castorflex.android.smoothprogressbar.SmoothProgressBar
-        android:visibility="gone"
         android:id="@+id/progress"
         android:layout_width="match_parent"
         android:layout_height="4dp"
         android:indeterminate="true"
+        android:visibility="gone"
+        app:spb_colors="@array/gplus_colors"
         app:spb_interpolator="spb_interpolator_decelerate"
-        app:spb_reversed="true"
-        app:spb_sections_count="1"
-        app:spb_speed="3"
         app:spb_mirror_mode="true"
         app:spb_progressiveStart_activated="true"
-        app:spb_colors="@array/gplus_colors" />
-
-    <com.freddieptf.mangatest.mainUi.widgets.genreview.GenresView
-        android:id="@+id/genre_view"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_gravity="bottom"
-        android:background="@android:color/white"
-        android:visibility="gone"
-        />
-
-
+        app:spb_reversed="true"
+        app:spb_sections_count="1"
+        app:spb_speed="3" />
 
 </FrameLayout>
 

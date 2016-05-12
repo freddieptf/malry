@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_search"
+        android:icon="@drawable/ic_action_search"
+        android:orderInCategory="100"
+        android:title="@string/string_search"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="always"
+        />
+
+    <item
+        android:id="@+id/menu_filter"
+        android:icon="@drawable/ic_filter_list_white_24dp"
+        android:orderInCategory="200"
+        android:title="@string/string_filter"
+        app:showAsAction="ifRoom" />
+
+    <group
+        android:id="@+id/menusourceGroup"
+        android:checkableBehavior="single"
+        android:enabled="true">
+
+        <item android:id="@+id/menu_sourceReader"
+            android:title="@string/pref_manga_reader"
+
+            />
+        <item android:id="@+id/menu_sourceFox"
+            android:title="@string/pref_manga_fox" />
+
+    </group>
+
+</menu>

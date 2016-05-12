@@ -12,8 +12,8 @@ import com.freddieptf.mangatest.data.DbHelper;
 import java.util.Map;
 import java.util.Set;
 
-import static com.freddieptf.mangatest.data.Contract.MyManga;
 import static com.freddieptf.mangatest.data.Contract.MangaReaderMangaList;
+import static com.freddieptf.mangatest.data.Contract.MyManga;
 
 /**
  * Created by fred on 1/30/15.
@@ -22,6 +22,43 @@ public class TestDB extends AndroidTestCase {
 
     public static final String LOG_TAG = TestDB.class.getSimpleName();
     public static String TEST_MANGA_NAME = "manga";
+
+    static ContentValues mockMangaValues() {
+        ContentValues cv = new ContentValues();
+
+        cv.put(MyManga.COLUMN_MANGA_NAME, TEST_MANGA_NAME);
+        cv.put(MyManga.COLUMN_MANGA_AUTHOR, "Fred");
+        cv.put(MyManga.COLUMN_MANGA_INFO, "Blah blah blah");
+        cv.put(MyManga.COLUMN_MANGA_STATUS, "On-going");
+        cv.put(Contract.MyManga.COLUMN_MANGA_CHAPTER_JSON, "ycbuidvbuisvbuvbsdbvusvbs");
+        cv.put(MyManga.COLUMN_MANGA_COVER, "http://google.com");
+
+        return cv;
+    }
+
+    static ContentValues mockMangaInListValues() {
+        ContentValues cv = new ContentValues();
+
+        cv.put(Contract.MangaReaderMangaList.COLUMN_MANGA_ID, "-manga-");
+        cv.put(Contract.MangaReaderMangaList.COLUMN_MANGA_NAME, TEST_MANGA_NAME);
+        return cv;
+    }
+
+    static void validateCursor(Cursor c, ContentValues cv) {
+
+        assertTrue(c.moveToFirst());
+
+        Set<Map.Entry<String, Object>> values = cv.valueSet();
+        for (Map.Entry<String, Object> entry : values) {
+            String columnName = entry.getKey();
+            int i = c.getColumnIndex(columnName);
+            assertTrue(i != -1);
+            String expectedValue = entry.getValue().toString();
+            assertEquals(expectedValue, c.getString(i));
+        }
+
+
+    }
 
     public void testCreateDb() throws Throwable {
         mContext.deleteDatabase(DbHelper.DATABASE_NAME);
@@ -70,58 +107,6 @@ public class TestDB extends AndroidTestCase {
 
         db.close();
         myDbhelper.close();
-
-
-    }
-
-
-    static ContentValues mockMangaValues(){
-        ContentValues cv = new ContentValues();
-
-        cv.put(MyManga.COLUMN_MANGA_NAME, TEST_MANGA_NAME);
-        cv.put(MyManga.COLUMN_MANGA_AUTHOR, "Fred");
-        cv.put(MyManga.COLUMN_MANGA_INFO, "Blah blah blah");
-        cv.put(MyManga.COLUMN_MANGA_STATUS, "On-going");
-        cv.put(Contract.MyManga.COLUMN_MANGA_CHAPTER_JSON, "ycbuidvbuisvbuvbsdbvusvbs");
-        cv.put(MyManga.COLUMN_MANGA_COVER, "http://google.com");
-
-        return cv;
-    }
-
-    static ContentValues mockMangaValues2(){
-        ContentValues contentValues= new ContentValues();
-
-        contentValues.put(Contract.MangaEden.COLUMN_MANGA_TITLE, "Frred");
-        contentValues.put(Contract.MangaEden.COLUMN_MANGA_HITS, "56789");
-        contentValues.put(Contract.MangaEden.COLUMN_MANGA_ID, "w2453yugbuyb");
-        contentValues.put(Contract.MangaEden.COLUMN_MANGA_STATUS, "gvhbjnkml");
-        contentValues.put(Contract.MangaEden.COLUMN_MANGA_COVER, "gvhbjnkm");
-
-        return contentValues;
-    }
-
-    static ContentValues mockMangaInListValues(){
-        ContentValues cv = new ContentValues();
-
-        cv.put(Contract.MangaReaderMangaList.COLUMN_MANGA_ID, "-manga-");
-        cv.put(Contract.MangaReaderMangaList.COLUMN_MANGA_NAME, TEST_MANGA_NAME);
-        return cv;
-    }
-
-
-
-    static void validateCursor(Cursor c, ContentValues cv){
-
-        assertTrue(c.moveToFirst());
-
-        Set<Map.Entry<String, Object>> values = cv.valueSet();
-        for(Map.Entry<String, Object> entry : values){
-            String columnName = entry.getKey();
-            int i = c.getColumnIndex(columnName);
-            assertTrue(i != -1);
-            String expectedValue = entry.getValue().toString();
-            assertEquals(expectedValue, c.getString(i));
-        }
 
 
     }
