@@ -1,56 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    android:id="@+id/mainDetailsView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/mainDetailsView"
-    android:tag="portrait">
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
-    <com.freddieptf.mangatest.volleyStuff.FadeInNetworkImageView
-        android:id="@+id/iv_MangaDetailsCover"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitXY"
-        />
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <FrameLayout
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="320dp"
+            android:fitsSystemWindows="true"
+            app:expandedTitleMarginBottom="94dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-            <ListView
-                android:background="?transparent_background_2"
-                android:id="@+id/lv_MangaChapters"
+            <ImageView
+                android:id="@+id/iv_MangaDetailsCover"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fastScrollEnabled="true"
-                android:overScrollMode="never"/>
+                android:scaleType="centerCrop" />
 
-            <fr.castorflex.android.smoothprogressbar.SmoothProgressBar
-                android:visibility="gone"
-                android:id="@+id/progress"
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="4dp"
-                android:indeterminate="true"
-                app:spb_interpolator="spb_interpolator_decelerate"
-                app:spb_reversed="true"
-                app:spb_sections_count="1"
-                app:spb_speed="3"
-                app:spb_mirror_mode="true"
-                app:spb_progressiveStart_activated="true"
-                app:spb_colors="@array/gplus_colors" />
+                android:layout_height="?actionBarSize"
+                android:background="@null"
+                app:layout_collapseMode="pin"
+                app:navigationIcon="@drawable/md_nav_back" />
 
-        </FrameLayout>
+        </android.support.design.widget.CollapsingToolbarLayout>
 
+    </android.support.design.widget.AppBarLayout>
 
-    </LinearLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/lv_MangaChapters"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:behavior_overlapTop="64dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <fr.castorflex.android.smoothprogressbar.SmoothProgressBar
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_anchor="@id/lv_MangaChapters"
+        app:spb_colors="@array/gplus_colors"
+        app:spb_interpolator="spb_interpolator_decelerate"
+        app:spb_mirror_mode="true"
+        app:spb_progressiveStart_activated="true"
+        app:spb_reversed="true"
+        app:spb_sections_count="1"
+        app:spb_speed="3" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:fabSize="normal"
+        app:layout_anchor="@id/lv_MangaChapters"
+        app:layout_anchorGravity="bottom|end|right"
+        app:srcCompat="@drawable/ic_add_white_24dp" />
 
-
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

@@ -1,35 +1,29 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="MyMangaTheme">
-        <!-- Customize your theme here. -->
-        <!--<item name="spbStyle">@style/SmoothProgressBar</item>-->
-    </style>
-    
-    <style name="MyMangaTheme" parent="Theme.AppCompat.Light.NoActionBar">
-
-
-        <item name="android:listViewStyle">@style/listStyle</item>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
-        <item name="list_selector">@drawable/list_item_state</item>
         <item name="textColorPrimary">@color/primary_text_default_material_light</item>
         <item name="textColorSecondary">@color/secondary_text_default_material_light</item>
         <item name="cardBackgroundColor">@color/cardview_light_background</item>
-        <item name="transparent_background_1">@color/semi_transparent_white</item>
-        <item name="transparent_background_2">@color/semi_transparent_white_50</item>
         <item name="divider_color">@color/divider</item>
         <item name="toolBar_shadow">@drawable/toolbar_shadow</item>
-
     </style>
+
+    <style name="MyMangaTheme" parent="AppTheme">
+        <item name="android:listViewStyle">@style/listStyle</item>
+        <item name="list_selector">@drawable/list_item_state</item>
+    </style>
+
+    <style name="DetailActivityTheme" parent="AppTheme" />
 
     <style name="MangaViewerTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
     </style>
-
 
     <style name="listStyle" parent="Widget.AppCompat.ListView">
         <item name="android:divider">@drawable/divider</item>

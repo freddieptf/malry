@@ -16,8 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.freddieptf.mangatest.R;
-import com.freddieptf.mangatest.data.Contract;
-import com.freddieptf.mangatest.mainUi.MainActivity;
+import com.freddieptf.mangatest.data.local.Contract;
+import com.freddieptf.mangatest.ui.MainActivity;
 
 import java.io.IOException;
 import java.io.InputStream;

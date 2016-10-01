@@ -6,10 +6,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.test.AndroidTestCase;
 
-import com.freddieptf.mangatest.data.Contract;
+import com.freddieptf.mangatest.data.local.Contract;
 
-import static com.freddieptf.mangatest.data.Contract.MangaReaderMangaList;
-import static com.freddieptf.mangatest.data.Contract.MyManga;
+import static com.freddieptf.mangatest.data.local.Contract.MangaReaderMangaList;
+import static com.freddieptf.mangatest.data.local.Contract.MyManga;
 
 /**
  * Created by fred on 1/30/15.

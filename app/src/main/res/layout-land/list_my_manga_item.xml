@@ -1,59 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    android:id="@+id/list_myMangaItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="160dp"
-    android:id="@+id/list_myMangaItem">
+    android:orientation="vertical">
 
     <android.support.v7.widget.CardView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/card"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp"
-        android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        app:cardBackgroundColor="?cardBackgroundColor"
-        android:foreground="?selectableItemBackground">
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="4dp"
+        android:foreground="?selectableItemBackground"
+        app:cardBackgroundColor="?cardBackgroundColor">
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
             android:orientation="vertical"
-            android:paddingStart="16dp"
+            android:paddingBottom="16dp"
             android:paddingEnd="8dp"
             android:paddingLeft="16dp"
             android:paddingRight="8dp"
-            android:paddingBottom="16dp"
-            android:paddingTop="16dp"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="3">
+            android:paddingStart="16dp"
+            android:paddingTop="16dp">
 
             <TableRow
-                android:orientation="horizontal"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tv_MyManga_name"
+                    style="@style/LargeTextAppearance"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/LargeTextAppearance"/>
+                    android:layout_height="wrap_content" />
 
             </TableRow>
 
             <!--@TODO change to visible when we sort out the last update time-->
             <TableRow
-                android:visibility="gone"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:visibility="gone">
 
                 <TextView
                     style="@style/SmallTextAppearance"
@@ -69,22 +69,22 @@
 
 
             <TableRow
-                android:orientation="horizontal"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
                 <TextView
-                    android:text="Author: "
+                    style="@style/SmallTextAppearance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    style="@style/SmallTextAppearance"/>
+                    android:text="Author: "
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tv_MyManga_author"
+                    style="@style/SmallTextAppearance"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    style="@style/SmallTextAppearance"/>
+                    android:layout_height="wrap_content" />
 
             </TableRow>
 
@@ -93,17 +93,17 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:text="Status: "
+                    style="@style/SmallTextAppearance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    style="@style/SmallTextAppearance"/>
+                    android:text="Status: "
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tv_MyManga_status"
+                    style="@style/SmallTextAppearance"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/SmallTextAppearance"
                     />
 
 
@@ -117,11 +117,11 @@
 
                 <TextView
                     android:id="@+id/tv_MyManga_info"
+                    style="@style/SmallTextAppearance"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="5"
                     android:ellipsize="marquee"
-                    style="@style/SmallTextAppearance"
+                    android:maxLines="5"
                     android:textColor="?textColorSecondary"
                     />
 
@@ -132,15 +132,15 @@
 
         <RelativeLayout
             android:id="@+id/iv_myMangaImageView_Layout"
-            android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_weight="1">
 
-                <com.freddieptf.mangatest.volleyStuff.FadeInNetworkImageView
+            <ImageView
                     android:id="@+id/iv_myMangaImageView"
-                    android:scaleType="fitXY"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                android:scaleType="fitXY"
                     />
 
 
@@ -156,22 +156,22 @@
 
 
         <TextView
-            android:visibility="gone"
             android:id="@+id/tv_mangaUpdates"
-            android:layout_alignParentRight="true"
+            style="@style/MediumTextAppearance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
             android:layout_marginEnd="28dp"
             android:layout_marginRight="28dp"
             android:layout_marginTop="4dp"
-            android:padding="4dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            style="@style/MediumTextAppearance"
             android:background="?colorAccent"
-            android:textColor="#fff"
+            android:elevation="5dp"
+            android:gravity="center"
+            android:padding="4dp"
             android:text="1"
-            android:elevation="5dp"/>
+            android:textColor="#fff"
+            android:visibility="gone" />
 
 
 

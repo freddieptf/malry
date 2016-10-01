@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="Sources"
-        android:layout="@layout/preference_category">
+    <PreferenceCategory
+        android:layout="@layout/preference_category"
+        android:title="Sources">
 
         <com.afollestad.materialdialogs.prefs.MaterialListPreference
-            android:layout="@layout/preference_custom"
-            android:title="@string/pref_manga_sources_title"
-            android:key="@string/pref_manga_sources_key"
             android:defaultValue="@string/pref_manga_reader"
             android:entries="@array/pref_manga_sources_Entries"
             android:entryValues="@array/pref_manga_sources_Entries"
+            android:key="@string/pref_manga_sources_key"
+            android:layout="@layout/preference_custom"
+            android:title="@string/pref_manga_sources_title"
             />
 
     </PreferenceCategory>
 
 
-    <PreferenceCategory android:title="Manga Cards"
-        android:layout="@layout/preference_category">
+    <PreferenceCategory
+        android:layout="@layout/preference_category"
+        android:title="Manga Cards">
 
         <CheckBoxPreference
-            android:layout="@layout/preference_custom"
-            android:title="@string/pref_my_manga_cards_compact"
-            android:summary="For smoother scroll on longer lists."
-            android:key="@string/pref_my_manga_cards_key"
             android:defaultValue="false"
+            android:key="@string/pref_my_manga_cards_key"
+            android:layout="@layout/preference_custom"
             android:persistent="true"
+            android:summary="For smoother scroll on longer lists."
+            android:title="@string/pref_my_manga_cards_compact"
             />
 
         <!--<CheckBoxPreference-->
@@ -39,42 +41,45 @@
     </PreferenceCategory>
 
 
-    <PreferenceCategory android:title="Theme"
-        android:layout="@layout/preference_category">
+    <PreferenceCategory
+        android:layout="@layout/preference_category"
+        android:title="Theme">
 
         <com.afollestad.materialdialogs.prefs.MaterialListPreference
-            android:layout="@layout/preference_custom"
-            android:title="@string/pref_themes_title"
-            android:key="@string/pref_themes_key"
-            android:summary="Choose your theme."
+            android:defaultValue="@string/pref_theme_light"
             android:entries="@array/pref_theme_entries"
             android:entryValues="@array/pref_theme_entries"
-            android:defaultValue="@string/pref_theme_light"
+            android:key="@string/pref_themes_key"
+            android:layout="@layout/preference_custom"
+            android:summary="Choose your theme."
+            android:title="@string/pref_themes_title"
             />
 
     </PreferenceCategory>
 
 
-    <PreferenceCategory android:title="Manga Databases"
-        android:layout="@layout/preference_category">
+    <PreferenceCategory
+        android:layout="@layout/preference_category"
+        android:title="Manga Databases">
 
         <Preference
             android:key="@string/pref_fix_database_key"
-            android:title="@string/pref_fix_database_title"
-            android:summary="Redownload a database if it did not set up right or update to keep the databases up to date."
-            android:layout="@layout/preference_custom"/>
+            android:layout="@layout/preference_custom"
+            android:summary="Redownload a database if it did not set up right or update to keep the databases up to releaseDate."
+            android:title="@string/pref_fix_database_title" />
 
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Info"
-        android:layout="@layout/preference_category">
+    <PreferenceCategory
+        android:layout="@layout/preference_category"
+        android:title="Info">
 
         <Preference
             android:key="@string/pref_about_title"
             android:layout="@layout/preference_custom"
-            android:title="@string/pref_about_title"
             android:summary="About this app."
+            android:title="@string/pref_about_title"
             />
 
     </PreferenceCategory>

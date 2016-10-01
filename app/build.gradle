@@ -37,7 +37,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    def supportVersion = '24.1.1'
+    def supportVersion = '24.2.1'
 
     compile "com.android.support:appcompat-v7:$supportVersion"
     compile "com.android.support:cardview-v7:$supportVersion"
@@ -61,6 +61,7 @@ dependencies {
     compile 'com.roughike:bottom-bar:1.3.3'
 
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
 
     compile 'com.google.code.gson:gson:2.7'
 

@@ -6,14 +6,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.freddieptf.mangatest.data.Contract;
-import com.freddieptf.mangatest.data.DbHelper;
+import com.freddieptf.mangatest.data.local.Contract;
+import com.freddieptf.mangatest.data.local.DbHelper;
 
 import java.util.Map;
 import java.util.Set;
 
-import static com.freddieptf.mangatest.data.Contract.MangaReaderMangaList;
-import static com.freddieptf.mangatest.data.Contract.MyManga;
+import static com.freddieptf.mangatest.data.local.Contract.MangaReaderMangaList;
+import static com.freddieptf.mangatest.data.local.Contract.MyManga;
 
 /**
  * Created by fred on 1/30/15.

@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:animationCache="false"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:paddingBottom="4dp"
-        android:scrollingCache="false"
-        />
+        android:layout_height="match_parent" />
 
     <TextView
         android:id="@+id/emptyView"
@@ -31,16 +24,6 @@
         android:textSize="22sp"
         android:visibility="gone"
         />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_action_refresh_white"
-        app:fab_type="normal"/>
-
 
 </android.support.design.widget.CoordinatorLayout>
 
