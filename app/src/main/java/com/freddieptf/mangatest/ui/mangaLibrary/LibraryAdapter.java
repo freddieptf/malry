@@ -12,6 +12,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.data.model.MangaDetails;
 import com.freddieptf.mangatest.utils.Utilities;
@@ -121,7 +122,7 @@ public class LibraryAdapter extends RecyclerView.Adapter<LibraryAdapter.LibraryV
             if (!Utilities.compactCards(view.getContext())) {
                 imageViewLayout.setVisibility(View.VISIBLE);
                 infoRow.setMinimumHeight(view.getContext().getResources().getDimensionPixelSize(R.dimen.myNavBarMargin));
-                Glide.with(imageView.getContext()).load(imagePath).into(imageView);
+                Glide.with(imageView.getContext()).load(imagePath).diskCacheStrategy(DiskCacheStrategy.SOURCE).into(imageView);
             } else {
                 imageViewLayout.setVisibility(View.GONE);
                 view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
