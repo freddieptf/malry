@@ -17,12 +17,12 @@ import java.util.ArrayList;
 class MangaListAdapter extends RecyclerView.Adapter<MangaListAdapter.MangaItemViewHolder>
         implements View.OnClickListener {
 
-    private OnMangaClicked onMangaClick;
+    private ClickCallback clickCallback;
     private ArrayList<MangaItem> items;
     private String source;
 
-    void setOnMangaClickListener(OnMangaClicked onMangaClick){
-        this.onMangaClick = onMangaClick;
+    void setClickCallback(ClickCallback clickCallback) {
+        this.clickCallback = clickCallback;
     }
 
     void swapData(ArrayList<MangaItem> items, String source){
@@ -34,7 +34,7 @@ class MangaListAdapter extends RecyclerView.Adapter<MangaListAdapter.MangaItemVi
     @Override
     public void onClick(View view) {
         MangaItem mangaItem = items.get((Integer) view.getTag());
-        onMangaClick.onMangaClicked(source, mangaItem.getName(), mangaItem.getMangaId());
+        clickCallback.onMangaItemClick(source, mangaItem);
     }
 
     @Override
@@ -55,12 +55,7 @@ class MangaListAdapter extends RecyclerView.Adapter<MangaListAdapter.MangaItemVi
         return items == null ? 0 : items.size();
     }
 
-    interface OnMangaClicked{
-        void onMangaClicked(String source, String name, String id);
-    }
-
     static class MangaItemViewHolder extends RecyclerView.ViewHolder {
-
         private TextView mangaTitle;
         MangaItemViewHolder(View view) {
             super(view);

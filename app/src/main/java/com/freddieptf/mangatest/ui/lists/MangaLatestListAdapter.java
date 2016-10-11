@@ -1,71 +1,70 @@
 package com.freddieptf.mangatest.ui.lists;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import com.freddieptf.mangatest.R;
-import com.freddieptf.mangatest.data.local.Contract;
-import com.freddieptf.mangatest.ui.lists.MangaListAdapter.OnMangaClicked;
+import com.freddieptf.mangatest.data.model.LatestMangaItem;
+
+import java.util.ArrayList;
 
 /**
  * Created by fred on 8/26/15.
  */
-public class MangaLatestListAdapter extends CursorAdapter implements View.OnClickListener {
+class MangaLatestListAdapter extends RecyclerView.Adapter<MangaLatestListAdapter.LatestMangaItemViewHolder> implements View.OnClickListener {
 
-    OnMangaClicked onMangaClick;
+    private ClickCallback clickCallback;
+    private ArrayList<LatestMangaItem> items;
 
-    public MangaLatestListAdapter(Context context, Cursor c) {
-        super(context, c, 0);
+    void swapData(ArrayList<LatestMangaItem> items) {
+        this.items = items;
+        notifyDataSetChanged();
     }
 
-    public void setOnMangaClickListener(OnMangaClicked onMangaClick){
-        this.onMangaClick = onMangaClick;
-    }
-
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-        View view = LayoutInflater.from(context).inflate(R.layout.list_latest_manga_item, viewGroup, false);
-        ViewHolder v = new ViewHolder(view);
-        view.setTag(v);
-        return view;
-    }
-
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-
+    void setClickCallback(ClickCallback clickCallback) {
+        this.clickCallback = clickCallback;
     }
 
     @Override
     public void onClick(final View view) {
-        final String[] manga = (String[])view.findViewById(R.id.name).getTag();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Uri m = Contract.MangaReaderMangaList.buildMangaInListWithNameUri(manga[1]);
-                Cursor c = view.getContext().getContentResolver().query(m,
-                        new String[]{
-                                Contract.MangaReaderMangaList.COLUMN_MANGA_ID}, null, null, null);
-                if(c != null && c.moveToFirst()){
-                    onMangaClick.onMangaClicked(manga[0], manga[1], c.getString(0));
-                    c.close();
-                }
-            }
-        }).start();
+        clickCallback.onLatestMangaItemClick(items.get((Integer) view.getTag()));
     }
 
-    class ViewHolder {
-        TextView name;
-        TextView date;
+    @Override
+    public LatestMangaItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new LatestMangaItemViewHolder(
+                LayoutInflater.from(parent.getContext()).inflate(R.layout.list_latest_manga_item, parent, false)
+        );
+    }
 
-        public ViewHolder(View view) {
+    @Override
+    public void onBindViewHolder(LatestMangaItemViewHolder holder, int position) {
+        holder.itemView.setOnClickListener(this);
+        holder.itemView.setTag(position);
+        holder.bind(items.get(position));
+    }
+
+    @Override
+    public int getItemCount() {
+        return items == null ? 0 : items.size();
+    }
+
+    class LatestMangaItemViewHolder extends RecyclerView.ViewHolder {
+        private TextView name;
+        private TextView date;
+
+        LatestMangaItemViewHolder(View view) {
+            super(view);
             name = (TextView) view.findViewById(R.id.name);
             date = (TextView) view.findViewById(R.id.date);
+        }
+
+        public void bind(LatestMangaItem item) {
+            name.setText(item.getMangaTitle());
+            date.setText(item.getReleaseDate());
         }
     }
 }

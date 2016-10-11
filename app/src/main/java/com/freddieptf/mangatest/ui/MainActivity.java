@@ -14,13 +14,14 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.freddieptf.mangatest.R;
-import com.freddieptf.mangatest.data.MangaDetailsListLoader;
-import com.freddieptf.mangatest.data.MangaDetailsRepository;
-import com.freddieptf.mangatest.data.sync.SyncHelper;
+import com.freddieptf.mangatest.data.manga.details.MangaDetailsListLoader;
+import com.freddieptf.mangatest.data.manga.details.MangaDetailsRepository;
+import com.freddieptf.mangatest.data.manga.lists.MangaListLoader;
 import com.freddieptf.mangatest.ui.downloads.DownloadsFragment;
-import com.freddieptf.mangatest.ui.mangaLibrary.LibraryFragment;
-import com.freddieptf.mangatest.ui.mangaLibrary.LibraryPresenter;
-import com.freddieptf.mangatest.ui.mangaLists.ListsFragment;
+import com.freddieptf.mangatest.ui.library.LibraryFragment;
+import com.freddieptf.mangatest.ui.library.LibraryPresenter;
+import com.freddieptf.mangatest.ui.lists.ListFragment;
+import com.freddieptf.mangatest.ui.lists.ListPresenter;
 import com.freddieptf.mangatest.utils.MyColorUtils;
 import com.freddieptf.mangatest.utils.Utilities;
 import com.roughike.bottombar.BottomBar;
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SyncHelper.scheduleJobs();
+//        SyncHelper.scheduleJobs();
 
         getSupportFragmentManager().addOnBackStackChangedListener(this);
 
@@ -177,7 +178,11 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             case R.id.menu_frag_mylibrary: {
                 position = 0;
 
-                LibraryFragment libraryFragment = new LibraryFragment();
+                LibraryFragment libraryFragment = (LibraryFragment) getSupportFragmentManager()
+                        .findFragmentByTag(fragmentTitles[position]);
+
+                if (libraryFragment == null) libraryFragment = new LibraryFragment();
+
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, libraryFragment,
                         fragmentTitles[position]).commit();
 
@@ -190,8 +195,15 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
             case R.id.menu_frag_lists: {
                 position = 1;
-                ListsFragment listsFragment = new ListsFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, listsFragment, fragmentTitles[position]).commit();
+
+                ListFragment listFragment = (ListFragment) getSupportFragmentManager().findFragmentByTag(fragmentTitles[position]);
+                if (listFragment == null) listFragment = new ListFragment();
+
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, listFragment, fragmentTitles[position]).commit();
+
+                MangaListLoader loader = (MangaListLoader) getSupportLoaderManager().<MangaListLoader.MangaLists>getLoader(ListPresenter.LOADER_ID);
+                if (loader == null) loader = new MangaListLoader(this);
+                ListPresenter presenter = new ListPresenter(getSupportLoaderManager(), loader, listFragment);
                 break;
             }
 

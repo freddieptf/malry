@@ -12,20 +12,32 @@ import com.freddieptf.mangatest.data.manga.lists.MangaListLoader;
 
 public class ListPresenter implements LoaderManager.LoaderCallbacks<MangaListLoader.MangaLists> {
 
-    private MangaListView view;
+    public static final int LOADER_ID = 23223;
+    private ListView view;
     private MangaListLoader loader;
     private LoaderManager loaderManager;
 
-    public ListPresenter(LoaderManager loaderManager, MangaListLoader loader, MangaListView view){
+    public ListPresenter(LoaderManager loaderManager, MangaListLoader loader, ListView view) {
         this.loader = loader;
         this.loaderManager = loaderManager;
         this.view = view;
-
         view.setPresenter(this);
     }
 
     public void init(){
-        loaderManager.initLoader(23223, null, this);
+        loaderManager.initLoader(LOADER_ID, null, this);
+    }
+
+    public void switchSource(String source) {
+        loader.SWITCH_IT_UP(source);
+    }
+
+    public String getActiveSource() {
+        return loader.getActiveSource();
+    }
+
+    public void setActiveSource(String source) {
+        loader.setActiveSource(source);
     }
 
     @Override

@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?list_selector"
     android:minHeight="?attr/listPreferredItemHeightSmall"
-    android:padding="16dp"
-    android:background="?list_selector">
+    android:orientation="horizontal"
+    android:padding="16dp">
     <TextView
         android:id="@+id/name"
+        style="@style/MediumTextAppearance.Condensed"
         android:layout_width="0dp"
-        android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
-        style="@style/MediumTextAppearance.Condensed"
+        android:layout_weight="1"
         />
 
     <TextView
         android:id="@+id/date"
-        android:layout_width="wrap_content"
-        android:gravity="right|end"
-        android:layout_height="wrap_content"
         style="@style/SmallTextAppearance"
-        android:fontFamily="sans-serif-condensed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
+        android:fontFamily="sans-serif-condensed"
+        android:gravity="right|end"
         />
 
 </LinearLayout>

@@ -12,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,15 +21,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.data.local.Contract;
-import com.freddieptf.mangatest.data.manga.list.MangaListLoader;
-import com.freddieptf.mangatest.data.remote.ApiTask;
-import com.freddieptf.mangatest.data.service.DownloadMangaDatabase;
+import com.freddieptf.mangatest.data.manga.lists.MangaListLoader;
+import com.freddieptf.mangatest.data.model.LatestMangaItem;
+import com.freddieptf.mangatest.data.model.MangaItem;
 import com.freddieptf.mangatest.ui.MainActivity;
 import com.freddieptf.mangatest.ui.base.BaseFragment;
-import com.freddieptf.mangatest.ui.detailView.DetailsActivity;
+import com.freddieptf.mangatest.ui.details.DetailsActivity;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
@@ -36,24 +36,21 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 /**
  * Created by fred on 1/30/15.
  */
-public class ListsFragment extends BaseFragment implements MangaListView, ListsPagerAdapter.PagerHelper,
-        MangaListAdapter.OnMangaClicked {
+public class ListFragment extends BaseFragment implements ListView, ListPagerAdapter.PagerHelper,
+        ClickCallback {
 
     private final String LOG_TAG = getClass().getSimpleName();
-    private MangaListAdapter mangaListAdapter;
-    private MangaLatestListAdapter latestListAdapter;
-    private MangaPopularListAdapter popularListAdapter;
-    String source = "";
     ViewPager viewPager;
-    private Uri PREF_CONTENT_URI;
     SmoothProgressBar progressBar;
     Cursor searchCursor = null;
     SearchManager searchManager;
     SearchView searchView;
+    private MangaListAdapter mangaListAdapter;
+    private MangaLatestListAdapter latestListAdapter;
+    private MangaPopularListAdapter popularListAdapter;
+    private ListPresenter presenter;
 
-    private MangaListPresenter presenter;
-
-    public ListsFragment() {
+    public ListFragment() {
         setHasOptionsMenu(true);
     }
 
@@ -76,31 +73,27 @@ public class ListsFragment extends BaseFragment implements MangaListView, ListsP
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         searchManager = (SearchManager)getActivity().getSystemService(MainActivity.SEARCH_SERVICE);
-        if(Utilities.isFirstStart(getActivity())) showWelcomeDialog();
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        PREF_CONTENT_URI = Utilities.getPrefContentUri(getActivity());
-
         progressBar = (SmoothProgressBar) view.findViewById(R.id.progress);
         viewPager = (ViewPager) view.findViewById(R.id.pager);
-        viewPager.setAdapter(new ListsPagerAdapter(this, getActivity()));
+        viewPager.setAdapter(new ListPagerAdapter(this, getActivity()));
         TabLayout tabLayout = getMainActivityHelper().getTabs();
         tabLayout.setupWithViewPager(viewPager);
 
         mangaListAdapter = new MangaListAdapter();
-        mangaListAdapter.setOnMangaClickListener(this);
+        mangaListAdapter.setClickCallback(this);
 
-        latestListAdapter = new MangaLatestListAdapter(getActivity(), null);
-        latestListAdapter.setOnMangaClickListener(this);
+        latestListAdapter = new MangaLatestListAdapter();
+        latestListAdapter.setClickCallback(this);
 
         popularListAdapter = new MangaPopularListAdapter(getActivity(), null);
-        popularListAdapter.setOnMangaClickedListener(this);
+//        popularListAdapter.setOnMangaClickedListener(this);
     }
 
     @Override
@@ -109,7 +102,7 @@ public class ListsFragment extends BaseFragment implements MangaListView, ListsP
         list.setLayoutManager(new LinearLayoutManager(getContext()));
         switch (pos) {
             case 0:
-//                listView.setAdapter(latestListAdapter);
+                list.setAdapter(latestListAdapter);
                 break;
             case 1:
 //                listView.setAdapter(popularListAdapter);
@@ -123,13 +116,15 @@ public class ListsFragment extends BaseFragment implements MangaListView, ListsP
     }
 
     @Override
-    public void setPresenter(MangaListPresenter mangaListPresenter) {
-        presenter = mangaListPresenter;
+    public void setPresenter(ListPresenter listPresenter) {
+        presenter = listPresenter;
     }
 
     @Override
     public void onDataLoad(MangaListLoader.MangaLists mangaLists) {
+        Log.d(LOG_TAG, "data" + (mangaLists.getMangaItems() == null ? 0 : mangaLists.getMangaItems().size()));
         mangaListAdapter.swapData(mangaLists.getMangaItems(), Utilities.getCurrentSource(getContext()));
+        latestListAdapter.swapData(mangaLists.getLatestMangaItems());
     }
 
     @Override
@@ -139,32 +134,51 @@ public class ListsFragment extends BaseFragment implements MangaListView, ListsP
     }
 
     @Override
-    public void onMangaClicked(String source, String name, String id) {
+    public void onMangaItemClick(String source, MangaItem item) {
         if (getActivity().getCurrentFocus() != null) {
             InputMethodManager im = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             im.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
         }
-
         Intent intent = new Intent(getActivity(), DetailsActivity.class);
-        intent.putExtra(DetailsActivity.TITLE_KEY, name);
-        intent.putExtra(DetailsActivity.ID_KEY, id);
+        intent.putExtra(DetailsActivity.TITLE_KEY, item.getName());
+        intent.putExtra(DetailsActivity.ID_KEY, item.getMangaId());
         intent.putExtra(DetailsActivity.SOURCE_KEY, source);
         startActivity(intent);
+    }
+
+    @Override
+    public void onLatestMangaItemClick(LatestMangaItem item) {
+        Intent intent = new Intent(getActivity(), DetailsActivity.class);
+        intent.putExtra(DetailsActivity.TITLE_KEY, item.getMangaTitle());
+        intent.putExtra(DetailsActivity.ID_KEY, item.getMangaId());
+        intent.putExtra(DetailsActivity.SOURCE_KEY, getString(R.string.pref_manga_reader));
+        startActivity(intent);
+    }
+
+    @Override
+    public void onPopularMangaItemClick() {
 
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (!Utilities.getCurrentSource(getActivity()).equals(source)) refreshLoaderOnPrefChange();
-        if(presenter != null) presenter.init();
+        if (presenter != null) {
+            if (presenter.getActiveSource().isEmpty()) {
+                presenter.setActiveSource(Utilities.getCurrentSource(getContext()));
+                presenter.init();
+            } else {
+                if (!Utilities.getCurrentSource(getActivity()).equals(presenter.getActiveSource()))
+                    presenter.switchSource(Utilities.getCurrentSource(getContext()));
+                else presenter.init();
+            }
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
         if (searchCursor != null) searchCursor.close();
-        source = Utilities.getCurrentSource(getActivity());
     }
 
     @Override
@@ -198,7 +212,7 @@ public class ListsFragment extends BaseFragment implements MangaListView, ListsP
                     searchCursor = getActivity().getContentResolver().query(uri, null, null, null, null);
                     Utilities.Log(LOG_TAG, "onQueryTextChange searchCursor = " + searchCursor.getCount());
 //                    MangaListAdapter adapter = new MangaListAdapter(getActivity(), searchCursor);
-//                    adapter.setOnMangaClickListener(ListsFragment.this);
+//                    adapter.setClickCallback(ListsFragment.this);
 //                    searchView.setSuggestionsAdapter(adapter);
                     return true;
                 }
@@ -209,7 +223,7 @@ public class ListsFragment extends BaseFragment implements MangaListView, ListsP
                     searchCursor = getActivity().getContentResolver().query(uri, null, null, null, null);
                     Utilities.Log(LOG_TAG, "onQueryTextChange searchCursor = " + searchCursor.getCount());
 //                    MangaListAdapter adapter = new MangaListAdapter(getActivity(), searchCursor);
-//                    adapter.setOnMangaClickListener(ListsFragment.this);
+//                    adapter.setClickCallback(ListsFragment.this);
 //                    searchView.setSuggestionsAdapter(adapter);
                     return true;
                 }
@@ -236,7 +250,7 @@ public class ListsFragment extends BaseFragment implements MangaListView, ListsP
             case R.id.menu_sourceFox:
             case R.id.menu_sourceReader: {
                 Utilities.setCurrentSource(getActivity(), item.getTitle().toString());
-                refreshLoaderOnPrefChange();
+                presenter.switchSource(item.getTitle().toString());
                 break;
             }
             case R.id.menu_filter: {
@@ -248,46 +262,9 @@ public class ListsFragment extends BaseFragment implements MangaListView, ListsP
         return true;
     }
 
-    private void refreshLoaderOnPrefChange() {
-        PREF_CONTENT_URI = Utilities.getPrefContentUri(getActivity());
-
-    }
-
     private void hideProgressBar() {
         progressBar.progressiveStop();
         progressBar.setVisibility(View.GONE);
-    }
-
-    private void showWelcomeDialog() {
-        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                .title("Welcome Otaku-san!")
-                .cancelable(false)
-                .positiveText("start")
-                .negativeText("later")
-                .content("Download and set up manga databases? If it doesn't set up right, " +
-                        "head over to Settings.")
-                .callback(new MaterialDialog.ButtonCallback() {
-                    @Override
-                    public void onPositive(MaterialDialog dialog) {
-                        super.onPositive(dialog);
-                        dialog.dismiss();
-                        showProgressBar();
-                        Intent intent = new Intent(getActivity(), DownloadMangaDatabase.class);
-                        intent.putExtra(DownloadMangaDatabase.FIX_SELECTION, ApiTask.ALL_LIST);
-                        getActivity().startService(intent);
-                        Utilities.setFirstStart(getActivity(), false);
-                    }
-
-                    @Override
-                    public void onNegative(MaterialDialog dialog) {
-                        super.onNegative(dialog);
-                        Utilities.setFirstStart(getActivity(), true);
-                        getActivity().finish();
-                        dialog.dismiss();
-                    }
-                }).build();
-
-        dialog.show();
     }
 
     private void showProgressBar() {

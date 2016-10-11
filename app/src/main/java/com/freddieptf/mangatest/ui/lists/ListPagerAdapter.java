@@ -12,14 +12,14 @@ import com.freddieptf.mangatest.utils.Utilities;
 /**
  * Created by fred on 8/25/15.
  */
-public class ListPagerAdapter extends android.support.v4.view.PagerAdapter{
+class ListPagerAdapter extends android.support.v4.view.PagerAdapter {
 
 
+    Context context; //// FIXME: 11/10/16 noooope
     private String[] titles = {"Latest", "Popular", "List"};
     private PagerHelper helper;
-    Context context; //// FIXME: 11/10/16 noooope
 
-    public ListPagerAdapter(PagerHelper helper, Context context){
+    ListPagerAdapter(PagerHelper helper, Context context) {
         this.helper = helper;
         this.context = context;
     }
@@ -59,14 +59,12 @@ public class ListPagerAdapter extends android.support.v4.view.PagerAdapter{
 
     }
 
-    public interface PagerHelper {
+    interface PagerHelper {
         void getListView(RecyclerView listView);
     }
 
-    //this viewholder looks pretty much useless to me, AFAIK
-    private static class PagerViewHolder {
-        RecyclerView list;
-
+    static class PagerViewHolder {
+        private RecyclerView list;
         public PagerViewHolder(View view) {
             list = (RecyclerView) view.findViewById(R.id.list);
         }

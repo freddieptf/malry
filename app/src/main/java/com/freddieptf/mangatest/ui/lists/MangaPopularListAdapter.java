@@ -11,15 +11,14 @@ import android.widget.TextView;
 
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.data.local.Contract;
-import com.freddieptf.mangatest.ui.lists.MangaListAdapter.OnMangaClicked;
+
 
 /**
  * Created by fred on 9/11/15.
  */
 public class MangaPopularListAdapter extends CursorAdapter implements View.OnClickListener {
 
-
-    OnMangaClicked onMangaClicked;
+    private ClickCallback clickCallback;
 
     public MangaPopularListAdapter(Context context, Cursor c) {
         super(context, c, 0);
@@ -37,15 +36,15 @@ public class MangaPopularListAdapter extends CursorAdapter implements View.OnCli
                                 Contract.MangaReaderMangaList.COLUMN_MANGA_ID}, null, null, null);
                 if(c != null){
                     c.moveToFirst();
-                    onMangaClicked.onMangaClicked(manga[0], manga[1], c.getString(0));
+//                    onMangaClicked.onMangaClicked(manga[0], manga[1], c.getString(0));
                     c.close();
                 }
             }
         }).start();
     }
 
-    public void setOnMangaClickedListener(OnMangaClicked onMangaClicked){
-        this.onMangaClicked = onMangaClicked;
+    public void setClickCallback(ClickCallback clickCallback) {
+        this.clickCallback = clickCallback;
     }
 
     @Override
