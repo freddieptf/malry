@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.ui.mangaLibrary;
+package com.freddieptf.mangatest.ui.library;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -28,7 +28,7 @@ import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.data.model.MangaDetails;
 import com.freddieptf.mangatest.data.sync.MangaLibrarySync;
 import com.freddieptf.mangatest.ui.base.BaseFragment;
-import com.freddieptf.mangatest.ui.detailView.DetailsActivity;
+import com.freddieptf.mangatest.ui.details.DetailsActivity;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import java.util.ArrayList;

@@ -15,8 +15,8 @@ import com.evernote.android.job.Job;
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.freddieptf.mangatest.R;
-import com.freddieptf.mangatest.data.MangaDetailsRepository;
 import com.freddieptf.mangatest.data.local.Contract;
+import com.freddieptf.mangatest.data.manga.details.MangaDetailsRepository;
 import com.freddieptf.mangatest.data.model.Chapter;
 import com.freddieptf.mangatest.data.model.MangaDetails;
 import com.freddieptf.mangatest.data.remote.MangaFox;
@@ -30,7 +30,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -90,9 +89,9 @@ public class MangaLibrarySync extends Job {
             try {
                 MangaDetails detailsObject;
                 if (cursor.getString(MANGA_SOURCE).equals(context.getString(R.string.pref_manga_reader))) {
-                    detailsObject = MangaReader.getInstance(new WeakReference<>(context)).getManga(cursor.getString(MANGA_ID));
+                    detailsObject = MangaReader.getInstance().getManga(cursor.getString(MANGA_ID));
                 } else {
-                    detailsObject = MangaFox.getInstance(new WeakReference<>(context)).getManga(cursor.getString(MANGA_ID));
+                    detailsObject = MangaFox.getInstance().getManga(cursor.getString(MANGA_ID));
                 }
 
                 if (detailsObject != null) {

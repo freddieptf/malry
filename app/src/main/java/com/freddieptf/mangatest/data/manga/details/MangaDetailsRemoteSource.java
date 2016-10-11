@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.data;
+package com.freddieptf.mangatest.data.manga.details;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -10,7 +10,6 @@ import com.freddieptf.mangatest.data.remote.MangaFox;
 import com.freddieptf.mangatest.data.remote.MangaReader;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 /**
@@ -36,9 +35,9 @@ public class MangaDetailsRemoteSource implements MangaDetailsSource {
         MangaDetails mangaDetails;
         try {
             if (source.equals(context.getString(R.string.pref_manga_reader))) {
-                mangaDetails = MangaReader.getInstance(new WeakReference<>(context)).getManga(id);
+                mangaDetails = MangaReader.getInstance().getManga(id);
             } else {
-                mangaDetails = MangaFox.getInstance(new WeakReference<>(context)).getManga(id);
+                mangaDetails = MangaFox.getInstance().getManga(id);
             }
             return mangaDetails;
         } catch (IOException e) {

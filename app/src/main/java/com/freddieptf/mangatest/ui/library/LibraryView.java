@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.ui.mangaLibrary;
+package com.freddieptf.mangatest.ui.library;
 
 import com.freddieptf.mangatest.data.model.MangaDetails;
 

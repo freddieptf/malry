@@ -1,11 +1,11 @@
-package com.freddieptf.mangatest.ui.mangaLibrary;
+package com.freddieptf.mangatest.ui.library;
 
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
-import com.freddieptf.mangatest.data.MangaDetailsListLoader;
-import com.freddieptf.mangatest.data.MangaDetailsRepository;
+import com.freddieptf.mangatest.data.manga.details.MangaDetailsListLoader;
+import com.freddieptf.mangatest.data.manga.details.MangaDetailsRepository;
 import com.freddieptf.mangatest.data.model.MangaDetails;
 
 import java.util.ArrayList;

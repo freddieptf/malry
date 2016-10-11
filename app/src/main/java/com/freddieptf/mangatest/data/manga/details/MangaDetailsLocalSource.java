@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.data;
+package com.freddieptf.mangatest.data.manga.details;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -59,6 +59,7 @@ public class MangaDetailsLocalSource implements MangaDetailsSource {
     private ContentResolver contentResolver;
 
     public MangaDetailsLocalSource(Context context) {
+        // FIXME: 11/10/16 bad idea..this probably leaks memory boiii
         contentResolver = context.getContentResolver();
     }
 

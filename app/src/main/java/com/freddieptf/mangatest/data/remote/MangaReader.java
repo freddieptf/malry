@@ -1,27 +1,17 @@
 package com.freddieptf.mangatest.data.remote;
 
-import android.content.Context;
-import android.util.Log;
-
-import com.freddieptf.mangatest.data.local.Contract;
-import com.freddieptf.mangatest.data.local.DbInsertHelper;
 import com.freddieptf.mangatest.data.model.ChapterPages;
 import com.freddieptf.mangatest.data.model.LatestMangaItem;
 import com.freddieptf.mangatest.data.model.MangaDetails;
 import com.freddieptf.mangatest.data.model.MangaItem;
-import com.freddieptf.mangatest.utils.Utilities;
+import com.freddieptf.mangatest.data.model.PopularMangaItem;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.concurrent.Callable;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -31,15 +21,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MangaReader {
 
     private static MangaReader reader;
-    private final String LOG_TAG = getClass().getSimpleName();
     private final MangaReaderApiService apiService;
-    private final DbInsertHelper dbInsertHelper;
-    private WeakReference<Context> context;
 
-    private MangaReader(WeakReference<Context> context) {
-        this.context = context;
-        dbInsertHelper = new DbInsertHelper();
-
+    private MangaReader() {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new RetryInterceptor())
                 .build();
@@ -52,8 +36,8 @@ public class MangaReader {
                 .create(MangaReaderApiService.class);
     }
 
-    public static MangaReader getInstance(WeakReference<Context> context) {
-        if (reader == null) reader = new MangaReader(context);
+    public static MangaReader getInstance() {
+        if (reader == null) reader = new MangaReader();
         return reader;
     }
 
@@ -75,60 +59,16 @@ public class MangaReader {
         // TODO: 22/09/16 update latest
     }
 
-    void getMangaList() {
-        apiService.getMangaList().enqueue(new Callback<ArrayList<MangaItem>>() {
-            @Override
-            public void onResponse(Call<ArrayList<MangaItem>> call, Response<ArrayList<MangaItem>> response) {
-                if (!response.body().isEmpty()) {
-                    context.get().getContentResolver().delete(Contract.MangaReaderMangaList.CONTENT_URI, null, null);
-                    context.get().getContentResolver().delete(Contract.VirtualTable.CONTENT_URI, null, null);
-                    Callable<Boolean> insertItems = dbInsertHelper
-                            .setDestinationUri(Contract.MangaReaderMangaList.CONTENT_URI)
-                            .insertMangaList(context.get(), response.body());
-                    try {
-                        boolean b = insertItems.call();
-                        if (b) Utilities.Log(LOG_TAG, "inserted MangaReader manga list");
-                        else Utilities.Log(LOG_TAG, "couldn't insert MangaReader manga list");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ArrayList<MangaItem>> call, Throwable t) {
-                Log.d(LOG_TAG, t.getMessage());
-            }
-        });
+    public ArrayList<MangaItem> getMangaList() throws IOException {
+        return apiService.getMangaList().execute().body();
     }
 
-    void getLatestList() {
-        apiService.getLatestMangaList().enqueue(new Callback<ArrayList<LatestMangaItem>>() {
-            @Override
-            public void onResponse(Call<ArrayList<LatestMangaItem>> call, Response<ArrayList<LatestMangaItem>> response) {
-                if (!response.body().isEmpty()) {
-                    context.get().getContentResolver().delete(Contract.MangaReaderLatestList.CONTENT_URI, null, null);
-                    Callable<Boolean> insertItems = dbInsertHelper
-                            .setDestinationUri(Contract.MangaReaderLatestList.CONTENT_URI)
-                            .insertLatestList(context.get(), response.body());
-                    try {
-                        boolean b = insertItems.call();
-                        if (b) Utilities.Log(LOG_TAG, "inserted latest manga");
-                        else Utilities.Log(LOG_TAG, "couldn't insert latest manga");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ArrayList<LatestMangaItem>> call, Throwable t) {
-                Log.d(LOG_TAG, t.getMessage());
-            }
-        });
+    public ArrayList<LatestMangaItem> getLatestList() throws IOException {
+        return apiService.getLatestMangaList().execute().body();
     }
 
-    void getPopularList() {
+    public ArrayList<PopularMangaItem> getPopularList() {
+        return null;
     }
 
     private static class RetryInterceptor implements Interceptor {

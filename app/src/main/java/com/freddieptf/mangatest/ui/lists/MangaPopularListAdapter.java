@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.ui.mangaLists;
+package com.freddieptf.mangatest.ui.lists;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.data.local.Contract;
-import com.freddieptf.mangatest.ui.mangaLists.MangaListAdapter.OnMangaClicked;
+import com.freddieptf.mangatest.ui.lists.MangaListAdapter.OnMangaClicked;
 
 /**
  * Created by fred on 9/11/15.
@@ -58,19 +58,7 @@ public class MangaPopularListAdapter extends CursorAdapter implements View.OnCli
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
-        view.setOnClickListener(this);
-        viewHolder.position.setText((cursor.getPosition() + 1) + ".");
-        viewHolder.name.setText(cursor.getString(ListsFragment.COLUMN_MANGA_NAME));
-        viewHolder.author.setText(cursor.getString(ListsFragment.COLUMN_MANGA_AUTHOR));
-        viewHolder.genre.setText(cursor.getString(ListsFragment.COLUMN_MANGA_GENRE));
-        viewHolder.chapters.setText(cursor.getString(ListsFragment.COLUMN_CHAPTER_DETAILS));
 
-        String[] manga = {context.getString(R.string.pref_manga_reader),
-                cursor.getString(ListsFragment.COLUMN_MANGA_NAME)
-        };
-
-        viewHolder.name.setTag(manga);
     }
 
     class ViewHolder {

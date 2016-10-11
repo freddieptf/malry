@@ -22,8 +22,8 @@ public class ApiTask extends Thread {
 
     public ApiTask(WeakReference<Context> context, int... tasks) {
         this.tasks = tasks;
-        mangaReader = MangaReader.getInstance(context);
-        mangaFox = MangaFox.getInstance(context);
+        mangaReader = MangaReader.getInstance();
+        mangaFox = MangaFox.getInstance();
     }
 
     @Override
@@ -31,10 +31,10 @@ public class ApiTask extends Thread {
         for (int task : tasks) {
             switch (task) {
                 case READER_MANGA_LIST:
-                    mangaReader.getMangaList();
+//                    mangaReader.getMangaList();
                     break;
                 case READER_LATEST_LIST:
-                    mangaReader.getLatestList();
+//                    mangaReader.getLatestList();
                     break;
                 case READER_POPULAR_LIST:
 //                    new Thread(new Runnable() {
@@ -61,7 +61,7 @@ public class ApiTask extends Thread {
 //                    }).start();
                     break;
                 case FOX_MANGA_LIST:
-                    mangaFox.getMangaList();
+//                    mangaFox.getMangaList();
                     break;
                 default:
                     Utilities.Log(LOG_TAG, "Unsupported Task");

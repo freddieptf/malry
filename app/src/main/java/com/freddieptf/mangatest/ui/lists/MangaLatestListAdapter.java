@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.ui.mangaLists;
+package com.freddieptf.mangatest.ui.lists;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.data.local.Contract;
-import com.freddieptf.mangatest.ui.mangaLists.MangaListAdapter.OnMangaClicked;
+import com.freddieptf.mangatest.ui.lists.MangaListAdapter.OnMangaClicked;
 
 /**
  * Created by fred on 8/26/15.
@@ -38,15 +38,7 @@ public class MangaLatestListAdapter extends CursorAdapter implements View.OnClic
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        ViewHolder holder = (ViewHolder) view.getTag();
-        view.setOnClickListener(this);
-        String[] manga = {context.getString(R.string.pref_manga_reader),
-                cursor.getString(ListsFragment.COLUMN_MANGA_NAME)
-                };
-        holder.name.setText(manga[1] + " Ch" + cursor.getString(ListsFragment.COLUMN_CHAPTER));
-        holder.date.setText(cursor.getString(ListsFragment.COLUMN_DATE));
 
-        holder.name.setTag(manga);
     }
 
     @Override

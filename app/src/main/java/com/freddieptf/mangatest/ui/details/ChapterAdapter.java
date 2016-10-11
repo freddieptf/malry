@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.ui.detailView;
+package com.freddieptf.mangatest.ui.details;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

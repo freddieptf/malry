@@ -14,7 +14,6 @@ import com.freddieptf.mangatest.data.remote.MangaReader;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.Random;
 
 /**
@@ -57,10 +56,10 @@ public class ChapterDownloadService extends Service implements Downloader.Downlo
                 ChapterPages chapterPages;
                 try {
                     if (source.equals(getBaseContext().getString(R.string.pref_manga_reader))) {
-                        chapterPages = MangaReader.getInstance(new WeakReference<>(getBaseContext()))
+                        chapterPages = MangaReader.getInstance()
                                 .getMangaChapterPages(manga, chId);
                     } else {
-                        chapterPages = MangaFox.getInstance(new WeakReference<>(getBaseContext()))
+                        chapterPages = MangaFox.getInstance()
                                 .getMangaChapterPages(manga, chId);
                     }
 

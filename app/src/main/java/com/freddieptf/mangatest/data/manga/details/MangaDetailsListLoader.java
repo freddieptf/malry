@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.data;
+package com.freddieptf.mangatest.data.manga.details;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;

@@ -1,10 +1,10 @@
-package com.freddieptf.mangatest.ui.mangaLists;
+package com.freddieptf.mangatest.ui.lists;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.utils.Utilities;
@@ -12,15 +12,14 @@ import com.freddieptf.mangatest.utils.Utilities;
 /**
  * Created by fred on 8/25/15.
  */
-public class ListsPagerAdapter extends android.support.v4.view.PagerAdapter{
+public class ListPagerAdapter extends android.support.v4.view.PagerAdapter{
 
 
-    String[] titles = {"Latest", "Popular", "List"};
+    private String[] titles = {"Latest", "Popular", "List"};
+    private PagerHelper helper;
+    Context context; //// FIXME: 11/10/16 noooope
 
-    PagerHelper helper;
-    Context context;
-
-    public ListsPagerAdapter(PagerHelper helper, Context context){
+    public ListPagerAdapter(PagerHelper helper, Context context){
         this.helper = helper;
         this.context = context;
     }
@@ -61,15 +60,15 @@ public class ListsPagerAdapter extends android.support.v4.view.PagerAdapter{
     }
 
     public interface PagerHelper {
-        void getListView(ListView listView);
+        void getListView(RecyclerView listView);
     }
 
     //this viewholder looks pretty much useless to me, AFAIK
-    class PagerViewHolder {
-        ListView list;
+    private static class PagerViewHolder {
+        RecyclerView list;
 
         public PagerViewHolder(View view) {
-            list = (ListView) view.findViewById(R.id.list);
+            list = (RecyclerView) view.findViewById(R.id.list);
         }
     }
 

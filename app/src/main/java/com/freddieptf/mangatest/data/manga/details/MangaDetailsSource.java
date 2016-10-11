@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.data;
+package com.freddieptf.mangatest.data.manga.details;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;

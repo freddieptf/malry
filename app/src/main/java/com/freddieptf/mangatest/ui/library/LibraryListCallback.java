@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.ui.mangaLibrary;
+package com.freddieptf.mangatest.ui.library;
 
 import android.support.v7.util.DiffUtil;
 

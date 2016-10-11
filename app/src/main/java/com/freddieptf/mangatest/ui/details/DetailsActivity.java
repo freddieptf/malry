@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.ui.detailView;
+package com.freddieptf.mangatest.ui.details;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -6,8 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.freddieptf.mangatest.R;
-import com.freddieptf.mangatest.data.MangaDetailsLoader;
-import com.freddieptf.mangatest.data.MangaDetailsRepository;
+import com.freddieptf.mangatest.data.manga.details.MangaDetailsLoader;
+import com.freddieptf.mangatest.data.manga.details.MangaDetailsRepository;
 
 /**
  * Created by freddieptf on 28/09/16.
