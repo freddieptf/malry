@@ -2,6 +2,8 @@ package com.freddieptf.mangatest.data.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Comparator;
+
 /**
  * Created by fred on 9/10/15.
  */
@@ -13,7 +15,7 @@ public class PopularMangaItem {
     private final String details;
     private final String author;
     private final int rank;
-    private final String[] genre;
+    private final String[] genres;
 
     private PopularMangaItem(Builder builder) {
         this.name = builder.name;
@@ -21,7 +23,7 @@ public class PopularMangaItem {
         this.rank = builder.rank;
         this.details = builder.details;
         this.author = builder.author;
-        this.genre = builder.genres;
+        this.genres = builder.genres;
     }
 
     public String getName() {
@@ -41,7 +43,7 @@ public class PopularMangaItem {
     }
 
     public String[] getGenre() {
-        return genre;
+        return genres;
     }
 
     public int getRank() {
@@ -83,6 +85,13 @@ public class PopularMangaItem {
 
         public PopularMangaItem build() {
             return new PopularMangaItem(this);
+        }
+    }
+
+    public static class RankComparator implements Comparator<PopularMangaItem> {
+        @Override
+        public int compare(PopularMangaItem popularMangaItem, PopularMangaItem t1) {
+            return t1.getRank() < popularMangaItem.getRank() ? 1 : -1;
         }
     }
 
