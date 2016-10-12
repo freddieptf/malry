@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.freddieptf.mangatest.data.local.Contract.MangaReaderMangaList;
-import com.freddieptf.mangatest.data.local.Contract.MangaReaderPopularList;
 import com.freddieptf.mangatest.data.model.Chapter;
 import com.freddieptf.mangatest.data.model.LatestMangaItem;
 import com.freddieptf.mangatest.data.model.MangaDetails;
@@ -18,6 +17,7 @@ import com.freddieptf.mangatest.utils.Utilities;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -118,24 +118,32 @@ public class DbInsertHelper {
         };
     }
 
-    // TODO: 19/09/16 ?? popular list?????
-    public void insertPopular(final Context context, final ArrayList<Object> list, Uri destination) {
-        List<ContentValues> contentValuesList = new ArrayList<>(list.size());
-        for (Object m : list) {
-            ContentValues cv = new ContentValues();
-            cv.put(MangaReaderPopularList.COLUMN_MANGA_NAME, ((PopularMangaItem) m).getName());
-            cv.put(MangaReaderPopularList.COLUMN_CHAPTER_DETAILS, ((PopularMangaItem) m).getChapterCount());
-            cv.put(MangaReaderPopularList.COLUMN_MANGA_AUTHOR, ((PopularMangaItem) m).getAuthor());
-            cv.put(MangaReaderPopularList.COLUMN_MANGA_GENRE, ((PopularMangaItem) m).getGenre());
-            contentValuesList.add(cv);
-        }
+    public Callable<Boolean> insertPopularList(final Context context, final ArrayList<PopularMangaItem> list) {
+        return new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                List<ContentValues> contentValuesList = new ArrayList<>(list.size());
+                for (PopularMangaItem m : list) {
+                    ContentValues cv = new ContentValues();
+                    cv.put(Contract.MangaReaderPopularList.COLUMN_MANGA_NAME, m.getName());
+                    cv.put(Contract.MangaReaderPopularList.COLUMN_CHAPTER_DETAILS, m.getDetails());
+                    cv.put(Contract.MangaReaderPopularList.COLUMN_MANGA_AUTHOR, m.getAuthor());
+                    cv.put(Contract.MangaReaderPopularList.COLUMN_MANGA_GENRE, Arrays.toString(m.getGenre()));
+                    cv.put(Contract.MangaReaderPopularList.COLUMN_MANGA_ID, m.getMangaId());
+                    cv.put(Contract.MangaReaderPopularList.COLUMN_MANGA_RANK, m.getRank());
+                    contentValuesList.add(cv);
+                }
 
-        if (contentValuesList.size() > 0) {
-            ContentValues[] contentValues = new ContentValues[contentValuesList.size()];
-            contentValuesList.toArray(contentValues);
-            contentValuesList.clear();
-            int rowsInserted = context.getContentResolver().bulkInsert(destination, contentValues);
-            Utilities.Log(LOG_TAG, "Rows inserted: " + rowsInserted);
-        }
+                int rowsInserted = -1;
+                if (contentValuesList.size() > 0) {
+                    ContentValues[] contentValues = new ContentValues[contentValuesList.size()];
+                    contentValuesList.toArray(contentValues);
+                    contentValuesList.clear();
+                    rowsInserted = context.getContentResolver().bulkInsert(destination, contentValues);
+                    Utilities.Log(LOG_TAG, "Rows inserted: " + rowsInserted);
+                }
+                return rowsInserted > 0;
+            }
+        };
     }
 }
