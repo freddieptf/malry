@@ -11,7 +11,6 @@ import com.freddieptf.mangatest.data.model.PopularMangaItem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 
 /**
@@ -24,7 +23,6 @@ class MangaPopularListAdapter extends RecyclerView.Adapter<MangaPopularListAdapt
 
     public void swapData(ArrayList<PopularMangaItem> items) {
         this.items = items;
-        Collections.sort(items, new PopularMangaItem.RankComparator());
         notifyDataSetChanged();
     }
 

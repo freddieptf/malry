@@ -10,6 +10,7 @@ import com.freddieptf.mangatest.data.model.PopularMangaItem;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.Callable;
 
 import static com.freddieptf.mangatest.data.local.DbInsertHelper.LOG_TAG;
@@ -114,6 +115,7 @@ public class MangaListRepository implements MangaListSource {
         if (items == null) {
             items = remoteSource.getMangaReaderPopularList(context);
             if (items != null) {
+                Collections.sort(items, new PopularMangaItem.RankComparator());
                 context.getContentResolver().delete(Contract.MangaReaderPopularList.CONTENT_URI, null, null);
                 Callable<Boolean> insertItems = dbInsertHelper
                         .setDestinationUri(Contract.MangaReaderPopularList.CONTENT_URI)
