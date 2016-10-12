@@ -1,17 +1,12 @@
 package com.freddieptf.mangatest.ui.lists;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,14 +14,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 
 import com.freddieptf.mangatest.R;
-import com.freddieptf.mangatest.data.local.Contract;
 import com.freddieptf.mangatest.data.manga.lists.MangaListLoader;
 import com.freddieptf.mangatest.data.model.LatestMangaItem;
 import com.freddieptf.mangatest.data.model.MangaItem;
-import com.freddieptf.mangatest.ui.MainActivity;
+import com.freddieptf.mangatest.data.model.PopularMangaItem;
 import com.freddieptf.mangatest.ui.base.BaseFragment;
 import com.freddieptf.mangatest.ui.details.DetailsActivity;
 import com.freddieptf.mangatest.utils.Utilities;
@@ -42,9 +35,6 @@ public class ListFragment extends BaseFragment implements ListView, ListPagerAda
     private final String LOG_TAG = getClass().getSimpleName();
     ViewPager viewPager;
     SmoothProgressBar progressBar;
-    Cursor searchCursor = null;
-    SearchManager searchManager;
-    SearchView searchView;
     private MangaListAdapter mangaListAdapter;
     private MangaLatestListAdapter latestListAdapter;
     private MangaPopularListAdapter popularListAdapter;
@@ -71,12 +61,6 @@ public class ListFragment extends BaseFragment implements ListView, ListPagerAda
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        searchManager = (SearchManager)getActivity().getSystemService(MainActivity.SEARCH_SERVICE);
-    }
-
-    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -92,8 +76,8 @@ public class ListFragment extends BaseFragment implements ListView, ListPagerAda
         latestListAdapter = new MangaLatestListAdapter();
         latestListAdapter.setClickCallback(this);
 
-        popularListAdapter = new MangaPopularListAdapter(getActivity(), null);
-//        popularListAdapter.setOnMangaClickedListener(this);
+        popularListAdapter = new MangaPopularListAdapter();
+        popularListAdapter.setClickCallback(this);
     }
 
     @Override
@@ -105,7 +89,7 @@ public class ListFragment extends BaseFragment implements ListView, ListPagerAda
                 list.setAdapter(latestListAdapter);
                 break;
             case 1:
-//                listView.setAdapter(popularListAdapter);
+                list.setAdapter(popularListAdapter);
                 break;
             case 2:
                 list.setAdapter(mangaListAdapter);
@@ -125,6 +109,7 @@ public class ListFragment extends BaseFragment implements ListView, ListPagerAda
         Log.d(LOG_TAG, "data" + (mangaLists.getMangaItems() == null ? 0 : mangaLists.getMangaItems().size()));
         mangaListAdapter.swapData(mangaLists.getMangaItems(), Utilities.getCurrentSource(getContext()));
         latestListAdapter.swapData(mangaLists.getLatestMangaItems());
+        popularListAdapter.swapData(mangaLists.getPopularMangaItems());
     }
 
     @Override
@@ -135,29 +120,27 @@ public class ListFragment extends BaseFragment implements ListView, ListPagerAda
 
     @Override
     public void onMangaItemClick(String source, MangaItem item) {
-        if (getActivity().getCurrentFocus() != null) {
-            InputMethodManager im = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            im.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-        }
-        Intent intent = new Intent(getActivity(), DetailsActivity.class);
-        intent.putExtra(DetailsActivity.TITLE_KEY, item.getName());
-        intent.putExtra(DetailsActivity.ID_KEY, item.getMangaId());
-        intent.putExtra(DetailsActivity.SOURCE_KEY, source);
-        startActivity(intent);
+        startActivity(createDetailActivtyIntent(item.getName(), item.getMangaId(), source));
     }
 
     @Override
     public void onLatestMangaItemClick(LatestMangaItem item) {
-        Intent intent = new Intent(getActivity(), DetailsActivity.class);
-        intent.putExtra(DetailsActivity.TITLE_KEY, item.getMangaTitle());
-        intent.putExtra(DetailsActivity.ID_KEY, item.getMangaId());
-        intent.putExtra(DetailsActivity.SOURCE_KEY, getString(R.string.pref_manga_reader));
-        startActivity(intent);
+        startActivity(createDetailActivtyIntent(item.getMangaTitle(), item.getMangaId(),
+                getString(R.string.pref_manga_reader)));
     }
 
     @Override
-    public void onPopularMangaItemClick() {
+    public void onPopularMangaItemClick(PopularMangaItem item) {
+        startActivity(createDetailActivtyIntent(item.getName(), item.getMangaId(),
+                getString(R.string.pref_manga_reader)));
+    }
 
+    private Intent createDetailActivtyIntent(String name, String id, String source) {
+        Intent intent = new Intent(getActivity(), DetailsActivity.class);
+        intent.putExtra(DetailsActivity.TITLE_KEY, name);
+        intent.putExtra(DetailsActivity.ID_KEY, id);
+        intent.putExtra(DetailsActivity.SOURCE_KEY, source);
+        return intent;
     }
 
     @Override
@@ -176,12 +159,6 @@ public class ListFragment extends BaseFragment implements ListView, ListPagerAda
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        if (searchCursor != null) searchCursor.close();
-    }
-
-    @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         if(Utilities.getCurrentSource(getActivity()).equals(getString(R.string.pref_manga_reader)))
@@ -195,52 +172,6 @@ public class ListFragment extends BaseFragment implements ListView, ListPagerAda
     public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_mangalist, menu);
-
-        searchView = (SearchView)menu.findItem(R.id.menu_search).getActionView();
-
-        if(searchView == null) Utilities.Log(LOG_TAG, "SearchView: Null");
-
-        if(searchView != null) {
-            searchView.setQueryHint("manga name");
-
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String s) {
-
-                    Uri uri = Contract.VirtualTable.buildVirtualMangaUriWithQuery(s);
-                    searchCursor = getActivity().getContentResolver().query(uri, null, null, null, null);
-                    Utilities.Log(LOG_TAG, "onQueryTextChange searchCursor = " + searchCursor.getCount());
-//                    MangaListAdapter adapter = new MangaListAdapter(getActivity(), searchCursor);
-//                    adapter.setClickCallback(ListsFragment.this);
-//                    searchView.setSuggestionsAdapter(adapter);
-                    return true;
-                }
-
-                @Override
-                public boolean onQueryTextChange(String s) {
-                    Uri uri = Contract.VirtualTable.buildVirtualMangaUriWithQuery(s);
-                    searchCursor = getActivity().getContentResolver().query(uri, null, null, null, null);
-                    Utilities.Log(LOG_TAG, "onQueryTextChange searchCursor = " + searchCursor.getCount());
-//                    MangaListAdapter adapter = new MangaListAdapter(getActivity(), searchCursor);
-//                    adapter.setClickCallback(ListsFragment.this);
-//                    searchView.setSuggestionsAdapter(adapter);
-                    return true;
-                }
-
-            });
-
-            searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-                @Override
-                public boolean onClose() {
-                    if(searchCursor != null) searchCursor.close();
-                    return false;
-                }
-            });
-
-        }
-
-
     }
 
     @Override
