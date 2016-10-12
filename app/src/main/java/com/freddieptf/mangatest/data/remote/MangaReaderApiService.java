@@ -4,6 +4,7 @@ import com.freddieptf.mangatest.data.model.ChapterPages;
 import com.freddieptf.mangatest.data.model.LatestMangaItem;
 import com.freddieptf.mangatest.data.model.MangaDetails;
 import com.freddieptf.mangatest.data.model.MangaItem;
+import com.freddieptf.mangatest.data.model.PopularMangaItem;
 
 import java.util.ArrayList;
 
@@ -21,6 +22,9 @@ interface MangaReaderApiService {
 
     @GET("/api/mr/latest")
     Call<ArrayList<LatestMangaItem>> getLatestMangaList();
+
+    @GET("/api/mr/popular")
+    Call<ArrayList<PopularMangaItem>> getPopularMangaList();
 
     @GET("/api/mr/manga/{mangaId}")
     Call<MangaDetails> getManga(@Path("mangaId") String mangaId);

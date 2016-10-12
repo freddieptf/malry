@@ -67,8 +67,8 @@ public class MangaReader {
         return apiService.getLatestMangaList().execute().body();
     }
 
-    public ArrayList<PopularMangaItem> getPopularList() {
-        return null;
+    public ArrayList<PopularMangaItem> getPopularList() throws IOException {
+        return apiService.getPopularMangaList().execute().body();
     }
 
     private static class RetryInterceptor implements Interceptor {
