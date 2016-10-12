@@ -39,6 +39,8 @@ public class DbHelper extends SQLiteOpenHelper {
                 + Contract.MangaReaderPopularList.TABLE_NAME
                 + " USING fts3 (" + Contract.MangaReaderPopularList._ID + " INTEGER PRIMARY KEY, "
                 + Contract.MangaReaderPopularList.COLUMN_MANGA_NAME + ", "
+                + Contract.MangaReaderPopularList.COLUMN_MANGA_ID + ", "
+                + Contract.MangaReaderPopularList.COLUMN_MANGA_RANK + ", "
                 + Contract.MangaReaderPopularList.COLUMN_MANGA_AUTHOR + ", "
                 + Contract.MangaReaderPopularList.COLUMN_CHAPTER_DETAILS + ", "
                 + Contract.MangaReaderPopularList.COLUMN_MANGA_GENRE + ");";

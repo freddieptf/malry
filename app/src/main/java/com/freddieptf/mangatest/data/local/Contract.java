@@ -99,10 +99,12 @@ public class Contract {
         public static final String CONTENT_ITEM_TYPE =
                 "vnd.android.cursor.item/" + CONTENT_AUTH + "/" + PATH_MANGAREADER_POPULAR_LIST;
 
-        public static final String TABLE_NAME = "mangareader_popular_list";
-        public static final String COLUMN_MANGA_NAME = "manga_name";
-        public static final String COLUMN_CHAPTER_DETAILS = "chapter_dets";
-        public static final String COLUMN_MANGA_AUTHOR = "manga_author";
+        public static final String TABLE_NAME = "popular_list";
+        public static final String COLUMN_MANGA_NAME = "name";
+        public static final String COLUMN_MANGA_ID = "id";
+        public static final String COLUMN_MANGA_RANK = "rank";
+        public static final String COLUMN_CHAPTER_DETAILS = "details";
+        public static final String COLUMN_MANGA_AUTHOR = "author";
         public static final String COLUMN_MANGA_GENRE = "genres";
 
         public static Uri buildListUri(long id){
