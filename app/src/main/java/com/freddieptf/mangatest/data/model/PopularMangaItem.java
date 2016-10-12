@@ -80,6 +80,10 @@ public class PopularMangaItem {
             this.genres = genres;
             return this;
         }
+
+        public PopularMangaItem build() {
+            return new PopularMangaItem(this);
+        }
     }
 
 }
