@@ -105,10 +105,32 @@ public class MangaListLocalSource implements MangaListSource {
         String[] POPULAR_COLUMNS = {
                 Contract.MangaReaderPopularList._ID,
                 Contract.MangaReaderPopularList.COLUMN_MANGA_NAME,
+                Contract.MangaReaderPopularList.COLUMN_MANGA_ID,
+                Contract.MangaReaderPopularList.COLUMN_MANGA_RANK,
                 Contract.MangaReaderPopularList.COLUMN_MANGA_AUTHOR,
                 Contract.MangaReaderPopularList.COLUMN_CHAPTER_DETAILS,
                 Contract.MangaReaderPopularList.COLUMN_MANGA_GENRE
         };
-        return null;
+
+        Cursor cursor = context.getContentResolver().query(Contract.MangaReaderPopularList.CONTENT_URI,
+                POPULAR_COLUMNS, null, null, null);
+
+        if (cursor == null || !cursor.moveToFirst()) return null;
+
+        cursor.moveToFirst();
+        ArrayList<PopularMangaItem> items = new ArrayList<>(cursor.getCount());
+
+        do {
+            PopularMangaItem.Builder builder = new PopularMangaItem.Builder(cursor.getString(1), cursor.getString(2));
+            builder.setRank(cursor.getInt(3))
+                    .setAuthor(cursor.getString(4))
+                    .setDetails(cursor.getString(5))
+                    .setGenres(cursor.getString(6).split(","));
+            items.add(builder.build());
+        } while (cursor.moveToNext());
+
+        if (!cursor.isClosed()) cursor.close();
+
+        return items;
     }
 }

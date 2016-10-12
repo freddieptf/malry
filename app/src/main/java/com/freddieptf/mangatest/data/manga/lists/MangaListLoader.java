@@ -63,7 +63,8 @@ public class MangaListLoader extends AsyncTaskLoader<MangaListLoader.MangaLists>
             if (repository.foxListCacheAvailable() && repository.readerListCacheAvailable()) {
                 Log.d(TAG, "load from cache");
                 MangaLists mangaLists = new MangaLists(repository.getFoxListCache())
-                        .setLatestItems(repository.getLatestListCache());
+                        .setLatestItems(repository.getLatestListCache())
+                        .setPopularItems(repository.getPopularListCache());
                 deliverResult(mangaLists);
             } else {
                 Log.d(TAG, "force load boiii mangafox");
@@ -73,7 +74,8 @@ public class MangaListLoader extends AsyncTaskLoader<MangaListLoader.MangaLists>
             if (repository.readerListCacheAvailable()) {
                 Log.d(TAG, "load from cache");
                 MangaLists mangaLists = new MangaLists(repository.getReaderListCache())
-                        .setLatestItems(repository.getLatestListCache());
+                        .setLatestItems(repository.getLatestListCache())
+                        .setPopularItems(repository.getPopularListCache());
                 deliverResult(mangaLists);
             } else {
                 Log.d(TAG, "force load boii mangareader");

@@ -26,6 +26,7 @@ public class MangaListRepository implements MangaListSource {
     private ArrayList<MangaItem> readerListCache;
     private ArrayList<MangaItem> foxListCache;
     private ArrayList<LatestMangaItem> latestListCache;
+    private ArrayList<PopularMangaItem> popularListCache;
 
     private MangaListRepository() {
         localSource = MangaListLocalSource.getInstance();
@@ -109,7 +110,26 @@ public class MangaListRepository implements MangaListSource {
 
     @Override
     public ArrayList<PopularMangaItem> getMangaReaderPopularList(Context context) {
-        return null;
+        ArrayList<PopularMangaItem> items = localSource.getMangaReaderPopularList(context);
+        if (items == null) {
+            items = remoteSource.getMangaReaderPopularList(context);
+            if (items != null) {
+                context.getContentResolver().delete(Contract.MangaReaderPopularList.CONTENT_URI, null, null);
+                Callable<Boolean> insertItems = dbInsertHelper
+                        .setDestinationUri(Contract.MangaReaderPopularList.CONTENT_URI)
+                        .insertPopularList(context, items);
+
+                try {
+                    boolean b = insertItems.call();
+                    if (b) Utilities.Log(LOG_TAG, "inserted popular manga");
+                    else Utilities.Log(LOG_TAG, "couldn't insert popular manga");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        popularListCache = items;
+        return items;
     }
 
     boolean readerListCacheAvailable() {
@@ -130,5 +150,9 @@ public class MangaListRepository implements MangaListSource {
 
     ArrayList<LatestMangaItem> getLatestListCache() {
         return latestListCache;
+    }
+
+    ArrayList<PopularMangaItem> getPopularListCache() {
+        return popularListCache;
     }
 }

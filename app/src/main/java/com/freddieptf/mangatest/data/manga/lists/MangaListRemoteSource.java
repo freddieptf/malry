@@ -63,6 +63,11 @@ public class MangaListRemoteSource implements MangaListSource {
 
     @Override
     public ArrayList<PopularMangaItem> getMangaReaderPopularList(Context context) {
-        return mangaReader.getPopularList();
+        try {
+            return mangaReader.getPopularList();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
