@@ -20,6 +20,7 @@ import com.freddieptf.mangatest.data.manga.lists.MangaListLoader;
 import com.freddieptf.mangatest.data.model.LatestMangaItem;
 import com.freddieptf.mangatest.data.model.MangaItem;
 import com.freddieptf.mangatest.data.model.PopularMangaItem;
+import com.freddieptf.mangatest.ui.base.BaseActivity;
 import com.freddieptf.mangatest.ui.base.BaseFragment;
 import com.freddieptf.mangatest.ui.details.DetailsActivity;
 import com.freddieptf.mangatest.utils.Utilities;
@@ -50,11 +51,6 @@ public class ListFragment extends BaseFragment implements ListView, ListPagerAda
     }
 
     @Override
-    protected boolean hideBottomBar() {
-        return true;
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_manga_list, container, false);
@@ -67,7 +63,7 @@ public class ListFragment extends BaseFragment implements ListView, ListPagerAda
         progressBar = (SmoothProgressBar) view.findViewById(R.id.progress);
         viewPager = (ViewPager) view.findViewById(R.id.pager);
         viewPager.setAdapter(new ListPagerAdapter(this, getActivity()));
-        TabLayout tabLayout = getMainActivityHelper().getTabs();
+        TabLayout tabLayout = ((BaseActivity) getActivity()).getTabs();
         tabLayout.setupWithViewPager(viewPager);
 
         mangaListAdapter = new MangaListAdapter();

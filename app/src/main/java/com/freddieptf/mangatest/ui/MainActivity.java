@@ -6,8 +6,6 @@ import android.support.annotation.IdRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +15,8 @@ import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.data.manga.details.MangaDetailsListLoader;
 import com.freddieptf.mangatest.data.manga.details.MangaDetailsRepository;
 import com.freddieptf.mangatest.data.manga.lists.MangaListLoader;
+import com.freddieptf.mangatest.data.sync.SyncHelper;
+import com.freddieptf.mangatest.ui.base.BaseActivity;
 import com.freddieptf.mangatest.ui.downloads.DownloadsFragment;
 import com.freddieptf.mangatest.ui.library.LibraryFragment;
 import com.freddieptf.mangatest.ui.library.LibraryPresenter;
@@ -30,12 +30,9 @@ import com.roughike.bottombar.OnMenuTabClickListener;
 import java.io.File;
 
 
-public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener,
-        MainActivityHelper {
+public class MainActivity extends BaseActivity {
 
     final public static String ACTION_UPDATE = "update";
-    //static..not sure if good or bad
-    public static AppBarLayout toolbarBig;
     public static boolean DEBUG = true;
     final String LOG_TAG = this.getClass().getSimpleName();
     String[] fragmentTitles;
@@ -44,15 +41,14 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     View toolBarShadow;
     BottomBar bottomBar;
     int position = -1;
+    private AppBarLayout toolbarBig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        SyncHelper.scheduleJobs();
-
-        getSupportFragmentManager().addOnBackStackChangedListener(this);
+        SyncHelper.scheduleJobs();
 
         toolbarBig = (AppBarLayout)findViewById(R.id.appBarLayout);
         toolBarShadow = findViewById(R.id.toolBarShadow);
@@ -126,33 +122,23 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
     @Override
-    public void onBackStackChanged() {
-        try {
-            Utilities.Log(LOG_TAG, "BackStack count: " + getSupportFragmentManager().getBackStackEntryCount());
-            Utilities.Log(LOG_TAG, " " + getSupportFragmentManager().getBackStackEntryAt(0));
-        }catch (IndexOutOfBoundsException | NullPointerException e){
-            Utilities.Log(LOG_TAG, e.getMessage());
-        }
-    }
-
-    @Override
-    public void hideBottomBar(boolean hide) {
-
-    }
-
-    @Override
-    public Toolbar getToolBar() {
-        return toolbar;
-    }
-
-    @Override
     public TabLayout getTabs() {
         return tabLayout;
     }
 
     @Override
-    public MainActivityHelper getMainActivityHelper() {
-        return this;
+    public void setNavigationIcon(int resId) {
+        toolbar.setNavigationIcon(resId);
+    }
+
+    @Override
+    public void hideTabs() {
+        tabLayout.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showTabs() {
+        tabLayout.setVisibility(View.VISIBLE);
     }
 
     public void recreateDownloadsFragmentWithArgs(File[] chapters, String mangaName){
@@ -170,7 +156,6 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         DownloadsFragment downloadsFragment =  new DownloadsFragment();
         downloadsFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().replace(R.id.container, downloadsFragment).addToBackStack("downloads_b").commit();
-
     }
 
     public void selectItem(int id) {

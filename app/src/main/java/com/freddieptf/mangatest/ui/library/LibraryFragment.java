@@ -63,11 +63,6 @@ public class LibraryFragment extends BaseFragment implements LibraryView, Librar
     }
 
     @Override
-    protected boolean hideBottomBar() {
-        return false;
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_my_manga, container, false);
     }

@@ -3,7 +3,6 @@ package com.freddieptf.mangatest.ui.details;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -26,7 +25,6 @@ import com.freddieptf.mangatest.data.model.MangaDetails;
 import com.freddieptf.mangatest.data.service.ChapterDownloadService;
 import com.freddieptf.mangatest.ui.MangaViewerActivity;
 import com.freddieptf.mangatest.ui.MangaViewerFragment;
-import com.freddieptf.mangatest.utils.Utilities;
 
 import java.io.File;
 
@@ -190,45 +188,45 @@ public class DetailsFragment extends Fragment implements DetailsView, ChapterAda
     public String viewIfOnDisk(String mangaName, String chapterId, String chapterTitle) {
 
         String path = null;
-        if (chapterTitle == null) chapterTitle = "chapter";
-
-        Utilities.Log(LOG_TAG, "View: " + chapterTitle + " id: " + chapterId);
-
-        if (Utilities.externalStorageMounted()) {
-
-            String parentDir = Environment.getExternalStorageDirectory().toString();
-            File parent = new File(parentDir + "/MangaTest");
-
-            if (!parent.exists()) return null;
-
-            File dir = new File("");
-            File[] mangaDirs = parent.listFiles();
-
-            for (File mangaDir : mangaDirs) {
-                if (mangaDir.getName().equals(mangaName)) {
-                    dir = new File(parent.getPath() + "/" + mangaName);
-                    break;
-                }
-            }
-
-            if (dir.exists()) {
-                File[] chapterDirs = dir.listFiles();
-                for (File chapterDir : chapterDirs) {
-                    if (chapterDir.getName().contains(chapterId)) {
-                        path = chapterDir.getPath();
-                        break;
-                    }
-                }
-            }
-
-        }
-
-        if (path != null) {
-            File f = new File(path);
-            if (f.exists()) {
-                return path;
-            }
-        }
+//        if (chapterTitle == null) chapterTitle = "chapter";
+//
+//        Utilities.Log(LOG_TAG, "View: " + chapterTitle + " id: " + chapterId);
+//
+//        if (Utilities.externalStorageMounted()) {
+//
+//            String parentDir = Environment.getExternalStorageDirectory().toString();
+//            File parent = new File(parentDir + "/MangaTest");
+//
+//            if (!parent.exists()) return null;
+//
+//            File dir = new File("");
+//            File[] mangaDirs = parent.listFiles();
+//
+//            for (File mangaDir : mangaDirs) {
+//                if (mangaDir.getName().equals(mangaName)) {
+//                    dir = new File(parent.getPath() + "/" + mangaName);
+//                    break;
+//                }
+//            }
+//
+//            if (dir.exists()) {
+//                File[] chapterDirs = dir.listFiles();
+//                for (File chapterDir : chapterDirs) {
+//                    if (chapterDir.getName().contains(chapterId)) {
+//                        path = chapterDir.getPath();
+//                        break;
+//                    }
+//                }
+//            }
+//
+//        }
+//
+//        if (path != null) {
+//            File f = new File(path);
+//            if (f.exists()) {
+//                return path;
+//            }
+//        }
 
         return null;
 
