@@ -103,7 +103,8 @@ public class ListFragment extends BaseFragment implements ListView, ListPagerAda
     @Override
     public void onDataLoad(MangaListLoader.MangaLists mangaLists) {
         Log.d(LOG_TAG, "data" + (mangaLists.getMangaItems() == null ? 0 : mangaLists.getMangaItems().size()));
-        mangaListAdapter.swapData(mangaLists.getMangaItems(), Utilities.getCurrentSource(getContext()));
+        if (getContext() != null)
+            mangaListAdapter.swapData(mangaLists.getMangaItems(), Utilities.getCurrentSource(getContext()));
         latestListAdapter.swapData(mangaLists.getLatestMangaItems());
         popularListAdapter.swapData(mangaLists.getPopularMangaItems());
     }
