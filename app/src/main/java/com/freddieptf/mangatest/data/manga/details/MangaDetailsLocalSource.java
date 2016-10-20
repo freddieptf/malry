@@ -75,7 +75,8 @@ public class MangaDetailsLocalSource implements MangaDetailsSource {
                 MangaDetails.Builder builder =
                         new MangaDetails.Builder(cursor.getString(COLUMN_MANGA_NAME), new Chapter[]{});
 
-                builder.setAuthor(cursor.getString(COLUMN_MANGA_AUTHOR))
+                builder.setId(cursor.getString(COLUMN_MANGA_ID))
+                        .setAuthor(cursor.getString(COLUMN_MANGA_AUTHOR))
                         .setCover(cursor.getString(COLUMN_MANGA_COVER))
                         .setInfo(cursor.getString(COLUMN_MANGA_INFO))
                         .setStatus(cursor.getString(COLUMN_MANGA_STATUS));

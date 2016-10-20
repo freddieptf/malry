@@ -136,6 +136,9 @@ public class LibraryAdapter extends RecyclerView.Adapter<LibraryAdapter.LibraryV
             if (updateMargin != 0) {
                 updateNum.setVisibility(View.VISIBLE);
                 updateNum.setText("" + updateMargin);
+            } else {
+                updateNum.setVisibility(View.GONE);
+                updateNum.setText("");
             }
         }
 
