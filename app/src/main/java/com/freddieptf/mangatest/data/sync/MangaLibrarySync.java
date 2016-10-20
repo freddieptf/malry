@@ -12,7 +12,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.evernote.android.job.Job;
-import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.data.local.Contract;
@@ -52,7 +51,6 @@ public class MangaLibrarySync extends Job {
     private final int MANGA_COVER = 5;
 
     public static void scheduleJob() {
-        JobManager.instance().cancelAllForTag(MangaLibrarySync.TAG);
         new JobRequest.Builder(MangaLibrarySync.TAG)
                 .setPeriodic(TimeUnit.HOURS.toMillis(8))
                 .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
@@ -95,8 +93,9 @@ public class MangaLibrarySync extends Job {
                 }
 
                 if (detailsObject != null) {
-                    String last_local = Chapter.fromJSON(new JSONArray(cursor.getString(MANGA_CHAPTER_JSON)))[0].chapterId;
-                    String last_fresh = detailsObject.getChapters()[0].chapterId;
+                    JSONArray jsonArray = new JSONArray(cursor.getString(MANGA_CHAPTER_JSON));
+                    String last_local = Chapter.fromJSON(jsonArray)[jsonArray.length() - 1].chapterId;
+                    String last_fresh = detailsObject.getChapters()[detailsObject.getChapters().length - 1].chapterId;
 
                     if (!last_local.equals(last_fresh)) {
                         ContentValues cv = new ContentValues();
@@ -163,7 +162,7 @@ public class MangaLibrarySync extends Job {
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_stat_maps_local_library)
-                        .setContentTitle("Manga Updates")
+                        .setContentTitle("Manga Updates: " + list.get(0))
                         .setContentText(contextText)
                         .setNumber(list.size())
                         .setDefaults(Notification.DEFAULT_ALL)
