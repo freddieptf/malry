@@ -52,7 +52,7 @@ public class DetailsPresenter implements LoaderManager.LoaderCallbacks<MangaDeta
     }
 
     public void save() {
-        repository.saveMangaDetails(mangaDetails, loader.getMangaId(), loader.getSource());
+        repository.saveMangaDetails(mangaDetails, loader.getMangaId(), loader.getSource(), loader.getContext());
         detailsView.onDataSaved();
     }
 }

@@ -29,7 +29,7 @@ public class MangaDetailsLoader extends AsyncTaskLoader<MangaDetails>
 
     @Override
     public MangaDetails loadInBackground() {
-        mangaDetails = mangaDetailsRepository.getMangaDetails(mangaId, mangaName, source);
+        mangaDetails = mangaDetailsRepository.getMangaDetails(mangaId, mangaName, source, getContext());
         return mangaDetails;
     }
 

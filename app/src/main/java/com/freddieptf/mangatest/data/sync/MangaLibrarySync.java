@@ -69,7 +69,7 @@ public class MangaLibrarySync extends Job {
 
     private Job.Result checkForUpdates(Context context) {
         List<String> updated = new ArrayList<>();
-        MangaDetailsRepository repository = MangaDetailsRepository.getInstance(context);
+        MangaDetailsRepository repository = MangaDetailsRepository.getInstance();
 
         Cursor cursor = context.getContentResolver().query(
                 Contract.MyManga.CONTENT_URI,
@@ -102,7 +102,7 @@ public class MangaLibrarySync extends Job {
                         cv.put(Contract.MyManga.COLUMN_MANGA_CHAPTER_JSON,
                                 new Gson().toJson(detailsObject.getChapters()));
 
-                        repository.updateMangaDetails(detailsObject.getName(), cv);
+                        repository.updateMangaDetails(getContext(), detailsObject.getName(), cv);
 
                         //get number of updates if user didn't go through them already
                         int updates = Utilities.readMangaPageFromPrefs(context, cursor.getString(MANGA_ID));
@@ -118,7 +118,7 @@ public class MangaLibrarySync extends Job {
                     if (!cursor.getString(MANGA_COVER).equals(detailsObject.getCover())) {
                         ContentValues cv = new ContentValues();
                         cv.put(Contract.MyManga.COLUMN_MANGA_COVER, detailsObject.getCover());
-                        repository.updateMangaDetails(detailsObject.getName(), cv);
+                        repository.updateMangaDetails(getContext(), detailsObject.getName(), cv);
                     }
                 } else {
                     Utilities.Log(TAG, "details object null");

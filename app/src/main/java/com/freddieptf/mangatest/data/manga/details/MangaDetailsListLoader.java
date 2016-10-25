@@ -24,7 +24,7 @@ public class MangaDetailsListLoader extends AsyncTaskLoader<ArrayList<MangaDetai
 
     @Override
     public ArrayList<MangaDetails> loadInBackground() {
-        return mangaDetailsRepository.getMangaDetailsList();
+        return mangaDetailsRepository.getMangaDetailsList(getContext());
     }
 
     @Override

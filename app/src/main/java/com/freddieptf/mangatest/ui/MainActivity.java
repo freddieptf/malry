@@ -171,7 +171,7 @@ public class MainActivity extends BaseActivity {
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, libraryFragment,
                         fragmentTitles[position]).commit();
 
-                MangaDetailsRepository repository = MangaDetailsRepository.getInstance(this);
+                MangaDetailsRepository repository = MangaDetailsRepository.getInstance();
                 MangaDetailsListLoader loader = new MangaDetailsListLoader(this, repository);
                 LibraryPresenter libraryPresenter = new LibraryPresenter(getSupportLoaderManager(), loader, repository, libraryFragment);
 

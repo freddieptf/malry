@@ -40,7 +40,7 @@ public class DetailsActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().replace(R.id.details_fragment, fragment).commit();
         }
 
-        MangaDetailsRepository repository = MangaDetailsRepository.getInstance(this);
+        MangaDetailsRepository repository = MangaDetailsRepository.getInstance();
         MangaDetailsLoader loader = new MangaDetailsLoader(this, repository);
         loader.setRequestDetails(mangaId, mangaTitle, source);
 

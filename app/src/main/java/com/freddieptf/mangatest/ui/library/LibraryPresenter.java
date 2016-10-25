@@ -51,7 +51,7 @@ public class LibraryPresenter implements LoaderManager.LoaderCallbacks<ArrayList
     }
 
     public void deleteItem(String name, int position) {
-        repository.deleteMangaDetails(name);
+        repository.deleteMangaDetails(name, mangaDetailsListLoader.getContext());
         libraryView.onItemDeleted(name, position);
     }
 }

@@ -18,20 +18,18 @@ import java.util.ArrayList;
 
 public class MangaDetailsRemoteSource implements MangaDetailsSource {
 
-    private Context context;
 
-    public MangaDetailsRemoteSource(Context context) {
-        this.context = context;
+    public MangaDetailsRemoteSource() {
     }
 
     @Override
-    public ArrayList<MangaDetails> getMangaDetailsList() {
+    public ArrayList<MangaDetails> getMangaDetailsList(Context context) {
         //no-op
         return null;
     }
 
     @Override
-    public MangaDetails getMangaDetails(@Nullable String id, @Nullable String name, @NonNull String source) {
+    public MangaDetails getMangaDetails(@Nullable String id, @Nullable String name, @NonNull String source, Context context) {
         MangaDetails mangaDetails;
         try {
             if (source.equals(context.getString(R.string.pref_manga_reader))) {
@@ -47,17 +45,17 @@ public class MangaDetailsRemoteSource implements MangaDetailsSource {
     }
 
     @Override
-    public void saveMangaDetails(@NonNull MangaDetails mangaDetails, @NonNull String mangaId, @NonNull String source) {
+    public void saveMangaDetails(@NonNull MangaDetails mangaDetails, @NonNull String mangaId, @NonNull String source, Context context) {
         //no-op
     }
 
     @Override
-    public void deleteMangaDetails(@NonNull String mangaName) {
+    public void deleteMangaDetails(@NonNull String mangaName, Context context) {
         //no-op
     }
 
     @Override
-    public void deleteAllMangaDetails() {
+    public void deleteAllMangaDetails(Context context) {
         //no-op
     }
 }

@@ -1,6 +1,5 @@
 package com.freddieptf.mangatest.data.manga.details;
 
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -56,16 +55,13 @@ public class MangaDetailsLocalSource implements MangaDetailsSource {
     private final int COLUMN_MANGA_SOURCE = 7;
     private final int COLUMN_MANGA_LAST_UPDATE = 8;
     private final int COLUMN_CHAPTER_JSON = 9;
-    private ContentResolver contentResolver;
 
-    public MangaDetailsLocalSource(Context context) {
-        // FIXME: 11/10/16 bad idea..this probably leaks memory boiii
-        contentResolver = context.getContentResolver();
+    public MangaDetailsLocalSource() {
     }
 
     @Override
-    public ArrayList<MangaDetails> getMangaDetailsList() {
-        Cursor cursor = contentResolver.query(Contract.MyManga.CONTENT_URI, columns, null, null, null);
+    public ArrayList<MangaDetails> getMangaDetailsList(Context context) {
+        Cursor cursor = context.getContentResolver().query(Contract.MyManga.CONTENT_URI, columns, null, null, null);
         if (cursor == null || !cursor.moveToFirst()) {
             return null;
         } else {
@@ -90,10 +86,10 @@ public class MangaDetailsLocalSource implements MangaDetailsSource {
     }
 
     @Override
-    public MangaDetails getMangaDetails(@Nullable String id, @Nullable String name, @NonNull String source) {
+    public MangaDetails getMangaDetails(@Nullable String id, @Nullable String name, @NonNull String source, Context context) {
 
         Uri uri = Contract.MyManga.buildMangaWithNameUri(name);
-        Cursor cursor = contentResolver.query(uri, full_columns, null, null, null);
+        Cursor cursor = context.getContentResolver().query(uri, full_columns, null, null, null);
         if (cursor == null || !cursor.moveToFirst()) {
             return null;
         } else {
@@ -122,23 +118,23 @@ public class MangaDetailsLocalSource implements MangaDetailsSource {
     }
 
     @Override
-    public void saveMangaDetails(@NonNull MangaDetails mangaDetails, @NonNull String mangaId, @NonNull String source) {
-        DbInsertHelper.insertToLibrary(contentResolver, mangaDetails, mangaId, source);
+    public void saveMangaDetails(@NonNull MangaDetails mangaDetails, @NonNull String mangaId, @NonNull String source, Context context) {
+        DbInsertHelper.insertToLibrary(context.getContentResolver(), mangaDetails, mangaId, source);
     }
 
-    public void updateMangaDetails(String mangaName, ContentValues contentValues) {
+    public void updateMangaDetails(Context context, String mangaName, ContentValues contentValues) {
         Uri uri = Contract.MyManga.buildMangaWithNameUri(mangaName);
-        contentResolver.update(uri, contentValues, null, null);
+        context.getContentResolver().update(uri, contentValues, null, null);
     }
 
     @Override
-    public void deleteMangaDetails(@NonNull String mangaName) {
+    public void deleteMangaDetails(@NonNull String mangaName, @NonNull Context context) {
         Uri uri = Contract.MyManga.buildMangaWithNameUri(mangaName);
-        contentResolver.delete(uri, null, null);
+        context.getContentResolver().delete(uri, null, null);
     }
 
     @Override
-    public void deleteAllMangaDetails() {
-        contentResolver.delete(Contract.MyManga.CONTENT_URI, null, null);
+    public void deleteAllMangaDetails(@NonNull Context context) {
+        context.getContentResolver().delete(Contract.MyManga.CONTENT_URI, null, null);
     }
 }

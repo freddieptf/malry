@@ -1,5 +1,6 @@
 package com.freddieptf.mangatest.data.manga.details;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -13,15 +14,15 @@ import java.util.ArrayList;
 
 public interface MangaDetailsSource {
 
-    ArrayList<MangaDetails> getMangaDetailsList();
+    ArrayList<MangaDetails> getMangaDetailsList(Context context);
 
-    MangaDetails getMangaDetails(@Nullable String id, @Nullable String name, @NonNull String source);
+    MangaDetails getMangaDetails(@Nullable String id, @Nullable String name, @NonNull String source, Context context);
 
-    void saveMangaDetails(@NonNull MangaDetails mangaDetails, @NonNull String mangaId, @NonNull String source);
+    void saveMangaDetails(@NonNull MangaDetails mangaDetails, @NonNull String mangaId, @NonNull String source, Context context);
 
-    void deleteMangaDetails(@NonNull String mangaName);
+    void deleteMangaDetails(@NonNull String mangaName, @NonNull Context context);
 
-    void deleteAllMangaDetails();
+    void deleteAllMangaDetails(@NonNull Context context);
 
     interface GetMangaDetailsCallback {
         void onDetailsLoaded(MangaDetails mangaDetails);

@@ -24,13 +24,13 @@ public class MangaDetailsRepository implements MangaDetailsSource {
 
     private ArrayList<MangaDetails> cache;
 
-    private MangaDetailsRepository(Context context) {
-        localSource = new MangaDetailsLocalSource(context);
-        remoteSource = new MangaDetailsRemoteSource(context);
+    private MangaDetailsRepository() {
+        localSource = new MangaDetailsLocalSource();
+        remoteSource = new MangaDetailsRemoteSource();
     }
 
-    public static MangaDetailsRepository getInstance(Context context) {
-        if (INSTANCE == null) INSTANCE = new MangaDetailsRepository(context);
+    public static MangaDetailsRepository getInstance() {
+        if (INSTANCE == null) INSTANCE = new MangaDetailsRepository();
         return INSTANCE;
     }
 
@@ -48,40 +48,40 @@ public class MangaDetailsRepository implements MangaDetailsSource {
     }
 
     @Override
-    public ArrayList<MangaDetails> getMangaDetailsList() {
-        cache = localSource.getMangaDetailsList();
-        return localSource.getMangaDetailsList();
+    public ArrayList<MangaDetails> getMangaDetailsList(Context context) {
+        cache = localSource.getMangaDetailsList(context);
+        return localSource.getMangaDetailsList(context);
     }
 
     @Override
-    public MangaDetails getMangaDetails(@Nullable String id, @Nullable String name, @NonNull String source) {
-        MangaDetails mangaDetails = localSource.getMangaDetails(id, name, source);
+    public MangaDetails getMangaDetails(@Nullable String id, @Nullable String name, @NonNull String source, Context context) {
+        MangaDetails mangaDetails = localSource.getMangaDetails(id, name, source, context);
         if (mangaDetails == null) {
-            mangaDetails = remoteSource.getMangaDetails(id, name, source);
+            mangaDetails = remoteSource.getMangaDetails(id, name, source, context);
         }
         return mangaDetails;
     }
 
     @Override
-    public void saveMangaDetails(@NonNull MangaDetails mangaDetails, @NonNull String mangaId, @NonNull String source) {
-        localSource.saveMangaDetails(mangaDetails, mangaId, source);
+    public void saveMangaDetails(@NonNull MangaDetails mangaDetails, @NonNull String mangaId, @NonNull String source, Context context) {
+        localSource.saveMangaDetails(mangaDetails, mangaId, source, context);
         refreshRepository();
     }
 
-    public void updateMangaDetails(String name, ContentValues contentValues) {
-        localSource.updateMangaDetails(name, contentValues);
+    public void updateMangaDetails(Context context, String name, ContentValues contentValues) {
+        localSource.updateMangaDetails(context, name, contentValues);
         refreshRepository();
     }
 
     @Override
-    public void deleteMangaDetails(@NonNull String mangaName) {
-        localSource.deleteMangaDetails(mangaName);
+    public void deleteMangaDetails(@NonNull String mangaName, Context context) {
+        localSource.deleteMangaDetails(mangaName, context);
         notifyObserver();
     }
 
     @Override
-    public void deleteAllMangaDetails() {
-        localSource.deleteAllMangaDetails();
+    public void deleteAllMangaDetails(Context context) {
+        localSource.deleteAllMangaDetails(context);
         notifyObserver();
     }
 
