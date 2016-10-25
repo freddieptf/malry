@@ -1,15 +1,17 @@
 package com.freddieptf.mangatest.data.remote;
 
 import android.graphics.Bitmap;
-import android.os.Environment;
 
 import com.freddieptf.mangatest.data.model.ChapterPages;
 import com.freddieptf.mangatest.data.model.ImagePage;
+import com.freddieptf.mangatest.utils.FileUtils;
 import com.freddieptf.mangatest.utils.Utilities;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * Created by freddieptf on 22/09/16.
@@ -34,20 +36,25 @@ class DownloadTask implements Runnable {
 
     @Override
     public void run() {
-        String parentDirectory = Environment.getExternalStorageDirectory().toString();
-        String manga = chapterImages.getMangaName();
-
-        String chapter = chapterImages.getChapter();
-        String chapterTitle = chapterImages.getChapterTitle();
+        String manga = chapterImages.getMangaName().trim();
+        String chapter = chapterImages.getChapter().trim();
+        String chapterTitle = chapterImages.getChapterTitle().trim();
 
         if (Utilities.externalStorageMounted()) {
-            parent = new File(parentDirectory + "/MangaTest/" + manga + "/" + chapter + ": " + chapterTitle);
+            parent = new File(FileUtils.getMangaChapterDir(manga, chapter + ": " + chapterTitle));
             if (!parent.exists() || parent.listFiles().length != chapterImages.getImagePages().length - 1) {
                 parent.mkdirs();
 
                 publishProgress.onStart(taskId, chapterImages.getImagePages().length, manga, chapter);
 
-                for (ImagePage imagePage : chapterImages.getImagePages()) {
+                ImagePage[] pages = chapterImages.getImagePages();
+                Arrays.sort(pages, new Comparator<ImagePage>() {
+                    @Override
+                    public int compare(ImagePage imagePage, ImagePage t1) {
+                        return t1.getPageId() < imagePage.getPageId() ? 1 : -1;
+                    }
+                });
+                for (ImagePage imagePage : pages) {
                     downloadImagePage(imagePage);
                     currentProgress++;
                 }
@@ -59,7 +66,7 @@ class DownloadTask implements Runnable {
 
     private void downloadImagePage(ImagePage imagePage) {
         Bitmap bitmap = Utilities.DownloadBitmapFromUrl(imagePage.getUrl());
-        String pageId = imagePage.getPageId();
+        int pageId = imagePage.getPageId();
         File file = new File(parent, pageId + ".jpg");
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file.getPath());
@@ -68,7 +75,7 @@ class DownloadTask implements Runnable {
             publishProgress.onProgressUpdate(taskId, currentProgress);
         } catch (IOException e) {
             e.printStackTrace();
-            publishProgress.onError(taskId, pageId, e);
+            publishProgress.onError(taskId, pageId + "", e);
         }
 
     }

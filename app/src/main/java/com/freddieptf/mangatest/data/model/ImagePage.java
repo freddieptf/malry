@@ -19,20 +19,20 @@ public class ImagePage implements Parcelable {
             return new ImagePage[size];
         }
     };
-    private final String pageId;
+    private final int pageId;
     private final String url;
 
-    public ImagePage(String pageId, String url) {
+    public ImagePage(int pageId, String url) {
         this.pageId = pageId;
         this.url = url;
     }
 
     private ImagePage(Parcel in) {
-        pageId = in.readString();
+        pageId = in.readInt();
         url = in.readString();
     }
 
-    public String getPageId() {
+    public int getPageId() {
         return pageId;
     }
 
@@ -42,7 +42,7 @@ public class ImagePage implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(pageId);
+        dest.writeInt(pageId);
         dest.writeString(url);
     }
 
