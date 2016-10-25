@@ -20,13 +20,12 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.freddieptf.mangatest.R;
+import com.freddieptf.mangatest.data.manga.chapters.ChapterLocalSource;
 import com.freddieptf.mangatest.data.model.Chapter;
+import com.freddieptf.mangatest.data.model.ChapterPages;
 import com.freddieptf.mangatest.data.model.MangaDetails;
 import com.freddieptf.mangatest.data.service.ChapterDownloadService;
-import com.freddieptf.mangatest.ui.MangaViewerActivity;
-import com.freddieptf.mangatest.ui.MangaViewerFragment;
-
-import java.io.File;
+import com.freddieptf.mangatest.ui.reader.ReaderActivity;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
@@ -35,7 +34,6 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
  */
 public class DetailsFragment extends Fragment implements DetailsView, ChapterAdapter.ChapterClickCallback {
 
-    String LOG_TAG = getClass().getSimpleName();
     RecyclerView recyclerView;
     ImageView coverImageView;
     SmoothProgressBar smoothProgressBar;
@@ -117,11 +115,8 @@ public class DetailsFragment extends Fragment implements DetailsView, ChapterAda
 
     @Override
     public void onChapterClicked(final Chapter ch, final String mangaId, final String source) {
-        String path = viewIfOnDisk(
-                mangaId == null ? ((DetailsActivity) getActivity()).getMangaId().replace("-", " ")
-                        : mangaId.replace("-", " "),
-                ch.chapterId, ch.chapterTitle);
-        if (path == null) {
+        ChapterPages chapterPages = new ChapterLocalSource().getChapter(source, mangaId, ch, getContext());
+        if (chapterPages == null) {
             MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
                     .title("MangaChapter " + ch.chapterId)
                     .positiveText("download")
@@ -132,11 +127,9 @@ public class DetailsFragment extends Fragment implements DetailsView, ChapterAda
                         public void onPositive(MaterialDialog dialog) {
                             super.onPositive(dialog);
                             Intent intent = new Intent(getActivity(), ChapterDownloadService.class);
-                            intent.putExtra(ChapterDownloadService.MANGA_NAME,
-                                    mangaId == null ? ((DetailsActivity) getActivity()).getMangaId() : mangaId);
+                            intent.putExtra(ChapterDownloadService.MANGA_NAME, mangaId);
                             intent.putExtra(ChapterDownloadService.MANGA_CHAPTER, ch.chapterId);
-                            intent.putExtra(ChapterDownloadService.MANGA_SOURCE,
-                                    source == null ? ((DetailsActivity) getActivity()).getSource() : source);
+                            intent.putExtra(ChapterDownloadService.MANGA_SOURCE, source);
                             getActivity().startService(intent);
                         }
 
@@ -155,26 +148,8 @@ public class DetailsFragment extends Fragment implements DetailsView, ChapterAda
             dialog.show();
 
         } else {
-            File file = new File(path);
-            String[] picUris = new String[file.listFiles().length];
-
-            for (int y = 0; y < file.listFiles().length; y++)
-                picUris[y] = file.listFiles()[y].getAbsolutePath();
-
-            Intent intent = new Intent(getActivity(), MangaViewerActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putStringArray(MangaViewerFragment.PIC_URLS, picUris);
-            bundle.putString("manga_title", ((DetailsActivity) getActivity()).getMangaTitle());
-
-            String chapter;
-            if (ch.chapterTitle == null) {
-                chapter = "MangaChapter " + ch.chapterId;
-            } else {
-                chapter = "c" + ch.chapterId + " " + ch.chapterTitle;
-            }
-
-            bundle.putString("chapterTitle", chapter);
-            intent.putExtra("bundle", bundle);
+            Intent intent = new Intent(getActivity(), ReaderActivity.class);
+            intent.putExtra(ReaderActivity.CHAPTER_BOII, chapterPages);
             startActivity(intent);
         }
 
@@ -182,53 +157,6 @@ public class DetailsFragment extends Fragment implements DetailsView, ChapterAda
 
     @Override
     public void onError() {
-
-    }
-
-    public String viewIfOnDisk(String mangaName, String chapterId, String chapterTitle) {
-
-        String path = null;
-//        if (chapterTitle == null) chapterTitle = "chapter";
-//
-//        Utilities.Log(LOG_TAG, "View: " + chapterTitle + " id: " + chapterId);
-//
-//        if (Utilities.externalStorageMounted()) {
-//
-//            String parentDir = Environment.getExternalStorageDirectory().toString();
-//            File parent = new File(parentDir + "/MangaTest");
-//
-//            if (!parent.exists()) return null;
-//
-//            File dir = new File("");
-//            File[] mangaDirs = parent.listFiles();
-//
-//            for (File mangaDir : mangaDirs) {
-//                if (mangaDir.getName().equals(mangaName)) {
-//                    dir = new File(parent.getPath() + "/" + mangaName);
-//                    break;
-//                }
-//            }
-//
-//            if (dir.exists()) {
-//                File[] chapterDirs = dir.listFiles();
-//                for (File chapterDir : chapterDirs) {
-//                    if (chapterDir.getName().contains(chapterId)) {
-//                        path = chapterDir.getPath();
-//                        break;
-//                    }
-//                }
-//            }
-//
-//        }
-//
-//        if (path != null) {
-//            File f = new File(path);
-//            if (f.exists()) {
-//                return path;
-//            }
-//        }
-
-        return null;
 
     }
 

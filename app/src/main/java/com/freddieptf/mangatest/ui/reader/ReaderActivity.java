@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.ui;
+package com.freddieptf.mangatest.ui.reader;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -7,14 +7,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.freddieptf.mangatest.R;
+import com.freddieptf.mangatest.data.model.ChapterPages;
 import com.freddieptf.mangatest.utils.Utilities;
 
 /**
  * Created by fred on 3/24/15.
  */
-public class MangaViewerActivity extends AppCompatActivity {
+public class ReaderActivity extends AppCompatActivity {
 
-
+    public static final String CHAPTER_BOII = "chapter_pages";
     final String LOG_TAG = getClass().getSimpleName();
     int posFromPrefs;
 
@@ -23,11 +24,10 @@ public class MangaViewerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manga_viewer);
 
-
-        Bundle bundle = getIntent().getBundleExtra("bundle");
-        String mangaTitle = bundle.getString("manga_title");
+        ChapterPages chapterPages = getIntent().getParcelableExtra(CHAPTER_BOII);
+        String mangaTitle = chapterPages.getMangaName();
+        String chapterTitle = chapterPages.getChapterTitle();
         try{
-            String chapterTitle = bundle.getString("chapterTitle");
             posFromPrefs = Utilities.readMangaPageFromPrefs(this, chapterTitle);
             Utilities.Log(LOG_TAG, "" + posFromPrefs);
         }catch (NullPointerException e){
@@ -42,17 +42,15 @@ public class MangaViewerActivity extends AppCompatActivity {
         if(savedInstanceState != null && savedInstanceState.containsKey("pos"))
             posFromPrefs = savedInstanceState.getInt("pos");
 
-        MangaViewerFragment mangaViewerFragment = new MangaViewerFragment();
+        ReaderFragment readerFragment = new ReaderFragment();
         Bundle b = new Bundle();
         b.putInt("pos", posFromPrefs);
-        mangaViewerFragment.setArguments(b);
+        readerFragment.setArguments(b);
         if(savedInstanceState == null)
             getSupportFragmentManager()
-                    .beginTransaction().replace(R.id.container, mangaViewerFragment, "viewer").commit();
+                    .beginTransaction().replace(R.id.container, readerFragment, "viewer").commit();
 
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -8,16 +8,14 @@
         android:id="@+id/picPage"
         android:layout_width="match_parent"
         android:layout_height="720dp"
+        android:tag="landscape"
         tools:ignore="UselessParent">
 
         <uk.co.senab.photoview.PhotoView
             android:id="@+id/pager_ImageView_item"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            android:tag="landscape"
-            />
+            android:layout_gravity="center" />
 
         <TextView
             android:id="@+id/tv_mangaPageNumber"

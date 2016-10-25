@@ -1,4 +1,4 @@
-package com.freddieptf.mangatest.ui;
+package com.freddieptf.mangatest.ui.reader;
 
 import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
@@ -7,9 +7,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,7 +19,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.freddieptf.mangatest.R;
-import com.freddieptf.mangatest.ui.adapters.PicPagerAdapter;
+import com.freddieptf.mangatest.data.model.ChapterPages;
+import com.freddieptf.mangatest.data.model.ImagePage;
 import com.freddieptf.mangatest.ui.widgets.CustomViewPager;
 import com.freddieptf.mangatest.utils.Utilities;
 
@@ -28,21 +29,16 @@ import java.io.IOException;
 /**
  * Created by fred on 3/22/15.
  */
-public class MangaViewerFragment extends Fragment {
+public class ReaderFragment extends Fragment {
 
     public static final String PIC_URLS = "pic_urls";
     public static final String MANGA_TITLE = "manga_title";
     public static final String CHAPTER_TITLE = "chapterTitle";
-    final String LOG_TAG = getClass().getSimpleName();
-    final String SCROLL_POSITION = "pos";
-    String[] picUris;
-    PicPagerAdapter adapter;
-    ActionBar actionBar;
-    int pos = 0;
-    int pageCount = -1;
-    CustomViewPager viewPager;
-    String chapterTitle;
-    WallpaperManager wallpaperManager;
+    private PicPagerAdapter adapter;
+    private int pos = 0;
+    private CustomViewPager viewPager;
+    private String chapterTitle;
+    private WallpaperManager wallpaperManager;
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -50,19 +46,19 @@ public class MangaViewerFragment extends Fragment {
         }
     };
 
-    public MangaViewerFragment(){
+    private ImagePage[] pages;
+
+    public ReaderFragment() {
         setHasOptionsMenu(true);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Bundle bundle = getActivity().getIntent().getBundleExtra("bundle");
-        chapterTitle = bundle.getString("chapterTitle");
+        ChapterPages chapterPages = getActivity().getIntent().getParcelableExtra(ReaderActivity.CHAPTER_BOII);
+        chapterTitle = chapterPages.getChapterTitle();
+        pages = chapterPages.getImagePages();
         if(getArguments() != null && getArguments().getInt("pos") != 0) pos = getArguments().getInt("pos");
-        Utilities.Log(LOG_TAG, "pos: " + pos + " chpterName: " + chapterTitle);
-
     }
 
     @Override
@@ -71,36 +67,21 @@ public class MangaViewerFragment extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(chapterTitle);
+        }
+    }
+
+    @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-
-        Bundle bundle = getActivity().getIntent().getBundleExtra("bundle");
-        picUris = bundle.getStringArray(PIC_URLS);
-        chapterTitle = bundle.getString("chapterTitle");
-        String mangaTitle = bundle.getString("manga_title");
-
-        if(actionBar != null) actionBar.setSubtitle(chapterTitle);
-        Utilities.Log(LOG_TAG, " picUris " + picUris.length);
-
-        pageCount = picUris.length;
-
         viewPager = (CustomViewPager)view.findViewById(R.id.pager_MangaPics);
-
-        adapter = new PicPagerAdapter(getActivity(), picUris, true, viewPager);
+        adapter = new PicPagerAdapter(pages);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(pos, false);
-
         wallpaperManager = WallpaperManager.getInstance(getActivity());
-
-//        Utilities.changeSystemUiOnTap(viewPager, getActivity());
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                Utilities.hideSystemUi(viewPager);
-//            }
-//        }, 1750);
-
     }
 
     @Override
@@ -112,10 +93,8 @@ public class MangaViewerFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-
         getActivity().unregisterReceiver(broadcastReceiver);
-
-        if((pageCount - 1) != viewPager.getCurrentItem() && viewPager.getCurrentItem() != 0) {
+        if ((pages.length - 1) != viewPager.getCurrentItem() && viewPager.getCurrentItem() != 0) {
             Utilities.writeMangaPageToPrefs(getActivity(),
                     chapterTitle,
                     viewPager.getCurrentItem());
@@ -141,7 +120,7 @@ public class MangaViewerFragment extends Fragment {
                     @Override
                     public void run() {
                         try {
-                            wallpaperManager.setBitmap(BitmapFactory.decodeFile(adapter.getCurrentPicUri()));
+                            wallpaperManager.setBitmap(BitmapFactory.decodeFile(adapter.getCurrentPicUri(viewPager.getCurrentItem())));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
