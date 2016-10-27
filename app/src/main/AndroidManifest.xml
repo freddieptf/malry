@@ -41,7 +41,7 @@
         </activity>
 
         <activity
-            android:name=".ui.detailView.DetailsActivity"
+            android:name=".ui.details.DetailsActivity"
             android:parentActivityName=".ui.MainActivity"
             android:theme="@style/DetailActivityTheme" />
 
@@ -51,7 +51,7 @@
         </activity>
 
         <activity
-            android:name=".ui.MangaViewerActivity"
+            android:name=".ui.reader.ReaderActivity"
             android:theme="@style/MangaViewerTheme" />
 
         <provider

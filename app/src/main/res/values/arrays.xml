@@ -4,9 +4,6 @@
     <string-array name="pref_manga_sources_Entries">
         <item>@string/pref_manga_reader</item>
         <item>@string/pref_manga_fox</item>
-        <item>@string/pref_manga_reader_latest</item>
-        <item>@string/pref_manga_reader_popular</item>
-        <item>@string/pref_all_dbs</item>
     </string-array>
 
     <string-array name="pref_theme_entries">
