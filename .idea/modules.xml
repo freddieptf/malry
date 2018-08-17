@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MangaTest.iml" filepath="$PROJECT_DIR$/MangaTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MyManga.iml" filepath="$PROJECT_DIR$/MyManga.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reader/reader.iml" filepath="$PROJECT_DIR$/reader/reader.iml" />
     </modules>
   </component>
 </project>

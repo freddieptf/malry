@@ -13,8 +13,6 @@ import android.view.ViewGroup;
 
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.ui.MainActivity;
-import com.freddieptf.mangatest.ui.MangaViewerActivity;
-import com.freddieptf.mangatest.ui.MangaViewerFragment;
 import com.freddieptf.mangatest.ui.base.BaseFragment;
 import com.freddieptf.mangatest.ui.recyclerviewdecor.DividerItemDecoration;
 import com.freddieptf.mangatest.ui.recyclerviewdecor.swipestuff.ItemDismissedHelper;
@@ -41,12 +39,6 @@ public class DownloadsFragment extends BaseFragment implements FilesAdapter.Swip
     ItemTouchHelper itemTouchHelper;
     List<File> toDelete;
 
-
-    @Override
-    protected boolean hideBottomBar() {
-        return hidebottombar;
-    }
-
     @Override
     protected int useNavigationIcon() {
         if (hidebottombar) return R.drawable.ic_action_name;
@@ -66,7 +58,7 @@ public class DownloadsFragment extends BaseFragment implements FilesAdapter.Swip
 
         }else {
             hidebottombar = false;
-            getMainActivityHelper().getToolBar().setNavigationIcon(R.drawable.ic_stat_maps_local_library);
+//            getMainActivityHelper().getToolBar().setNavigationIcon(R.drawable.ic_stat_maps_local_library);
 //            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getResources().getString(R.string.myDownloads));
         }
 
@@ -102,14 +94,14 @@ public class DownloadsFragment extends BaseFragment implements FilesAdapter.Swip
 
                     }
 
-                    Bundle bundle = new Bundle();
-                    bundle.putStringArray(MangaViewerFragment.PIC_URLS, picUrls);
-                    bundle.putString(MangaViewerFragment.CHAPTER_TITLE, file.getName());
-                    bundle.putString(MangaViewerFragment.MANGA_TITLE, mangaName);
-
-                    Intent intent =  new Intent(getActivity(), MangaViewerActivity.class);
-                    intent.putExtra("bundle", bundle);
-                    startActivity(intent);
+//                    Bundle bundle = new Bundle();
+//                    bundle.putStringArray(MangaViewerFragment.PIC_URLS, picUrls);
+//                    bundle.putString(MangaViewerFragment.CHAPTER_TITLE, file.getName());
+//                    bundle.putString(MangaViewerFragment.MANGA_TITLE, mangaName);
+//
+//                    Intent intent =  new Intent(getActivity(), MangaViewerActivity.class);
+//                    intent.putExtra("bundle", bundle);
+//                    startActivity(intent);
 
                 }
             }, this);
