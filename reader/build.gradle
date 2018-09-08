@@ -2,10 +2,11 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 26
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -28,9 +29,20 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    testImplementation 'junit:junit:4.12'
+    def val = rootProject.ext
+
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    testImplementation 'junit:junit:4.12'
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+//    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.25.0'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$val.kotlinCoroutines"
+
+    implementation "com.android.support:appcompat-v7:$val.supportLibVersion"
+    implementation "com.android.support:design:$val.supportLibVersion"
+    implementation 'com.github.chrisbanes.photoview:library:1.2.3'
+    implementation 'com.pixplicity.multiviewpager:library:1.0'
+    implementation 'com.github.bumptech.glide:glide:3.7.0'
+
 }
