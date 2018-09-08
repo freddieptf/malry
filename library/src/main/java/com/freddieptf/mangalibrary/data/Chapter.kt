@@ -7,6 +7,7 @@ import android.net.Uri
  */
 data class Chapter(val docID: String,
                    val name: String,
-                   val mimeType: String) {
+                   val mimeType: String,
+                   val parent: String) {
 
 }

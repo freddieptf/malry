@@ -2,15 +2,12 @@ package com.freddieptf.mangalibrary.detail
 
 import android.content.Context
 import android.net.Uri
-import android.os.Environment
 import android.provider.DocumentsContract
-import android.support.v4.os.EnvironmentCompat
+import com.freddieptf.mangalibrary.ChapterUtils
 import com.freddieptf.mangalibrary.data.Chapter
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import java.io.File
-import java.nio.file.DirectoryStream
-import java.nio.file.Files
 import kotlin.coroutines.experimental.suspendCoroutine
 
 /**
@@ -21,12 +18,12 @@ class Presenter(private val view: Contract.View,
 
     private fun openMangaDir(ctx: Context): List<Chapter>? {
 
+        val manga = Uri.parse(dirUri.path.replace(":", "/")).lastPathSegment
+
         val uri = DocumentsContract.buildChildDocumentsUriUsingTree(
                 dirUri,
                 DocumentsContract.getDocumentId(dirUri)
         )
-
-        println(uri)
 
         val PROJECTION = arrayOf<String>(
             DocumentsContract.Document.COLUMN_DOCUMENT_ID,
@@ -44,18 +41,25 @@ class Presenter(private val view: Contract.View,
 
         val chapters = ArrayList<Chapter>()
         do {
-            val chapter = Chapter(cursor.getString(0), cursor.getString(1), cursor.getString(2))
+            val chapter = Chapter(
+                    cursor.getString(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    manga)
             chapters.add(chapter)
         } while (cursor.moveToNext())
 
         return chapters
     }
 
-    fun openChapterDir(ctx: Context, chapter: Chapter): List<String> {
-        val file = File("/storage/" + chapter.docID.replace(":", "/"))
-        println(file.name + "::" + file.isDirectory + "::" + file.length())
+    fun openChapter(ctx: Context, chapter: Chapter): List<String> {
+        val chPath = ChapterUtils.getChapterUrlFromDocID(chapter.docID)
+        var file = File(chPath)
         val paths = ArrayList<String>()
-        file.listFiles().mapTo(paths) {it.absolutePath}
+        if (!file.isDirectory) {
+            file = ChapterUtils.getChapter(ctx.externalCacheDir.absolutePath, chapter)
+        }
+        file.listFiles().mapTo(paths) { it.absolutePath }
         return paths
     }
 
