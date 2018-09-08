@@ -1,2 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.freddieptf.comicreader" />
+    package="com.freddieptf.comicreader">
+
+    <uses-permission android:name="android.permission.SET_WALLPAPER"/>
+
+    <application>
+        <activity android:name=".ReaderActivity" />
+    </application>
+</manifest>

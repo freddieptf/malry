@@ -1,13 +1,18 @@
 package com.freddieptf.mangalibrary;
 
-import android.content.Context;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.*;
+import java.io.File;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -16,11 +21,35 @@ import static org.junit.Assert.*;
  */
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
-    @Test
-    public void useAppContext() throws Exception {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.freddieptf.mangalibrary.test", appContext.getPackageName());
+    private final String TAG = getClass().getSimpleName();
+
+    @Test
+    public void testPersm() {
+        assertTrue(
+                ContextCompat.checkSelfPermission(InstrumentationRegistry.getContext(),
+                        Manifest.permission.READ_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED);
+
+        assertTrue(
+                ContextCompat.checkSelfPermission(InstrumentationRegistry.getContext(),
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED);
     }
+
+    @Test
+    public void openFile() {
+        File file = new File("storage/83E6-11EA/Manga/Deadman Wonderland/1_ Who Killed Cock Robin");
+//        File file = new File("/storage/emulated/0/Pictures/Screenshots");
+        assertTrue(file.exists());
+        assertTrue(file.length() > 0);
+        assertTrue(file.isDirectory());
+
+        assertTrue(file.canRead());
+        assertTrue(file.listFiles().length > 0);
+        Log.d(TAG, "openFile: " + file.listFiles().length);
+        assertTrue(file.canWrite());
+
+    }
+
 }
