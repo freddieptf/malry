@@ -52,5 +52,6 @@ dependencies {
 
     implementation "com.android.support:appcompat-v7:$val.supportLibVersion"
     implementation "com.android.support:recyclerview-v7:$val.supportLibVersion"
+    implementation "org.apache.commons:commons-compress:$val.commonsCompress"
 
 }

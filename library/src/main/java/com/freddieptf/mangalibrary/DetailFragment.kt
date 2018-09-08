@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import com.freddieptf.comicreader.ReaderActivity
 import com.freddieptf.comicreader.ReaderFragment
 import com.freddieptf.mangalibrary.data.Chapter
@@ -72,7 +71,7 @@ class DetailFragment: Fragment(), Contract.View {
     override fun onChapterClick(chapter: Chapter) {
         val bundle = Bundle()
         bundle.putStringArrayList(ReaderFragment.PIC_URIS,
-                presenter.openChapterDir(context!!, chapter) as ArrayList<String>)
+                presenter.openChapter(context!!, chapter) as ArrayList<String>)
         val i = Intent(context!!, ReaderActivity::class.java)
         i.putExtras(bundle)
         startActivity(i)
