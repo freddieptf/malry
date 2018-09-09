@@ -19,6 +19,7 @@ class Presenter(private val view: Contract.View,
     private fun openMangaDir(ctx: Context): List<Chapter>? {
 
         val manga = Uri.parse(dirUri.path.replace(":", "/")).lastPathSegment
+        view.showTitle(manga)
 
         val uri = DocumentsContract.buildChildDocumentsUriUsingTree(
                 dirUri,

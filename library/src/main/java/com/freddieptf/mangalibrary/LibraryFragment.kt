@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 
@@ -36,6 +37,9 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(false)
+
         recyler = view.findViewById(R.id.rv_libraryList)
         recyler.layoutManager = LinearLayoutManager(context!!)
         recyler.adapter = adapter
@@ -63,8 +67,7 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
 
     private fun startLibSelector() {
         var i = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        i.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        i.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
         startActivityForResult(i, 100)
     }
 
