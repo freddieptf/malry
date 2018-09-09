@@ -9,6 +9,7 @@ interface Contract {
 
     interface View: ChapterAdapter.ChapterClickListener {
         fun onChaptersLoad(data: List<Chapter>)
+        fun showTitle(title: String)
     }
 
 }

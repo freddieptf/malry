@@ -58,7 +58,7 @@ class LibraryAdapter: RecyclerView.Adapter<LibraryAdapter.DirItemViewHolder>(), 
 
         fun bind(dir: DocumentFile) {
             tvName.text = dir.name
-            tvSize.text = dir.listFiles().size.toString()
+            tvSize.text = dir.listFiles().size.toString() + " items"
         }
 
     }
