@@ -5,9 +5,12 @@ import android.net.Uri
 import android.provider.DocumentsContract
 import com.freddieptf.mangalibrary.ChapterUtils
 import com.freddieptf.mangalibrary.data.Chapter
+import com.freddieptf.mangalibrary.utils.AlphanumComparator
+import com.freddieptf.mangalibrary.utils.ChapterTitleComparator
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import java.io.File
+import java.util.*
 import kotlin.coroutines.experimental.suspendCoroutine
 
 /**
@@ -50,6 +53,7 @@ class Presenter(private val view: Contract.View,
             chapters.add(chapter)
         } while (cursor.moveToNext())
 
+        Collections.sort(chapters, ChapterTitleComparator())
         return chapters
     }
 
@@ -61,6 +65,7 @@ class Presenter(private val view: Contract.View,
             file = ChapterUtils.getChapter(ctx.externalCacheDir.absolutePath, chapter)
         }
         file.listFiles().mapTo(paths) { it.absolutePath }
+        Collections.sort(paths, AlphanumComparator())
         return paths
     }
 
