@@ -13,8 +13,8 @@ object ReaderDataManager {
         this.readerDB = readerDB
     }
 
-    fun getCache(id: String): ChapterCache {
-        return readerDB.chapterCacheDao().get(id)
+    fun getCache(parent: String, chapter: String): ChapterCache {
+        return readerDB.chapterCacheDao().get(parent+"/"+chapter)
     }
 
     fun save(chapter: ChapterCache) {
