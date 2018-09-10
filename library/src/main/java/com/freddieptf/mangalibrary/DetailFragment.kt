@@ -3,15 +3,15 @@ package com.freddieptf.mangalibrary
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.freddieptf.comicreader.ReaderActivity
-import com.freddieptf.comicreader.ReaderFragment
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.freddieptf.reader.ReaderActivity
+import com.freddieptf.reader.ReaderFragment
 import com.freddieptf.mangalibrary.data.Chapter
 import com.freddieptf.mangalibrary.detail.ChapterAdapter
 import com.freddieptf.mangalibrary.detail.Contract
@@ -72,11 +72,11 @@ class DetailFragment: Fragment(), Contract.View {
     }
 
     override fun onChapterClick(chapter: Chapter) {
-        val bundle = Bundle()
-        bundle.putStringArrayList(ReaderFragment.PIC_URIS,
-                presenter.openChapter(context!!, chapter) as ArrayList<String>)
-        val i = Intent(context!!, ReaderActivity::class.java)
-        i.putExtras(bundle)
+        val i = ReaderActivity.newIntent(
+                context!!,
+                chapter.name,
+                chapter.parent,
+                presenter.openChapter(context!!, chapter))
         startActivity(i)
     }
 

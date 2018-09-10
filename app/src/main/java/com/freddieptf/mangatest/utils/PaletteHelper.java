@@ -1,6 +1,7 @@
 package com.freddieptf.mangatest.utils;
 
-import android.support.v7.graphics.Palette;
+
+import androidx.palette.graphics.Palette;
 
 /**
  * Created by fred on 7/13/15.

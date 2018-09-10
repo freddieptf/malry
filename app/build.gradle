@@ -11,6 +11,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName '0.6.0'
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -34,13 +35,20 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':library')
 
-    def supportVersion = '27.1.1'
+    def val = rootProject.ext
 
-    compile "com.android.support:appcompat-v7:$supportVersion"
-    compile "com.android.support:cardview-v7:$supportVersion"
-    compile "com.android.support:recyclerview-v7:$supportVersion"
-    compile "com.android.support:design:$supportVersion"
-    compile "com.android.support:palette-v7:$supportVersion"
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    compile "com.android.support:appcompat-v7:$val.supportLibVersion"
+    compile "com.android.support:cardview-v7:$val.supportLibVersion"
+    compile "com.android.support:recyclerview-v7:$val.supportLibVersion"
+    compile "com.android.support:design:$val.supportLibVersion"
+    compile "com.android.support:palette-v7:$val.supportLibVersion"
+
+    implementation "androidx.room:room-runtime:$val.roomVersion"
+    annotationProcessor "androidx.room:room-compiler:$val.roomVersion"
 
     compile 'com.afollestad.material-dialogs:core:0.9.0.1'
     compile 'com.afollestad.material-dialogs:commons:0.9.0.1'

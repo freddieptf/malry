@@ -8,15 +8,15 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.freddieptf.mangatest.R;
-import com.freddieptf.mangatest.data.service.DownloadMangaDatabase;
 import com.freddieptf.mangatest.utils.Utilities;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 /**
  * Created by fred on 3/1/15.
@@ -28,7 +28,6 @@ public class Settings extends AppCompatActivity implements Preference.OnPreferen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.preferences);
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionBar);
-        toolbar.setBackgroundColor(getResources().getColor(R.color.primary));
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Settings");
 
@@ -118,56 +117,6 @@ public class Settings extends AppCompatActivity implements Preference.OnPreferen
                     materialDialog.show();
 
                     return true;
-                }
-            });
-
-
-            findPreference(getString(R.string.pref_fix_database_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                            .title("Manga Databases")
-                            .items(R.array.pref_manga_sources_Entries)
-                            .itemsCallbackMultiChoice(new Integer[]{}, new MaterialDialog.ListCallbackMultiChoice() {
-                                @Override
-                                public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
-
-                                    Intent intent = new Intent(getActivity(), DownloadMangaDatabase.class);
-                                    if(integers[0] == 4) materialDialog.setSelectedIndices(
-                                            new Integer[]{0, 1, 2, 3, 4});
-
-                                    if (integers.length == 1) {
-                                        intent.putExtra(DownloadMangaDatabase.FIX_SELECTION, integers[0] + 1);
-                                        startMeService(intent);
-                                    } else if (integers.length > 1) {
-                                        int[] ints = new int[integers.length];
-                                        int inc = 0;
-                                        for(Integer i : integers){
-                                            ints[inc] = i + 1;
-                                            inc++;
-                                        }
-                                        intent.putExtra(DownloadMangaDatabase.FIX_MULTIPLE_SELECTION, ints);
-                                        startMeService(intent);
-                                    } else {
-                                        Toast.makeText(getActivity(), "Baka, you didn't choose anything!", Toast.LENGTH_SHORT).show();
-                                    }
-
-
-                                    return true;
-                                }
-                            })
-                            .positiveText(getString(R.string.download))
-                            .negativeText("Cancel")
-                            .build();
-
-                    dialog.show();
-
-                    return false;
-                }
-
-                private void startMeService(Intent intent) {
-                    if(Utilities.isOnline(getActivity())) getActivity().startService(intent);
-                    else Toast.makeText(getActivity(), getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
                 }
             });
 

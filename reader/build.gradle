@@ -44,5 +44,8 @@ dependencies {
     implementation 'com.github.chrisbanes.photoview:library:1.2.3'
     implementation 'com.pixplicity.multiviewpager:library:1.0'
     implementation 'com.github.bumptech.glide:glide:3.7.0'
+    implementation "androidx.room:room-runtime:$val.roomVersion"
+    kapt "androidx.room:room-compiler:$val.roomVersion"
+
 
 }
