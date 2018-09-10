@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.freddieptf.mangatest.R;
-import com.freddieptf.mangatest.data.local.Contract;
 import com.freddieptf.mangatest.ui.MainActivity;
 
 import java.io.IOException;
@@ -61,20 +60,6 @@ public class Utilities {
         }else{
             editor.putBoolean("firstStart", false).apply();
         }
-    }
-
-    public static void writeMangaPageToPrefs(Context context, String pref, int page){
-        SharedPreferences prefs = context.getSharedPreferences(pref, 0);
-        SharedPreferences.Editor editor = prefs.edit();
-        if(page == 0) prefs.edit().clear().apply();
-        else editor.putInt(pref, page).apply();
-    }
-
-    public static int readMangaPageFromPrefs(Context context, String pref){
-        int page;
-        SharedPreferences prefs = context.getSharedPreferences(pref, 0);
-        page = prefs.getInt(pref, 0);
-        return page;
     }
 
     public static boolean compactCards(Context context){
@@ -134,33 +119,6 @@ public class Utilities {
     public static void setCurrentSource(Context context, String source){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         sharedPreferences.edit().putString(context.getString(R.string.pref_manga_sources_key), source).apply();
-    }
-
-    public static Uri getPrefContentUri(Context context){
-        Uri uri;
-
-        if(getCurrentSource(context).equals(context.getString(R.string.pref_manga_reader))){
-            uri = Contract.MangaReaderMangaList.CONTENT_URI;
-        }else {
-            uri = Contract.MangaFoxMangaList.CONTENT_URI;
-        }
-
-        return uri;
-    }
-
-
-
-    public static String getMangaStatus(String status){
-        String complete = "2";
-        String onGoing = "1";
-
-        if(status.trim().equals(complete)){
-            return "Complete";
-        }else if(status.trim().equals(onGoing)){
-            return "On Going";
-        }else {
-            return "";
-        }
     }
 
 

@@ -4,19 +4,17 @@ import android.Manifest
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.provider.DocumentsContract
-import android.support.v4.provider.DocumentFile
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.documentfile.provider.DocumentFile
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 
 /**
@@ -89,9 +87,9 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
         var uri = LibraryPrefs.getLibUri(context!!)
         if (uri == null) {
             startLibSelector()
-            return ArrayList()
+            return ArrayList<DocumentFile>()
         }
-        var libraryDocFile = DocumentFile.fromTreeUri(context, LibraryPrefs.getLibUri(context!!))
+        var libraryDocFile = DocumentFile.fromTreeUri(getContext()!!, LibraryPrefs.getLibUri(context!!)!!)!!
         for(item in libraryDocFile.listFiles()) {
             println(item.uri.path + "::" + item.type + "::" + item.name + "::")
         }

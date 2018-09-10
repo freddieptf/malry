@@ -8,11 +8,6 @@
         android:title="Library" />
 
     <item
-        android:id="@+id/menu_frag_lists"
-        android:icon="@drawable/ic_list"
-        android:title="Lists" />
-
-    <item
         android:id="@+id/menu_frag_download"
         android:icon="@drawable/ic_action_download"
         android:title="Downloads" />
