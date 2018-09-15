@@ -7,6 +7,7 @@ import com.freddieptf.mangalibrary.ChapterUtils
 import com.freddieptf.mangalibrary.data.Chapter
 import com.freddieptf.mangalibrary.utils.AlphanumComparator
 import com.freddieptf.mangalibrary.utils.ChapterTitleComparator
+import com.freddieptf.reader.data.ReaderDataManager
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import java.io.File
@@ -50,6 +51,7 @@ class Presenter(private val view: Contract.View,
                     cursor.getString(1),
                     cursor.getString(2),
                     manga)
+            chapter.read = ReaderDataManager.isChapterRead(chapter.parent, chapter.name)
             chapters.add(chapter)
         } while (cursor.moveToNext())
 

@@ -1,9 +1,13 @@
 package com.freddieptf.mangalibrary.detail
 
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.freddieptf.mangalibrary.R
 import com.freddieptf.mangalibrary.data.Chapter
@@ -11,7 +15,7 @@ import com.freddieptf.mangalibrary.data.Chapter
 /**
  * Created by freddieptf on 9/1/18.
  */
-class ChapterAdapter: RecyclerView.Adapter<ChapterAdapter.ChapterViewHolder>(), View.OnClickListener {
+class ChapterAdapter : RecyclerView.Adapter<ChapterAdapter.ChapterViewHolder>(), View.OnClickListener {
 
     private var data: List<Chapter> = ArrayList()
     private lateinit var chapterClickListener: ChapterClickListener
@@ -48,7 +52,7 @@ class ChapterAdapter: RecyclerView.Adapter<ChapterAdapter.ChapterViewHolder>(), 
             chapterClickListener.onChapterClick(data.get(i))
     }
 
-    class ChapterViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    class ChapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private var tvName: TextView
         private lateinit var tvType: TextView
@@ -59,6 +63,15 @@ class ChapterAdapter: RecyclerView.Adapter<ChapterAdapter.ChapterViewHolder>(), 
 
         fun bind(chapter: Chapter) {
             tvName.text = chapter.name
+            val typedVal = TypedValue()
+            if (!chapter.read) {
+                itemView.context.theme.resolveAttribute(
+                        android.R.attr.textColorPrimary, typedVal, true)
+            } else {
+                itemView.context.theme.resolveAttribute(
+                        android.R.attr.textColorSecondary, typedVal, true)
+            }
+            tvName.setTextColor(ContextCompat.getColor(itemView.context, typedVal.resourceId))
         }
 
     }

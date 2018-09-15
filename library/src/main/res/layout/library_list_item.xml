@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/TextAppearance.AppCompat.Medium"
-        android:textStyle="normal"/>
+        android:textStyle="normal"
+        android:textColor="?android:textColorPrimary" />
 
     <TextView
         android:id="@+id/tv_size"
