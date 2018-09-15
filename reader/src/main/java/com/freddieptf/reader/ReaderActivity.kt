@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.os.PersistableBundle
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -51,22 +52,25 @@ class ReaderActivity : AppCompatActivity() {
                     .replace(R.id.container, readerFragment, ReaderFragment.javaClass.simpleName)
                     .commit()
 
-            addSystemUiVisibiltyChangeListener()
-            hideSystemUI()
-
         }
 
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        addSystemUiVisibiltyChangeListener()
+        hideSystemUI()
     }
 
     private fun addSystemUiVisibiltyChangeListener() {
         window.decorView.setOnSystemUiVisibilityChangeListener { visibility ->
             if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
                 // The system bars are visible.
-                actionBar!!.show()
+                supportActionBar!!.show()
                 eventuallyHide()
             } else {
                 // The system bars are NOT visible.
-                actionBar!!.hide()
+                supportActionBar!!.hide()
             }
         }
     }
