@@ -1,9 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.freddieptf.reader">
 
-    <uses-permission android:name="android.permission.SET_WALLPAPER"/>
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
 
     <application>
-        <activity android:name="com.freddieptf.reader.ReaderActivity" />
+        <activity
+            android:name="com.freddieptf.reader.ReaderActivity"
+            android:theme="@style/ReaderTheme" />
     </application>
 </manifest>

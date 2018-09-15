@@ -53,7 +53,7 @@ class ReaderFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         if ((activity as AppCompatActivity).supportActionBar != null) {
-            (activity as AppCompatActivity).supportActionBar!!.subtitle = chapterTitle
+            (activity as AppCompatActivity).supportActionBar!!.title = chapterTitle
         }
     }
 
