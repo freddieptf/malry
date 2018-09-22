@@ -28,6 +28,10 @@ class ChapterCache constructor(id: String, page: Int, totalPages: Int) {
         get
         set
 
+    var pagePath: String = ""
+        get
+        set
+
     @PrimaryKey
     @NonNull
     var id: String

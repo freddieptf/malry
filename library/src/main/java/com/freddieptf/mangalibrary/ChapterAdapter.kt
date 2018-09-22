@@ -1,16 +1,13 @@
-package com.freddieptf.mangalibrary.detail
+package com.freddieptf.mangalibrary
 
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.freddieptf.mangalibrary.R
-import com.freddieptf.mangalibrary.data.Chapter
+import com.freddieptf.mangalibrary.data.models.Chapter
 
 /**
  * Created by freddieptf on 9/1/18.

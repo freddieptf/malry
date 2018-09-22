@@ -1,36 +1,33 @@
 package com.freddieptf.mangalibrary
 
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.freddieptf.mangalibrary.data.models.Chapter
 import com.freddieptf.reader.ReaderActivity
-import com.freddieptf.reader.ReaderFragment
-import com.freddieptf.mangalibrary.data.Chapter
-import com.freddieptf.mangalibrary.detail.ChapterAdapter
-import com.freddieptf.mangalibrary.detail.Contract
-import com.freddieptf.mangalibrary.detail.Presenter
-import java.util.ArrayList
 
 /**
  * Created by freddieptf on 9/1/18.
  */
-class DetailFragment: Fragment(), Contract.View {
+class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
 
     companion object {
 
         private val DIR_URI = "dir_uri"
 
-        fun newInstance(dirUri: Uri): DetailFragment {
+        fun newInstance(dirUri: Uri): ChapterListFragment {
             val bundle = Bundle()
             bundle.putParcelable(DIR_URI, dirUri)
-            val frag = DetailFragment()
+            val frag = ChapterListFragment()
             frag.arguments = bundle
             return frag
         }
@@ -38,46 +35,43 @@ class DetailFragment: Fragment(), Contract.View {
     }
 
     private lateinit var recycler: RecyclerView
-    private lateinit var presenter: Presenter
+    private lateinit var viewModel: LibraryViewModel
     private val adapter = ChapterAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.detail_frag, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
         (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recycler = view.findViewById(R.id.recycler)
-
         recycler.layoutManager = LinearLayoutManager(context)
         recycler.adapter = adapter
         adapter.setChapterClickListener(this)
 
         var uri = arguments!!.get(DIR_URI) as Uri
+        viewModel = ViewModelProviders.of(activity!!).get(LibraryViewModel::class.java)
+        viewModel.getChapters(context!!, uri).observe(this, Observer {
+            adapter.swapData(it)
+        })
 
-        presenter = Presenter(this, uri)
-        presenter.startLoad(context!!)
-
-    }
-
-    override fun onChaptersLoad(data: List<Chapter>) {
-        println("chapterSize=" + data.size.toString())
-        adapter.swapData(data)
-    }
-
-    override fun showTitle(title: String) {
-        activity!!.setTitle(title)
     }
 
     override fun onChapterClick(chapter: Chapter) {
-        val i = ReaderActivity.newIntent(
-                context!!,
-                chapter.name,
-                chapter.parent,
-                presenter.openChapter(context!!, chapter))
-        startActivity(i)
+        viewModel.getChImgPaths(context!!, chapter)
+                .observe(this, Observer {
+                    val i = ReaderActivity.newIntent(
+                            context!!,
+                            chapter.name,
+                            chapter.parentName,
+                            it
+                    )
+                    startActivity(i)
+                })
     }
 
 }

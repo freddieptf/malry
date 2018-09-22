@@ -4,18 +4,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
+import com.freddieptf.mangalibrary.data.models.LibraryItem
 
 /**
  * Created by freddieptf on 9/1/18.
  */
 class LibraryAdapter: RecyclerView.Adapter<LibraryAdapter.DirItemViewHolder>(), View.OnClickListener {
 
-    private var data: List<DocumentFile> = ArrayList()
+    private var data: List<LibraryItem> = ArrayList()
     private var clickListener: ClickListener? = null
 
-    fun swapData(data: List<DocumentFile>) {
+    fun swapData(data: List<LibraryItem>) {
         this.data = data
         notifyDataSetChanged()
     }
@@ -56,15 +56,15 @@ class LibraryAdapter: RecyclerView.Adapter<LibraryAdapter.DirItemViewHolder>(), 
             tvSize = itemView.findViewById(R.id.tv_size)
         }
 
-        fun bind(dir: DocumentFile) {
+        fun bind(dir: LibraryItem) {
             tvName.text = dir.name
-            tvSize.text = dir.listFiles().size.toString() + " items"
+            tvSize.text = dir.itemCount.toString() + " items"
         }
 
     }
 
     interface ClickListener {
-        fun onDirClick(dir: DocumentFile)
+        fun onDirClick(dir: LibraryItem)
     }
 
 }
