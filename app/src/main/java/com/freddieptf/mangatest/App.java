@@ -2,6 +2,7 @@ package com.freddieptf.mangatest;
 
 import android.app.Application;
 
+import com.freddieptf.mangalibrary.data.LibraryDataManager;
 import com.freddieptf.reader.data.ReaderDataManager;
 import com.squareup.leakcanary.LeakCanary;
 
@@ -23,8 +24,10 @@ public class App extends Application {
 
         AppDb appDb = Room.databaseBuilder(this, AppDb.class, "app.db")
                 .allowMainThreadQueries()
+                .fallbackToDestructiveMigration()
                 .build();
         ReaderDataManager.INSTANCE.use(appDb);
+        LibraryDataManager.INSTANCE.use(appDb);
 
     }
 

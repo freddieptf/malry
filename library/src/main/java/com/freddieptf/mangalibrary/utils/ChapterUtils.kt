@@ -1,7 +1,7 @@
-package com.freddieptf.mangalibrary
+package com.freddieptf.mangalibrary.utils
 
 import android.net.Uri
-import com.freddieptf.mangalibrary.data.Chapter
+import com.freddieptf.mangalibrary.data.models.Chapter
 import org.apache.commons.compress.utils.IOUtils
 
 import java.io.File
@@ -23,7 +23,7 @@ object ChapterUtils {
         val cacheDir = File(cachePath)
         var chDir: File? = null
 
-        var parentDir = cacheDir.listFiles().find { it.name.equals(chapter.parent) }
+        var parentDir = cacheDir.listFiles().find { it.name.equals(chapter.parentName) }
 
         if (parentDir != null) {
             chDir = parentDir.listFiles().find { it.name.equals(chapter.name) }
@@ -31,7 +31,7 @@ object ChapterUtils {
 
         if (chDir == null) {
             return extractCbz(getChapterUrlFromDocID(chapter.docID),
-                    cachePath + File.pathSeparator + chapter.parent)
+                    cachePath + File.pathSeparator + chapter.parentName)
         }
 
         return chDir

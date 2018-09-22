@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.freddieptf.reader.data.ReaderDataManager
 import com.freddieptf.reader.data.models.ChapterCache
 import com.freddieptf.reader.widgets.CustomViewPager
@@ -21,8 +23,6 @@ class ReaderFragment : Fragment() {
         val PIC_URIS_EXTRA = "reader.pic_uris"
         val CHAPTER_TITLE_EXTRA = "reader.chapter_title"
         val CHAPTER_PARENT_EXTRA = "reader.chapter_parent"
-
-        private val PAGE_CACHE_XTRA = "reader.page.num"
 
         fun newInstance(chapter: String, parent:String, paths: List<String>): ReaderFragment {
             val frag = ReaderFragment()
@@ -41,6 +41,7 @@ class ReaderFragment : Fragment() {
     private var viewPager: CustomViewPager? = null
     private lateinit var chapterTitle: String
     private lateinit var parent: String
+    private lateinit var viewModel: ReaderFragViewModel
 
     init {
         setHasOptionsMenu(true)
@@ -69,17 +70,12 @@ class ReaderFragment : Fragment() {
         adapter = PicPagerAdapter(pages)
         viewPager!!.adapter = adapter
 
-        if(savedInstanceState == null) {
-            val cache = ReaderDataManager.getCache(parent, chapterTitle)
+        viewModel = ViewModelProviders.of(this).get(ReaderFragViewModel::class.java)
+        viewModel.getChCache(parent, chapterTitle).observe(this, Observer<ChapterCache> { cache ->
             if(cache != null) pos = cache.page
-        }
+            viewPager!!.setCurrentItem(pos, false)
+        })
 
-        viewPager!!.setCurrentItem(pos, false)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putInt(PAGE_CACHE_XTRA, viewPager!!.currentItem)
     }
 
     override fun onDestroy() {

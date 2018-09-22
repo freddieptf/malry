@@ -1,6 +1,6 @@
 package com.freddieptf.mangalibrary.utils;
 
-import com.freddieptf.mangalibrary.data.Chapter;
+import com.freddieptf.mangalibrary.data.models.Chapter;
 
 import java.util.Comparator;
 
