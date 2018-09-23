@@ -22,6 +22,10 @@ class ChapterAdapter : RecyclerView.Adapter<ChapterAdapter.ChapterViewHolder>(),
         notifyDataSetChanged()
     }
 
+    fun getData(): List<Chapter> {
+        return data
+    }
+
     override fun onBindViewHolder(holder: ChapterViewHolder, position: Int) {
         holder.itemView.tag = position
         holder.itemView.setOnClickListener(this)
@@ -46,7 +50,7 @@ class ChapterAdapter : RecyclerView.Adapter<ChapterAdapter.ChapterViewHolder>(),
     override fun onClick(v: View) {
         val i = v.tag!! as Int
         if (chapterClickListener != null)
-            chapterClickListener.onChapterClick(data.get(i))
+            chapterClickListener.onChapterClick(data.get(i), i)
     }
 
     class ChapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -74,6 +78,6 @@ class ChapterAdapter : RecyclerView.Adapter<ChapterAdapter.ChapterViewHolder>(),
     }
 
     interface ChapterClickListener {
-        fun onChapterClick(chapter: Chapter)
+        fun onChapterClick(chapter: Chapter, pos: Int)
     }
 }

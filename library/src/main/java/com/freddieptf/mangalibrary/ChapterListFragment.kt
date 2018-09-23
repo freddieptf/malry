@@ -2,7 +2,6 @@ package com.freddieptf.mangalibrary
 
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.freddieptf.mangalibrary.data.models.Chapter
 import com.freddieptf.reader.ReaderActivity
+import com.freddieptf.reader.api.ChapterProvider
 
 /**
  * Created by freddieptf on 9/1/18.
@@ -61,17 +61,11 @@ class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
 
     }
 
-    override fun onChapterClick(chapter: Chapter) {
-        viewModel.getChImgPaths(context!!, chapter)
-                .observe(this, Observer {
-                    val i = ReaderActivity.newIntent(
-                            context!!,
-                            chapter.name,
-                            chapter.parentName,
-                            it
-                    )
-                    startActivity(i)
-                })
+    override fun onChapterClick(chapter: Chapter, pos: Int) {
+        val provider = LocalLibChapterProvider().useCtx(context!!).setRead(pos, adapter.getData())
+        ChapterProvider.useProvider(provider)
+        val i = ReaderActivity.newIntent(context!!)
+        startActivity(i)
     }
 
 }

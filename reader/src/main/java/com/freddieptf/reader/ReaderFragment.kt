@@ -4,44 +4,29 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.freddieptf.reader.api.Chapter
+import com.freddieptf.reader.api.ChapterProvider
 import com.freddieptf.reader.data.ReaderDataManager
 import com.freddieptf.reader.data.models.ChapterCache
-import com.freddieptf.reader.widgets.CustomViewPager
-import java.util.*
+import com.freddieptf.reader.widgets.ReaderViewPager
 
 /**
  * Created by fred on 3/22/15.
  */
-class ReaderFragment : Fragment() {
-
-    companion object {
-
-        val PIC_URIS_EXTRA = "reader.pic_uris"
-        val CHAPTER_TITLE_EXTRA = "reader.chapter_title"
-        val CHAPTER_PARENT_EXTRA = "reader.chapter_parent"
-
-        fun newInstance(chapter: String, parent:String, paths: List<String>): ReaderFragment {
-            val frag = ReaderFragment()
-            val bundle = Bundle()
-            bundle.putStringArrayList(PIC_URIS_EXTRA, paths as ArrayList<String>)
-            bundle.putString(CHAPTER_TITLE_EXTRA, chapter)
-            bundle.putString(CHAPTER_PARENT_EXTRA, parent)
-            frag.arguments = bundle
-            return frag
-        }
-
-    }
+class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
 
     private var adapter: PicPagerAdapter? = null
     private var pos = 0
-    private var viewPager: CustomViewPager? = null
+    private var viewPager: ReaderViewPager? = null
     private lateinit var chapterTitle: String
     private lateinit var parent: String
     private lateinit var viewModel: ReaderFragViewModel
+    private var dialog: AlertDialog? = null
 
     init {
         setHasOptionsMenu(true)
@@ -58,28 +43,73 @@ class ReaderFragment : Fragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    private fun showChapter(chapter: Chapter) {
+        val pages = chapter.paths
+        chapterTitle = chapter.chapter
+        parent = chapter.parent
+        (activity as AppCompatActivity).supportActionBar!!.title = chapterTitle
 
-        val bundle = arguments!!
-        val pages = bundle.getStringArrayList(PIC_URIS_EXTRA)
-        chapterTitle = bundle.getString(CHAPTER_TITLE_EXTRA)
-        parent = bundle.getString(CHAPTER_PARENT_EXTRA)
-
-        viewPager = view.findViewById<View>(R.id.pager_MangaPics) as CustomViewPager
         adapter = PicPagerAdapter(pages)
         viewPager!!.adapter = adapter
 
-        viewModel = ViewModelProviders.of(this).get(ReaderFragViewModel::class.java)
-        viewModel.getChCache(parent, chapterTitle).observe(this, Observer<ChapterCache> { cache ->
-            if(cache != null) pos = cache.page
-            viewPager!!.setCurrentItem(pos, false)
-        })
+        viewModel.getChCache(parent, chapterTitle).observe(this, observer)
+    }
 
+    private var observer = Observer<ChapterCache> { cache ->
+        if(cache != null && cache.id == parent +"/"+chapterTitle) {
+            pos = cache.page
+            viewPager!!.setCurrentItem(pos, false)
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        viewPager = view.findViewById<View>(R.id.pager_MangaPics) as ReaderViewPager
+        viewPager!!.setReadProgressListener(this)
+
+        viewModel = ViewModelProviders.of(this).get(ReaderFragViewModel::class.java)
+
+        val chapter = ChapterProvider.getProvider().getCurrentRead()
+        showChapter(chapter)
+
+    }
+
+    override fun onSwipeToNextCh() {
+        val hasNext = ChapterProvider.getProvider().hasNextRead()
+        if (hasNext && (dialog == null || !dialog!!.isShowing)) {
+            dialog = AlertDialog.Builder(context!!)
+                    .setMessage("Would you like to move the next chapter")
+                    .setPositiveButton("Next") { dialogInterface, _ ->
+                        cacheLastSeenPage()
+                        showChapter(ChapterProvider.getProvider().getNextRead()!!)
+                        dialogInterface!!.dismiss()
+                    }
+                    .setNegativeButton("Cancel", { dialogInterface, _ -> dialogInterface.dismiss() })
+                    .show()
+        }
+
+    }
+
+    override fun onSwipeToPreviousCh() {
+        val hasPrev = ChapterProvider.getProvider().hasPreviousRead()
+        if (hasPrev && (dialog == null || !dialog!!.isShowing)) {
+            dialog = AlertDialog.Builder(context!!)
+                    .setMessage("Would you like to move the previous chapter")
+                    .setPositiveButton("Previous") { dialogInterface, _ ->
+                        cacheLastSeenPage()
+                        showChapter(ChapterProvider.getProvider().getPreviousRead()!!)
+                        dialogInterface!!.dismiss()
+                    }
+                    .setNegativeButton("Cancel", { dialogInterface, i -> dialogInterface.dismiss() })
+                    .show()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        cacheLastSeenPage()
+    }
+
+    private fun cacheLastSeenPage() {
         ReaderDataManager.save(ChapterCache(parent, chapterTitle, viewPager!!.currentItem, adapter!!.count))
     }
 

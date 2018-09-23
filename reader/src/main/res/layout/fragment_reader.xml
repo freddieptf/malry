@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.freddieptf.reader.widgets.CustomViewPager
+    <com.freddieptf.reader.widgets.ReaderViewPager
         android:id="@+id/pager_MangaPics"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
