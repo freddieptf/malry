@@ -18,13 +18,8 @@ class ReaderActivity : AppCompatActivity() {
 
     companion object {
 
-        fun newIntent(ctx: Context, chapter: String, parent: String, paths: List<String>): Intent {
+        fun newIntent(ctx: Context): Intent {
             val intent = Intent(ctx, ReaderActivity::class.java)
-            val bundle = Bundle()
-            bundle.putStringArrayList(ReaderFragment.PIC_URIS_EXTRA, paths as ArrayList<String>)
-            bundle.putString(ReaderFragment.CHAPTER_TITLE_EXTRA, chapter)
-            bundle.putString(ReaderFragment.CHAPTER_PARENT_EXTRA, parent)
-            intent.putExtras(bundle)
             return intent
         }
 
@@ -40,16 +35,11 @@ class ReaderActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        if (supportFragmentManager.findFragmentByTag(ReaderFragment.javaClass.simpleName) == null) {
-            val bundle = intent.extras!!
-            val readerFragment = ReaderFragment.newInstance(
-                    bundle.getString(ReaderFragment.CHAPTER_TITLE_EXTRA),
-                    bundle.getString(ReaderFragment.CHAPTER_PARENT_EXTRA),
-                    bundle.getStringArrayList(ReaderFragment.PIC_URIS_EXTRA)
-            )
+        if (supportFragmentManager.findFragmentByTag(ReaderFragment::class.java.simpleName) == null) {
+            val readerFragment = ReaderFragment()
             supportFragmentManager
                     .beginTransaction()
-                    .replace(R.id.container, readerFragment, ReaderFragment.javaClass.simpleName)
+                    .replace(R.id.container, readerFragment, ReaderFragment::class.java.simpleName)
                     .commit()
 
         }

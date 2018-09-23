@@ -45,7 +45,6 @@ class LibraryViewModel : ViewModel() {
     }
 
     private lateinit var chapterList: LiveData<List<Chapter>>
-    private val chImgPaths = MutableLiveData<List<String>>()
 
     fun getChapters(ctx: Context, dirUri: Uri): LiveData<List<Chapter>> {
         chapterList = LibraryDataManager.getChapters(dirUri)
@@ -106,15 +105,18 @@ class LibraryViewModel : ViewModel() {
         return chapters
     }
 
-    private fun openChapter(ctx: Context, chapter: Chapter): List<String> {
-        val chPath = ChapterUtils.getChapterUrlFromDocID(chapter.docID)
-        var file = File(chPath)
-        val paths = ArrayList<String>()
-        if (!file.isDirectory) {
-            file = ChapterUtils.getChapter(ctx.externalCacheDir.absolutePath, chapter)
+    companion object {
+        fun openChapter(ctx: Context, chapter: Chapter): List<String> {
+            val chPath = ChapterUtils.getChapterUrlFromDocID(chapter.docID)
+            var file = File(chPath)
+            val paths = ArrayList<String>()
+            if (!file.isDirectory) {
+                file = ChapterUtils.getChapter(ctx.externalCacheDir.absolutePath, chapter)
+            }
+            file.listFiles().mapTo(paths) { it.absolutePath }
+            Collections.sort(paths, AlphanumComparator())
+            return paths
         }
-        file.listFiles().mapTo(paths) { it.absolutePath }
-        Collections.sort(paths, AlphanumComparator())
-        return paths
     }
+
 }
