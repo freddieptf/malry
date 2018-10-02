@@ -56,6 +56,8 @@ class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
         var uri = arguments!!.get(DIR_URI) as Uri
         viewModel = ViewModelProviders.of(activity!!).get(LibraryViewModel::class.java)
         viewModel.getChapters(context!!, uri).observe(this, Observer {
+            (activity as AppCompatActivity).supportActionBar?.title =
+                    if (it.isEmpty()) "Library" else it.get(0).parentName
             adapter.swapData(it)
         })
 

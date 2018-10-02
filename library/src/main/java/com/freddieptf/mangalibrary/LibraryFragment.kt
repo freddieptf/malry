@@ -58,7 +58,7 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        activity!!.setTitle("Library")
+        (activity as AppCompatActivity).supportActionBar!!.title = "Library"
         (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(false)
     }
 
