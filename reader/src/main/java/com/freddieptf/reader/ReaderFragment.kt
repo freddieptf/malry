@@ -1,9 +1,7 @@
 package com.freddieptf.reader
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -14,6 +12,8 @@ import com.freddieptf.reader.api.ChapterProvider
 import com.freddieptf.reader.data.ReaderDataManager
 import com.freddieptf.reader.data.models.ChapterCache
 import com.freddieptf.reader.widgets.ReaderViewPager
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Created by fred on 3/22/15.
@@ -27,6 +27,7 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
     private lateinit var parent: String
     private lateinit var viewModel: ReaderFragViewModel
     private var dialog: AlertDialog? = null
+    private var currentRead: Chapter? = null
 
     init {
         setHasOptionsMenu(true)
@@ -43,20 +44,71 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.reader_menu, menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        when (ReaderPrefUtils.getReadDirection(context!!)) {
+            ReaderViewPager.DIRECTION.LEFT_TO_RIGHT -> {
+                menu.findItem(R.id.menu_read_ltr).setChecked(true)
+            }
+            ReaderViewPager.DIRECTION.RIGHT_TO_LEFT -> {
+                menu.findItem(R.id.menu_read_rtl).setChecked(true)
+            }
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_read_ltr -> {
+                ReaderPrefUtils.setReadDirection(context!!, ReaderViewPager.DIRECTION.LEFT_TO_RIGHT)
+                activity?.invalidateOptionsMenu()
+                showChapter(currentRead!!)
+            }
+            R.id.menu_read_rtl -> {
+                ReaderPrefUtils.setReadDirection(context!!, ReaderViewPager.DIRECTION.RIGHT_TO_LEFT)
+                activity?.invalidateOptionsMenu()
+                showChapter(currentRead!!)
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun showChapter(chapter: Chapter) {
-        val pages = chapter.paths
-        chapterTitle = chapter.chapter
-        parent = chapter.parent
+        this.currentRead = chapter
+
+        val pages = ArrayList<String>()
+        pages += currentRead!!.paths
+        chapterTitle = currentRead!!.chapter
+        parent = currentRead!!.parent
         (activity as AppCompatActivity).supportActionBar!!.title = chapterTitle
 
-        adapter = PicPagerAdapter(pages)
-        viewPager!!.adapter = adapter
+        pos = viewPager!!.currentItem
 
-        viewModel.getChCache(parent, chapterTitle).observe(this, observer)
+        val direction = ReaderPrefUtils.getReadDirection(context!!)
+        viewPager!!.setReadDirection(direction)
+
+        when (direction) {
+            ReaderViewPager.DIRECTION.LEFT_TO_RIGHT -> {
+                Collections.reverse(pages)
+                adapter = PicPagerAdapter(pages)
+                viewPager!!.adapter = adapter
+            }
+            ReaderViewPager.DIRECTION.RIGHT_TO_LEFT -> {
+                adapter = PicPagerAdapter(pages)
+                viewPager!!.adapter = adapter
+            }
+        }
+
+        if (pos == 0) viewModel.getChCache(parent, chapterTitle).observe(this, observer)
+        else viewPager!!.setCurrentItem(pos, false)
     }
 
     private var observer = Observer<ChapterCache> { cache ->
-        if(cache != null && cache.id == parent +"/"+chapterTitle) {
+        if (cache != null && cache.id == parent + "/" + chapterTitle) {
             pos = cache.page
             viewPager!!.setCurrentItem(pos, false)
         }
@@ -68,8 +120,7 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
 
         viewModel = ViewModelProviders.of(this).get(ReaderFragViewModel::class.java)
 
-        val chapter = ChapterProvider.getProvider().getCurrentRead()
-        showChapter(chapter)
+        showChapter(ChapterProvider.getProvider().getCurrentRead())
 
     }
 

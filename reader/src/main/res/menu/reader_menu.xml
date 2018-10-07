@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/menu_read_direction"
+        android:title="Read Direction"
+        android:icon="@drawable/ic_read_direction_white_24dp"
+        app:showAsAction="always">
+        <menu>
+            <group
+                android:checkableBehavior="single">
+                <item android:id="@+id/menu_read_rtl"
+                    android:title="Comic" />
+                <item android:id="@+id/menu_read_ltr"
+                    android:title="Manga" />
+            </group>
+        </menu>
+    </item>
+
+</menu>
