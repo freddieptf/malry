@@ -33,20 +33,12 @@ class ReaderViewPager @JvmOverloads constructor(context: Context, attrs: Attribu
     }
 
     override fun setCurrentItem(item: Int, smoothScroll: Boolean) {
-        var i = item
-        if (direction == DIRECTION.LEFT_TO_RIGHT) {
-            i = (adapter?.count ?: 0) - item - 1
-        }
-        Log.d("setCurrentItem", "$direction:$i:$smoothScroll")
+        var i = if (direction == DIRECTION.LEFT_TO_RIGHT) adapter!!.count - item - 1 else item
         super.setCurrentItem(i, smoothScroll)
     }
 
     override fun setCurrentItem(item: Int) {
-        var i = item
-        if (direction == DIRECTION.LEFT_TO_RIGHT) {
-            i = (adapter?.count ?: 0) - item - 1
-        }
-        Log.d("setCurrentItem", "$direction:$i")
+        var i = if (direction == DIRECTION.LEFT_TO_RIGHT) adapter!!.count - item - 1 else item
         super.setCurrentItem(i)
     }
 

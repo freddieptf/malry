@@ -111,7 +111,7 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
         if (cache != null && cache.id == parent + "/" + chapterTitle) {
             pos = cache.page
             viewPager!!.setCurrentItem(pos, false)
-        }
+        } else viewPager!!.setCurrentItem(0, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
