@@ -66,11 +66,13 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
             R.id.menu_read_ltr -> {
                 ReaderPrefUtils.setReadDirection(context!!, ReaderViewPager.DIRECTION.LEFT_TO_RIGHT)
                 activity?.invalidateOptionsMenu()
+                pos = viewPager!!.currentItem
                 showChapter(currentRead!!)
             }
             R.id.menu_read_rtl -> {
                 ReaderPrefUtils.setReadDirection(context!!, ReaderViewPager.DIRECTION.RIGHT_TO_LEFT)
                 activity?.invalidateOptionsMenu()
+                pos = viewPager!!.currentItem
                 showChapter(currentRead!!)
             }
         }
@@ -85,8 +87,6 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
         chapterTitle = currentRead!!.chapter
         parent = currentRead!!.parent
         (activity as AppCompatActivity).supportActionBar!!.title = chapterTitle
-
-        pos = viewPager!!.currentItem
 
         val direction = ReaderPrefUtils.getReadDirection(context!!)
         viewPager!!.setReadDirection(direction)

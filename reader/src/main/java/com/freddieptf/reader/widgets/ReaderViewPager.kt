@@ -63,7 +63,7 @@ class ReaderViewPager @JvmOverloads constructor(context: Context, attrs: Attribu
                             readProgressListener!!.onSwipeToPreviousCh()
                         }
                     }
-                } else if (currentItem == adapter?.count ?: 0 - 1) {
+                } else if (currentItem == (adapter?.count ?: 0) - 1) {
                     when {
                         (direction == DIRECTION.LEFT_TO_RIGHT && startDragXPos < inDragX) ||
                                 (direction == DIRECTION.RIGHT_TO_LEFT && startDragXPos > inDragX) ->
