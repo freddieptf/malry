@@ -55,17 +55,6 @@ class LibraryViewModel : ViewModel() {
         return chapterList
     }
 
-    fun getChImgPaths(ctx: Context, chapter: Chapter): LiveData<List<String>>{
-        val chImgPaths = MutableLiveData<List<String>>()
-        launch {
-            val result = openChapter(ctx, chapter)
-            launch(UI) {
-                chImgPaths.value = result
-            }
-        }
-        return chImgPaths
-    }
-
     private fun openMangaDir(ctx: Context, dirUri:Uri): List<Chapter>? {
 
         val manga = Uri.parse(dirUri.path.replace(":", "/")).lastPathSegment

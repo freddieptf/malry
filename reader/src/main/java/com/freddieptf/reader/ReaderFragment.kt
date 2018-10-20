@@ -5,12 +5,11 @@ import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.freddieptf.reader.api.Chapter
 import com.freddieptf.reader.api.ChapterProvider
 import com.freddieptf.reader.data.ReaderDataManager
-import com.freddieptf.reader.data.models.ChapterCache
+import com.freddieptf.reader.data.models.ChReadCache
 import com.freddieptf.reader.widgets.ReaderViewPager
 import java.util.*
 import kotlin.collections.ArrayList
@@ -21,7 +20,6 @@ import kotlin.collections.ArrayList
 class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
 
     private var adapter: PicPagerAdapter? = null
-    private var pos = 0
     private var viewPager: ReaderViewPager? = null
     private lateinit var chapterTitle: String
     private lateinit var parent: String
@@ -66,13 +64,11 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
             R.id.menu_read_ltr -> {
                 ReaderPrefUtils.setReadDirection(context!!, ReaderViewPager.DIRECTION.LEFT_TO_RIGHT)
                 activity?.invalidateOptionsMenu()
-                pos = viewPager!!.currentItem
                 showChapter(currentRead!!)
             }
             R.id.menu_read_rtl -> {
                 ReaderPrefUtils.setReadDirection(context!!, ReaderViewPager.DIRECTION.RIGHT_TO_LEFT)
                 activity?.invalidateOptionsMenu()
-                pos = viewPager!!.currentItem
                 showChapter(currentRead!!)
             }
         }
@@ -103,15 +99,8 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
             }
         }
 
-        if (pos == 0) viewModel.getChCache(parent, chapterTitle).observe(this, observer)
-        else viewPager!!.setCurrentItem(pos, false)
-    }
+        viewPager!!.setCurrentItem(viewModel.getLastViewedChPage(parent, chapterTitle), false)
 
-    private var observer = Observer<ChapterCache> { cache ->
-        if (cache != null && cache.id == parent + "/" + chapterTitle) {
-            pos = cache.page
-            viewPager!!.setCurrentItem(pos, false)
-        } else viewPager!!.setCurrentItem(0, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -161,7 +150,7 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
     }
 
     private fun cacheLastSeenPage() {
-        ReaderDataManager.save(ChapterCache(parent, chapterTitle, viewPager!!.currentItem, adapter!!.count))
+        viewModel.saveLastViewedPage(parent, chapterTitle, viewPager!!.currentItem, adapter!!.count)
     }
 
 }

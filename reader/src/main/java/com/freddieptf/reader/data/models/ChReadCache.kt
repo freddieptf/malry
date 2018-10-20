@@ -1,6 +1,7 @@
 package com.freddieptf.reader.data.models
 
 import androidx.annotation.NonNull
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
@@ -9,7 +10,7 @@ import androidx.room.PrimaryKey
  * Created by freddieptf on 9/9/18.
  */
 @Entity(tableName = "chapter_cache")
-class ChapterCache constructor(id: String, page: Int, totalPages: Int) {
+class ChReadCache constructor(chID: String, page: Int, totalPages: Int) {
 
     constructor(parent: String, chapter: String, page: Int, totalPages: Int) :
             this(parent + "/" + chapter, page, totalPages) {
@@ -34,18 +35,19 @@ class ChapterCache constructor(id: String, page: Int, totalPages: Int) {
 
     @PrimaryKey
     @NonNull
-    var id: String
+    @ColumnInfo(name = "id")
+    var chID: String
         get
         set
 
     init {
         this.page = page
-        this.id = id
+        this.chID = chID
         this.totalPages = totalPages
     }
 
     override fun toString(): String {
-        return id + "::" + page + "/" + totalPages
+        return chID + "::" + page + "/" + totalPages
     }
 
 }

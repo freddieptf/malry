@@ -63,7 +63,7 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
     }
 
     override fun onDirClick(dir: LibraryItem) {
-        val detailFragment = ChapterListFragment.newInstance(dir.dirUri)
+        val detailFragment = ChapterListFragment.newInstance(dir.dirUri, dir.name)
         fragmentManager!!.beginTransaction()
                 .replace(
                         (activity!! as LibraryFragmentContainer).getFragmentContainerId(),

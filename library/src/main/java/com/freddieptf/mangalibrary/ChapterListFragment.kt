@@ -23,10 +23,12 @@ class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
     companion object {
 
         private val DIR_URI = "dir_uri"
+        private val DIR_NAME = "dir_name"
 
-        fun newInstance(dirUri: Uri): ChapterListFragment {
+        fun newInstance(dirUri: Uri, dirName: String): ChapterListFragment {
             val bundle = Bundle()
             bundle.putParcelable(DIR_URI, dirUri)
+            bundle.putString(DIR_NAME, dirName)
             val frag = ChapterListFragment()
             frag.arguments = bundle
             return frag
@@ -45,6 +47,7 @@ class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        (activity as AppCompatActivity).supportActionBar!!.title = arguments!!.getString(DIR_NAME)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -52,15 +55,14 @@ class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
         recycler.layoutManager = LinearLayoutManager(context)
         recycler.adapter = adapter
         adapter.setChapterClickListener(this)
-
-        var uri = arguments!!.get(DIR_URI) as Uri
         viewModel = ViewModelProviders.of(activity!!).get(LibraryViewModel::class.java)
-        viewModel.getChapters(context!!, uri).observe(this, Observer {
-            (activity as AppCompatActivity).supportActionBar?.title =
-                    if (it.isEmpty()) "Library" else it.get(0).parentName
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getChapters(context!!, arguments!!.get(DIR_URI) as Uri).observe(this, Observer {
             adapter.swapData(it)
         })
-
     }
 
     override fun onChapterClick(chapter: Chapter, pos: Int) {

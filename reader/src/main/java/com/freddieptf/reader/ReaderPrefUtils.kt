@@ -20,9 +20,9 @@ internal class ReaderPrefUtils {
         }
 
         fun getReadDirection(ctx: Context): ReaderViewPager.DIRECTION {
-            return if (ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(READ_DIRECTION_PREF, -1) == 1)
-                ReaderViewPager.DIRECTION.LEFT_TO_RIGHT
-            else ReaderViewPager.DIRECTION.RIGHT_TO_LEFT
+            return if (ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(READ_DIRECTION_PREF, -1) == 0)
+                ReaderViewPager.DIRECTION.RIGHT_TO_LEFT
+            else ReaderViewPager.DIRECTION.LEFT_TO_RIGHT
         }
 
     }
