@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.freddieptf.mangalibrary.data.ArchiveCacheManager;
+import com.freddieptf.mangatest.App;
 import com.freddieptf.mangatest.R;
 import com.freddieptf.mangatest.utils.Utilities;
 
@@ -49,7 +51,11 @@ public class Settings extends AppCompatActivity implements Preference.OnPreferen
             int index = listPreference.findIndexOfValue(v);
             if (index >= 0) preference.setSummary(listPreference.getEntries()[index].toString());
         } else {
-            preference.setSummary(v);
+            if(preference.getKey().equals(getString(R.string.chapter_cache_size_pref_key))) {
+                preference.setSummary(v + "MB");
+                ((App) getApplication()).initChCache(Long.parseLong(v));
+            }
+            else preference.setSummary(v);
         }
 
         return true;
@@ -84,8 +90,19 @@ public class Settings extends AppCompatActivity implements Preference.OnPreferen
             addPreferencesFromResource(R.xml.preference);
 
             ((Settings) getActivity()).bindPrefToSummary(
-                    findPreference(getString(R.string.pref_manga_sources_key)));
+                    findPreference(getString(R.string.chapter_cache_size_pref_key)));
 
+            findPreference(getString(R.string.clear_cache_key))
+                    .setSummary(String.valueOf(ArchiveCacheManager.INSTANCE.getCacheDirSize()/(1024*1024)) + "MB used");
+
+            findPreference(getString(R.string.clear_cache_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    ArchiveCacheManager.INSTANCE.clearAll();
+                    preference.setSummary("0MB Used");
+                    return true;
+                }
+            });
 
             findPreference(getString(R.string.pref_about_title)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
@@ -104,7 +121,7 @@ public class Settings extends AppCompatActivity implements Preference.OnPreferen
 
                     MaterialDialog materialDialog = new MaterialDialog.Builder(getActivity())
                             .title(getString(R.string.app_name) + " v" + version)
-                            .content("Just a Simple Manga Downloader and Reader.")
+                            .content("Just a Manga/Comic Reader.")
                             .positiveText("ok")
                             .callback(new MaterialDialog.ButtonCallback() {
                                 @Override

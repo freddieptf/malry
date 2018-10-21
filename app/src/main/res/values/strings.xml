@@ -5,7 +5,7 @@
     <string name="myMangaList">Manga List</string>
     <string name="myDownloads">Downloads</string>
 
-    <string name="app_name">My Manga Beta</string>
+    <string name="app_name">Malry</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_manga_details">Manga</string>
 
@@ -43,5 +43,8 @@
     <string name="string_search">Search</string>
     <string name="string_filter">Filter by Genre</string>
     <string name="string_check4updates">Check for Updates</string>
+    <string name="chapter_cache_size_pref_key">chapter_cache_size</string>
+    <string name="chapter_cache_size_pref">Size Limit</string>
+    <string name="clear_cache_key">clear_cache</string>
 
 </resources>

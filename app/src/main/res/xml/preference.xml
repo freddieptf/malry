@@ -3,19 +3,22 @@
 
     <PreferenceCategory
         android:layout="@layout/preference_category"
-        android:title="Sources">
+        android:title="Chapter Caching">
 
-        <com.afollestad.materialdialogs.prefs.MaterialListPreference
-            android:defaultValue="@string/pref_manga_reader"
-            android:entries="@array/pref_manga_sources_Entries"
-            android:entryValues="@array/pref_manga_sources_Entries"
-            android:key="@string/pref_manga_sources_key"
+        <EditTextPreference
+            android:defaultValue="100"
+            android:key="@string/chapter_cache_size_pref_key"
             android:layout="@layout/preference_custom"
-            android:title="@string/pref_manga_sources_title"
-            />
+            android:persistent="true"
+            android:title="@string/chapter_cache_size_pref"
+            android:inputType="numberDecimal" />
+
+        <Preference
+            android:layout="@layout/preference_custom"
+            android:title="Clear Cache"
+            android:key="@string/clear_cache_key"/>
 
     </PreferenceCategory>
-
 
     <PreferenceCategory
         android:layout="@layout/preference_category"
@@ -28,18 +31,10 @@
             android:persistent="true"
             android:summary="For smoother scroll on longer lists."
             android:title="@string/pref_my_manga_cards_compact"
+            android:enabled="false"
             />
 
-        <!--<CheckBoxPreference-->
-            <!--android:layout="@layout/preference_custom"-->
-            <!--android:title="@string/wifi_only"-->
-            <!--android:summary="Images will only be downloaded when you're connected to WiFi. Cached images, however, will still load."-->
-            <!--android:key="@string/wifi_only_key"-->
-            <!--android:defaultValue="false"-->
-            <!--android:persistent="true"/>-->
-
     </PreferenceCategory>
-
 
     <PreferenceCategory
         android:layout="@layout/preference_category"
@@ -53,21 +48,8 @@
             android:layout="@layout/preference_custom"
             android:summary="Choose your theme."
             android:title="@string/pref_themes_title"
+            android:enabled="false"
             />
-
-    </PreferenceCategory>
-
-
-    <PreferenceCategory
-        android:layout="@layout/preference_category"
-        android:title="Manga Databases">
-
-        <Preference
-            android:key="@string/pref_fix_database_key"
-            android:layout="@layout/preference_custom"
-            android:summary="Redownload a database if it did not set up right or update to keep the databases up to releaseDate."
-            android:title="@string/pref_fix_database_title" />
-
 
     </PreferenceCategory>
 

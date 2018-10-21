@@ -66,7 +66,7 @@ class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
     }
 
     override fun onChapterClick(chapter: Chapter, pos: Int) {
-        val provider = LocalLibChapterProvider().useCtx(context!!).setRead(pos, adapter.getData())
+        val provider = LocalLibChProvider().setRead(pos, adapter.getData())
         ChapterProvider.useProvider(provider)
         val i = ReaderActivity.newIntent(context!!)
         startActivity(i)
