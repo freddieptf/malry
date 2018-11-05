@@ -1,6 +1,5 @@
 package com.freddieptf.mangalibrary
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +11,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.freddieptf.mangalibrary.data.models.Chapter
+import com.freddieptf.mangalibrary.data.models.LibraryItem
 import com.freddieptf.reader.ReaderActivity
 import com.freddieptf.reader.api.ChapterProvider
 
@@ -22,13 +22,11 @@ class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
 
     companion object {
 
-        private val DIR_URI = "dir_uri"
-        private val DIR_NAME = "dir_name"
+        private val LIBRARY_ITEM = "library_item"
 
-        fun newInstance(dirUri: Uri, dirName: String): ChapterListFragment {
+        fun newInstance(libraryItem: LibraryItem): ChapterListFragment {
             val bundle = Bundle()
-            bundle.putParcelable(DIR_URI, dirUri)
-            bundle.putString(DIR_NAME, dirName)
+            bundle.putParcelable(LIBRARY_ITEM, libraryItem)
             val frag = ChapterListFragment()
             frag.arguments = bundle
             return frag
@@ -47,7 +45,7 @@ class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        (activity as AppCompatActivity).supportActionBar!!.title = arguments!!.getString(DIR_NAME)
+        (activity as AppCompatActivity).supportActionBar!!.title = arguments!!.getParcelable<LibraryItem>(LIBRARY_ITEM).name
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -56,13 +54,18 @@ class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
         recycler.adapter = adapter
         adapter.setChapterClickListener(this)
         viewModel = ViewModelProviders.of(activity!!).get(LibraryViewModel::class.java)
-    }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.getChapters(context!!, arguments!!.get(DIR_URI) as Uri).observe(this, Observer {
-            adapter.swapData(it)
-        })
+        val item = arguments!!.getParcelable<LibraryItem>(LIBRARY_ITEM)
+
+        viewModel.getDbChapterList(item.dirUri).observe(this,
+                Observer {
+                    if (it.size < item.itemCount) {
+                        viewModel.syncChaptersFromDisk(context!!, item.dirUri)
+                    } else {
+                        adapter.swapData(data = it)
+                    }
+                })
+
     }
 
     override fun onChapterClick(chapter: Chapter, pos: Int) {

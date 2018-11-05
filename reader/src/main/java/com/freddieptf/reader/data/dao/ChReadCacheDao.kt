@@ -13,8 +13,11 @@ interface ChReadCacheDao {
     @Query("SELECT * FROM chapter_cache")
     fun get(): LiveData<List<ChReadCache>>
 
-    @Query("SELECT * FROM chapter_cache WHERE id=:id")
-    fun get(id: String): ChReadCache?
+    @Query("SELECT * FROM chapter_cache WHERE manga_name=:manga AND id=:chapterTitle")
+    fun get(manga: String, chapterTitle: String): ChReadCache?
+
+    @Query("SELECT * FROM chapter_cache WHERE manga_name=:manga ORDER BY rowid DESC LIMIT 1")
+    fun getLastRead(manga: String): ChReadCache?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun save(cache: ChReadCache)
