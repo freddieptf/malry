@@ -22,7 +22,11 @@ object ReaderDataManager {
     }
 
     fun getCache(parent: String, chapter: String): ChReadCache? {
-        return readerDB.chapterCacheDao().get(parent+"/"+chapter)
+        return readerDB.chapterCacheDao().get(parent, chapter)
+    }
+
+    fun getLastRead(manga: String): ChReadCache? {
+        return readerDB.chapterCacheDao().getLastRead(manga)
     }
 
     fun isChapterRead(parent: String, chapter: String): Boolean {

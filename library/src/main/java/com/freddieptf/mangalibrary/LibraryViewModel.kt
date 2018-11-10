@@ -6,17 +6,16 @@ import android.provider.DocumentsContract
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.freddieptf.mangalibrary.data.LibraryDataManager
 import com.freddieptf.mangalibrary.data.models.Chapter
 import com.freddieptf.mangalibrary.data.models.LibraryItem
-import com.freddieptf.mangalibrary.utils.AlphanumComparator
 import com.freddieptf.mangalibrary.utils.ChapterTitleComparator
-import com.freddieptf.mangalibrary.utils.ChapterUtils
+import com.freddieptf.mangalibrary.utils.SingleEvent
 import com.freddieptf.reader.data.ReaderDataManager
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
-import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -44,15 +43,35 @@ class LibraryViewModel : ViewModel() {
         }
     }
 
-    private lateinit var chapterList: LiveData<List<Chapter>>
+    private val mangaDirSelection: MutableLiveData<LibraryItem> = MutableLiveData()
+    private val chapterList: LiveData<SingleEvent<List<Chapter>>> = Transformations.switchMap(mangaDirSelection) {
+        libItem -> getChapterListR(libItem)
+    }
 
-    fun getChapters(ctx: Context, dirUri: Uri): LiveData<List<Chapter>> {
-        chapterList = LibraryDataManager.getChapters(dirUri)
+    fun getDbChapterList(dirUri: Uri): LiveData<List<Chapter>> = LibraryDataManager.getChaptersLiveData(dirUri)
+
+    fun getChapterList(): LiveData<SingleEvent<List<Chapter>>> = chapterList
+
+    fun setChSelection(dirUri: LibraryItem) {
+        mangaDirSelection.value = dirUri
+    }
+
+    private fun getChapterListR(item: LibraryItem): LiveData<SingleEvent<List<Chapter>>> {
+        val resumedList = MutableLiveData<SingleEvent<List<Chapter>>>()
+        launch {
+            val list = LibraryDataManager.getChapters(item.dirUri)
+            launch(UI) {
+                resumedList.value = SingleEvent(list)
+            }
+        }
+        return resumedList
+    }
+
+    fun syncChaptersFromDisk(ctx: Context, dirUri: Uri) {
         launch {
             val result = openMangaDir(ctx, dirUri)
-            if(result != null) LibraryDataManager.saveChapters(result)
+            if (result != null) LibraryDataManager.saveChapters(result)
         }
-        return chapterList
     }
 
     private fun openMangaDir(ctx: Context, dirUri:Uri): List<Chapter>? {

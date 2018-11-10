@@ -16,6 +16,11 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.freddieptf.mangalibrary.data.models.LibraryItem
+import com.freddieptf.reader.ReaderActivity
+import com.freddieptf.reader.api.ChapterProvider
+import com.freddieptf.reader.data.ReaderDataManager
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 
 
 /**
@@ -44,6 +49,8 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
         if (!hasStoragePerms()) throw SecurityException("no storage permissions")
 
         viewModel = ViewModelProviders.of(activity!!).get(LibraryViewModel::class.java)
+        resumeReadObsver()
+
         recyler = view.findViewById(R.id.rv_libraryList)
         recyler.layoutManager = LinearLayoutManager(context!!)
         recyler.adapter = adapter
@@ -62,8 +69,23 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
         (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(false)
     }
 
-    override fun onDirClick(dir: LibraryItem) {
-        val detailFragment = ChapterListFragment.newInstance(dir.dirUri, dir.name)
+    override fun onDirClick(item: LibraryItem) {
+        launch {
+            val cache = ReaderDataManager.getLastRead(item.name)
+            if (cache == null) {
+                launch(UI) {
+                    openChapterListFrag(item)
+                }
+            } else {
+                launch(UI) {
+                    viewModel.setChSelection(item)
+                }
+            }
+        }
+    }
+
+    private fun openChapterListFrag(dir: LibraryItem) {
+        val detailFragment = ChapterListFragment.newInstance(dir)
         fragmentManager!!.beginTransaction()
                 .replace(
                         (activity!! as LibraryFragmentContainer).getFragmentContainerId(),
@@ -72,6 +94,33 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
                 )
                 .addToBackStack(ChapterListFragment::class.java.simpleName)
                 .commit()
+    }
+
+    private fun resumeReadObsver() {
+        viewModel.getChapterList().observe(this, Observer {
+            it.getData()?.let { chapters ->
+                if (chapters.isNotEmpty()) {
+                    launch {
+                        val cache = ReaderDataManager.getLastRead(chapters[0].parentName)
+                        var startPos = 0
+                        if (cache != null) {
+                            chapters.forEachIndexed { index, chapter ->
+                                if (chapter.name == cache.chapterTitle) {
+                                    startPos = index
+                                    return@forEachIndexed
+                                }
+                            }
+                        }
+                        val provider = LocalLibChProvider().setRead(startPos, chapters)
+                        ChapterProvider.useProvider(provider)
+                        launch(UI) {
+                            val i = ReaderActivity.newIntent(context!!)
+                            startActivity(i)
+                        }
+                    }
+                }
+            }
+        })
     }
 
     private fun startLibSelector() {
@@ -106,7 +155,7 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
 
     private fun hasStoragePerms(): Boolean {
         return (ContextCompat.checkSelfPermission(context!!, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        == PackageManager.PERMISSION_GRANTED)
+                == PackageManager.PERMISSION_GRANTED)
     }
 
     private fun swapData(uri: Uri) {

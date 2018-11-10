@@ -24,8 +24,12 @@ object LibraryDataManager {
         return db.LibraryItemDao().saveLibraryItem(item)
     }
 
-    fun getChapters(mangaDirUri: Uri): LiveData<List<Chapter>> {
+    fun getChapters(mangaDirUri: Uri): List<Chapter> {
         return db.LibraryItemDao().getChapters(mangaDirUri)
+    }
+
+    fun getChaptersLiveData(mangaDirUri: Uri): LiveData<List<Chapter>> {
+        return db.LibraryItemDao().getChaptersLiveData(mangaDirUri)
     }
 
     fun saveChapters(data: List<Chapter>) {
