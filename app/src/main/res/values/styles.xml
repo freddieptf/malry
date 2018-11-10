@@ -1,16 +1,19 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowActionBar">false</item>
         <item name="textColorPrimary">@color/primary_text_default_material_light</item>
         <item name="textColorSecondary">@color/secondary_text_default_material_light</item>
         <item name="cardBackgroundColor">@color/cardview_light_background</item>
         <item name="divider_color">@color/divider</item>
         <item name="toolBar_shadow">@drawable/toolbar_shadow</item>
 
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary</item>
-        <item name="colorAccent">@color/accent</item>
+        <!--<item name="colorPrimary">@color/primary</item>-->
+        <!--<item name="colorPrimaryDark">@color/primary</item>-->
+        <!--<item name="colorAccent">@color/accent</item>-->
+
+        <item name="android:fontFamily">@font/cabin</item>
 
     </style>
 
