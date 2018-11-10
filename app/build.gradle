@@ -48,6 +48,7 @@ dependencies {
     compile "com.android.support:design:$val.supportLibVersion"
     compile "com.android.support:palette-v7:$val.supportLibVersion"
 
+    implementation("androidx.appcompat:appcompat:1.0.0")
     implementation "androidx.room:room-runtime:$val.roomVersion"
     annotationProcessor "androidx.room:room-compiler:$val.roomVersion"
 

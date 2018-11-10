@@ -8,8 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.freddieptf.reader.api.Chapter
 import com.freddieptf.reader.api.ChapterProvider
-import com.freddieptf.reader.data.ReaderDataManager
-import com.freddieptf.reader.data.models.ChReadCache
 import com.freddieptf.reader.widgets.ReaderViewPager
 import java.util.*
 import kotlin.collections.ArrayList
@@ -17,15 +15,20 @@ import kotlin.collections.ArrayList
 /**
  * Created by fred on 3/22/15.
  */
-class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
+class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, ReaderViewPager.ReadSignals {
 
     private var adapter: PicPagerAdapter? = null
-    private var viewPager: ReaderViewPager? = null
+    private lateinit var viewPager: ReaderViewPager
     private lateinit var chapterTitle: String
     private lateinit var parent: String
     private lateinit var viewModel: ReaderFragViewModel
     private var dialog: AlertDialog? = null
     private var currentRead: Chapter? = null
+    private var showingBars = 1
+
+    companion object {
+        private val SHOWING_BARS = "showing_bars"
+    }
 
     init {
         setHasOptionsMenu(true)
@@ -33,13 +36,6 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_reader, container, false)
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        if ((activity as AppCompatActivity).supportActionBar != null) {
-            (activity as AppCompatActivity).supportActionBar!!.title = chapterTitle
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -75,42 +71,34 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun showChapter(chapter: Chapter) {
-        this.currentRead = chapter
-
-        val pages = ArrayList<String>()
-        pages += currentRead!!.paths
-        chapterTitle = currentRead!!.chapter
-        parent = currentRead!!.parent
-        (activity as AppCompatActivity).supportActionBar!!.title = chapterTitle
-
-        val direction = ReaderPrefUtils.getReadDirection(context!!)
-        viewPager!!.setReadDirection(direction)
-
-        when (direction) {
-            ReaderViewPager.DIRECTION.LEFT_TO_RIGHT -> {
-                Collections.reverse(pages)
-                adapter = PicPagerAdapter(pages)
-                viewPager!!.adapter = adapter
-            }
-            ReaderViewPager.DIRECTION.RIGHT_TO_LEFT -> {
-                adapter = PicPagerAdapter(pages)
-                viewPager!!.adapter = adapter
-            }
-        }
-
-        viewPager!!.setCurrentItem(viewModel.getLastViewedChPage(parent, chapterTitle), false)
-
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        addSystemUiVisibiltyChangeListener()
+
         viewPager = view.findViewById<View>(R.id.pager_MangaPics) as ReaderViewPager
-        viewPager!!.setReadProgressListener(this)
+        viewPager.setReadProgressListener(this)
+        viewPager.setReadSignalCallback(this)
+
+        savedInstanceState?.let { showingBars = it.getInt(SHOWING_BARS, 1) }
+        if(showingBars != 1) (activity as ReaderActivity).hideSystemUI()
+        viewPager.setInterceptTouch(showingBars == 1)
 
         viewModel = ViewModelProviders.of(this).get(ReaderFragViewModel::class.java)
 
         showChapter(ChapterProvider.getProvider().getCurrentRead())
 
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.apply {
+            putInt(SHOWING_BARS, showingBars)
+        }
+    }
+
+    // just hides the system bars
+    override fun pageReadToggle() {
+        if(showingBars == 1) (activity!! as ReaderActivity).hideSystemUI()
+        else (activity!! as ReaderActivity).showSystemUI()
     }
 
     override fun onSwipeToNextCh() {
@@ -149,8 +137,50 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
         cacheLastSeenPage()
     }
 
-    private fun cacheLastSeenPage() {
-        viewModel.saveLastViewedPage(parent, chapterTitle, viewPager!!.currentItem, adapter!!.count)
+    private fun showChapter(chapter: Chapter) {
+        this.currentRead = chapter
+
+        val pages = ArrayList<String>()
+        pages += currentRead!!.paths
+        chapterTitle = currentRead!!.chapter
+        parent = currentRead!!.parent
+        (activity as AppCompatActivity).supportActionBar!!.title = chapterTitle
+
+        val direction = ReaderPrefUtils.getReadDirection(context!!)
+        viewPager.setReadDirection(direction)
+
+        when (direction) {
+            ReaderViewPager.DIRECTION.LEFT_TO_RIGHT -> {
+                Collections.reverse(pages)
+                adapter = PicPagerAdapter(pages)
+                viewPager.adapter = adapter
+            }
+            ReaderViewPager.DIRECTION.RIGHT_TO_LEFT -> {
+                adapter = PicPagerAdapter(pages)
+                viewPager.adapter = adapter
+            }
+        }
+
+        viewPager.setCurrentItem(viewModel.getLastViewedChPage(parent, chapterTitle), false)
+
     }
 
+    private fun cacheLastSeenPage() {
+        viewModel.saveLastViewedPage(parent, chapterTitle, viewPager.currentItem, adapter!!.count)
+    }
+
+    private fun addSystemUiVisibiltyChangeListener() {
+        (activity!! as AppCompatActivity).window.decorView.setOnSystemUiVisibilityChangeListener { visibility ->
+            if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
+                // The system bars are visible.
+                viewPager.setInterceptTouch(true)
+                (activity as AppCompatActivity).supportActionBar!!.show()
+                showingBars = 1
+            } else {
+                // The system bars are NOT visible.
+                viewPager.setInterceptTouch(false)
+                showingBars = 0
+            }
+        }
+    }
 }

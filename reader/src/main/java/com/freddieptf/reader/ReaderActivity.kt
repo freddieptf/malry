@@ -46,25 +46,6 @@ class ReaderActivity : AppCompatActivity() {
 
     }
 
-    override fun onPostCreate(savedInstanceState: Bundle?) {
-        super.onPostCreate(savedInstanceState)
-        addSystemUiVisibiltyChangeListener()
-        hideSystemUI()
-    }
-
-    private fun addSystemUiVisibiltyChangeListener() {
-        window.decorView.setOnSystemUiVisibilityChangeListener { visibility ->
-            if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
-                // The system bars are visible.
-                supportActionBar!!.show()
-                eventuallyHide()
-            } else {
-                // The system bars are NOT visible.
-                supportActionBar!!.hide()
-            }
-        }
-    }
-
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item!!.itemId) {
             android.R.id.home -> {
@@ -74,32 +55,27 @@ class ReaderActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun eventuallyHide(){
-        Handler().postDelayed(Runnable {
-            hideSystemUI()
-        }, 5000)
-    }
-
-    private fun hideSystemUI() {
+    fun hideSystemUI() {
         // Enables regular immersive mode.
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
                 // Set the content to appear under the system bars so that the
                 // content doesn't resize when the system bars hide and show.
                 or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 // Hide the nav bar and status bar
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_FULLSCREEN)
 
+        supportActionBar!!.hide()
     }
 
     // Shows the system bars by removing all the flags
     // except for the ones that make the content appear under the system bars.
-    private fun showSystemUI() {
+    fun showSystemUI() {
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+        supportActionBar!!.show()
     }
 
 

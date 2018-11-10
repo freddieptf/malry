@@ -41,6 +41,6 @@ ext {
     supportLibVersion = '27.1.1'
     kotlinCoroutines = '0.24.0'
     commonsCompress = '1.18'
-    roomVersion = "2.0.0-beta01"
-    archLifecycleVersion = "2.0.0-beta01"
+    roomVersion = "2.0.0"
+    archLifecycleVersion = "2.0.0"
 }

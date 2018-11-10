@@ -2,8 +2,9 @@ package com.freddieptf.reader.widgets
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
+import android.view.GestureDetector
 import android.view.MotionEvent
+import androidx.core.view.GestureDetectorCompat
 
 import androidx.viewpager.widget.ViewPager
 
@@ -15,9 +16,13 @@ class ReaderViewPager @JvmOverloads constructor(context: Context, attrs: Attribu
     companion object {
         private val TAG = ReaderViewPager::class.java.simpleName
     }
+
     private var startDragXPos = 0f
     private var readProgressListener: ReadProgressListener? = null
+    private var readSignals: ReadSignals? = null
     private var direction: DIRECTION? = null
+    private var systemBarsVisible = true
+    private var detector: GestureDetectorCompat? = null
 
     enum class DIRECTION {
         LEFT_TO_RIGHT,
@@ -30,6 +35,14 @@ class ReaderViewPager @JvmOverloads constructor(context: Context, attrs: Attribu
 
     fun setReadDirection(direction: DIRECTION) {
         this.direction = direction
+    }
+
+    fun setInterceptTouch(systemBarsVisible: Boolean) {
+        this.systemBarsVisible = systemBarsVisible
+    }
+
+    fun setReadSignalCallback(callbacks: ReadSignals) {
+        this.readSignals = callbacks
     }
 
     override fun setCurrentItem(item: Int, smoothScroll: Boolean) {
@@ -48,6 +61,7 @@ class ReaderViewPager @JvmOverloads constructor(context: Context, attrs: Attribu
         }
         return super.getCurrentItem()
     }
+
 
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         val inDragX = ev.x
@@ -70,14 +84,37 @@ class ReaderViewPager @JvmOverloads constructor(context: Context, attrs: Attribu
                             readProgressListener!!.onSwipeToNextCh()
                     }
                 }
+
             }
         }
+
         return super.onInterceptTouchEvent(ev)
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (detector == null)
+            detector = GestureDetectorCompat(context, gestureListenere)
+        detector!!.onTouchEvent(ev)
+        return super.dispatchTouchEvent(ev)
     }
 
     interface ReadProgressListener {
         fun onSwipeToNextCh()
         fun onSwipeToPreviousCh()
+    }
+
+    interface ReadSignals {
+        fun pageReadToggle()
+    }
+
+    private var gestureListenere = object : GestureDetector.SimpleOnGestureListener() {
+        override fun onSingleTapUp(e: MotionEvent?): Boolean {
+            return true
+        }
+        override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
+            readSignals?.pageReadToggle()
+            return true
+        }
     }
 
 }

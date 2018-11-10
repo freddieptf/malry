@@ -9,7 +9,7 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 
 import androidx.viewpager.widget.PagerAdapter
-import uk.co.senab.photoview.PhotoView
+import com.github.chrisbanes.photoview.PhotoView
 
 /**
  * Created by fred on 3/22/15.
