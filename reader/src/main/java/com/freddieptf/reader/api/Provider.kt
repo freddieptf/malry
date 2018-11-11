@@ -13,8 +13,12 @@ abstract class Provider {
 
     abstract fun getCurrentRead(): Chapter
 
+    abstract fun setCurrentRead(chapter: Chapter)
+
     abstract fun hasPreviousRead(): Boolean
 
     abstract fun getPreviousRead(): Chapter?
+
+    abstract fun getReadList(): List<Chapter>
 
 }

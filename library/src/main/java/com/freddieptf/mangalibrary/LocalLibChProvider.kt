@@ -7,13 +7,14 @@ import com.freddieptf.reader.api.Chapter
 import com.freddieptf.reader.api.Provider
 import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Created by freddieptf on 9/22/18.
  */
 class LocalLibChProvider : Provider() {
 
-    private lateinit var chapters: List<com.freddieptf.mangalibrary.data.models.Chapter>
+    private lateinit var chapters: ArrayList<com.freddieptf.mangalibrary.data.models.Chapter>
     private var pos: Int = 0
 
     private fun openChapter(chapter: com.freddieptf.mangalibrary.data.models.Chapter): List<String> {
@@ -30,7 +31,7 @@ class LocalLibChProvider : Provider() {
 
     fun setRead(startPos: Int, chapters: List<com.freddieptf.mangalibrary.data.models.Chapter>): LocalLibChProvider {
         this.pos = startPos
-        this.chapters = chapters;
+        this.chapters = chapters as ArrayList<com.freddieptf.mangalibrary.data.models.Chapter>;
         return this
     }
 
@@ -42,12 +43,12 @@ class LocalLibChProvider : Provider() {
         if (pos >= chapters.size || chapters.isEmpty()) return null
         pos++
         val ch = chapters.get(pos)
-        return Chapter(ch.name, ch.parentName, openChapter(ch))
+        return Chapter(ch.name, ch.parentName).setPaths(openChapter(ch))
     }
 
     override fun getCurrentRead(): Chapter {
         val ch = chapters.get(pos)
-        return Chapter(ch.name, ch.parentName, openChapter(ch))
+        return Chapter(ch.name, ch.parentName).setPaths(openChapter(ch))
     }
 
     override fun hasPreviousRead(): Boolean {
@@ -58,8 +59,15 @@ class LocalLibChProvider : Provider() {
         if (pos <= 0 || chapters.isEmpty()) return null
         pos--
         val ch = chapters.get(pos)
-        return Chapter(ch.name, ch.parentName, openChapter(ch))
+        return Chapter(ch.name, ch.parentName).setPaths(openChapter(ch))
     }
 
+    override fun getReadList(): List<Chapter> {
+        return chapters.map { it -> Chapter(it.name, it.parentName) }
+    }
+
+    override fun setCurrentRead(chapter: Chapter) {
+        pos = getReadList().indexOf(chapter)
+    }
 
 }
