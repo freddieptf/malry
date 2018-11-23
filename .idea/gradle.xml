@@ -9,9 +9,11 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/library" />
+            <option value="$PROJECT_DIR$/malry" />
+            <option value="$PROJECT_DIR$/malry-api" />
+            <option value="$PROJECT_DIR$/malry-commons" />
             <option value="$PROJECT_DIR$/reader" />
+            <option value="$PROJECT_DIR$/storage-provider" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

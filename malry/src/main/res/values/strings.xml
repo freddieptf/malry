@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Malry</string>
+    <string name="action_settings">Settings</string>
+
+
+    <string name="pref_my_manga_cards_compact">Compact Cards</string>
+    <string name="pref_my_manga_cards_key">compact</string>
+    <string name="pref_themes_title">Theme</string>
+    <string name="pref_themes_key">theme</string>
+    <string name="pref_theme_light">Light</string>
+    <string name="pref_theme_dark">Dark</string>
+    <string name="pref_about_title">About</string>
+    <string name="chapter_cache_size_pref_key">chapter_cache_size</string>
+    <string name="chapter_cache_size_pref">Size Limit</string>
+    <string name="clear_cache_key">clear_cache</string>
+
+</resources>

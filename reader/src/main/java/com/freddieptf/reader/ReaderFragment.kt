@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
-import com.freddieptf.reader.api.Chapter
-import com.freddieptf.reader.api.ChapterProvider
+import com.freddieptf.malry.api.Chapter
 import com.freddieptf.reader.widgets.ReaderViewPager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -72,20 +75,45 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, ReaderV
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        addSystemUiVisibiltyChangeListener()
 
         viewPager = view.findViewById<View>(R.id.pager_MangaPics) as ReaderViewPager
         viewPager.setReadProgressListener(this)
         viewPager.setReadSignalCallback(this)
 
         savedInstanceState?.let { showingBars = it.getInt(SHOWING_BARS, 1) }
-        if(showingBars != 1) (activity as ReaderActivity).hideSystemUI()
-        viewPager.setInterceptTouch(showingBars == 1)
+        if (showingBars != 1) (activity as ReaderActivity).hideSystemUI()
+        (activity as ReaderActivity).lockDrawer(showingBars == 0)
 
-        viewModel = ViewModelProviders.of(this).get(ReaderFragViewModel::class.java)
+        viewModel = ViewModelProviders.of(activity!!).get(ReaderFragViewModel::class.java)
 
-        showChapter(ChapterProvider.getProvider().getCurrentRead())
+        viewModel.openChapterChannel().observe(this, androidx.lifecycle.Observer {
+            if (it.seen) return@Observer
+            GlobalScope.launch {
+                cacheLastSeenPage()
+                ChapterProvider.getProvider().setCurrentRead(it.getData()!!)
+                currentRead = ChapterProvider.getProvider().getCurrentRead()
+                GlobalScope.launch(Dispatchers.Main) {
+                    (activity as ReaderActivity).hideDrawer(object : DrawerLayout.SimpleDrawerListener() {
+                        override fun onDrawerClosed(drawerView: View) {
+                            showChapter(currentRead!!)
+                        }
+                    })
+                }
+            }
+        })
 
+        GlobalScope.launch {
+            val read = ChapterProvider.getProvider().getCurrentRead()
+            GlobalScope.launch(Dispatchers.Main) {
+                showChapter(read)
+            }
+        }
+
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        addSystemUiVisibiltyChangeListener()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -97,7 +125,7 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, ReaderV
 
     // just hides the system bars
     override fun pageReadToggle() {
-        if(showingBars == 1) (activity!! as ReaderActivity).hideSystemUI()
+        if (showingBars == 1) (activity!! as ReaderActivity).hideSystemUI()
         else (activity!! as ReaderActivity).showSystemUI()
     }
 
@@ -133,8 +161,8 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, ReaderV
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         cacheLastSeenPage()
+        super.onDestroy()
     }
 
     private fun showChapter(chapter: Chapter) {
@@ -142,8 +170,8 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, ReaderV
 
         val pages = ArrayList<String>()
         pages += currentRead!!.paths
-        chapterTitle = currentRead!!.chapter
-        parent = currentRead!!.parent
+        chapterTitle = currentRead!!.title
+        parent = currentRead!!.parentTitle
         (activity as AppCompatActivity).supportActionBar!!.title = chapterTitle
 
         val direction = ReaderPrefUtils.getReadDirection(context!!)
@@ -161,25 +189,26 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, ReaderV
             }
         }
 
-        viewPager.setCurrentItem(viewModel.getLastViewedChPage(parent, chapterTitle), false)
+        viewPager.setCurrentItem(chapter.lastReadPage, false)
+        viewModel.setCurrentRead(currentRead!!)
 
     }
 
     private fun cacheLastSeenPage() {
-        viewModel.saveLastViewedPage(parent, chapterTitle, viewPager.currentItem, adapter!!.count)
+        viewModel.saveLastViewedPage(currentRead!!.id, viewPager.currentItem, adapter!!.count)
     }
 
     private fun addSystemUiVisibiltyChangeListener() {
         (activity!! as AppCompatActivity).window.decorView.setOnSystemUiVisibilityChangeListener { visibility ->
             if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
                 // The system bars are visible.
-                viewPager.setInterceptTouch(true)
                 (activity as AppCompatActivity).supportActionBar!!.show()
                 showingBars = 1
+                (activity as ReaderActivity).lockDrawer(false)
             } else {
                 // The system bars are NOT visible.
-                viewPager.setInterceptTouch(false)
                 showingBars = 0
+                (activity as ReaderActivity).lockDrawer(true)
             }
         }
     }

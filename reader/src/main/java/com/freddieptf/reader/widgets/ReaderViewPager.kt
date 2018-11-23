@@ -21,7 +21,6 @@ class ReaderViewPager @JvmOverloads constructor(context: Context, attrs: Attribu
     private var readProgressListener: ReadProgressListener? = null
     private var readSignals: ReadSignals? = null
     private var direction: DIRECTION? = null
-    private var systemBarsVisible = true
     private var detector: GestureDetectorCompat? = null
 
     enum class DIRECTION {
@@ -35,10 +34,6 @@ class ReaderViewPager @JvmOverloads constructor(context: Context, attrs: Attribu
 
     fun setReadDirection(direction: DIRECTION) {
         this.direction = direction
-    }
-
-    fun setInterceptTouch(systemBarsVisible: Boolean) {
-        this.systemBarsVisible = systemBarsVisible
     }
 
     fun setReadSignalCallback(callbacks: ReadSignals) {

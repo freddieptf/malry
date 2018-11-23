@@ -1,1 +1,1 @@
-include ':app', ':reader', ':library'
+include ':malry', ':reader', ':storage-provider', ':malry-api', ':malry-commons'
