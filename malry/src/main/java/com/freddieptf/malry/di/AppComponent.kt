@@ -12,8 +12,6 @@ import javax.inject.Singleton
 @Component(modules = [AppModule::class])
 interface AppComponent {
 
-    fun inject(fragment: LibraryFragment)
-
-    fun inject(fragment: ChapterListFragment)
+    fun dataProviderComponent(module: DataProviderModule): DataProviderComponent
 
 }

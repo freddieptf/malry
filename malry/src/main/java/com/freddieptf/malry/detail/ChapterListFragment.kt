@@ -58,7 +58,7 @@ class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
         super.onActivityCreated(savedInstanceState)
         (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         (activity as AppCompatActivity).supportActionBar!!.title = arguments!!.getString(LIBRARY_ITEM_NAME)
-        (activity!!.application as App).component.inject(this)
+        (activity!!.application as App).dataProviderComponent.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

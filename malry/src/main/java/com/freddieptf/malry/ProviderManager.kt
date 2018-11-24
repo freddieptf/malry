@@ -6,14 +6,13 @@ import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.api.ChapterProvider
 import com.freddieptf.malry.api.DataProvider
 import com.freddieptf.malry.api.LibraryItem
-import javax.inject.Singleton
+import com.freddieptf.malry.di.LibLocationScope
 
 /**
  * Created by freddieptf on 11/17/18.
  */
-@Singleton
+@LibLocationScope
 class ProviderManager constructor(private val localProvider: DataProvider) : DataProvider() {
-
 
     override fun getChapterProvider(chapter: Chapter): ChapterProvider {
         return localProvider.getChapterProvider(chapter)

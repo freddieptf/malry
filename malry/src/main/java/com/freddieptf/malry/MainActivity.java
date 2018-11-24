@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements LibraryFragment.L
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == STORAGE_REQ_CODE &&
+        if (requestCode == STORAGE_REQ_CODE && permissions.length > 0 &&
                 Objects.equals(permissions[0], Manifest.permission.WRITE_EXTERNAL_STORAGE) &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             showLibraryFragment();

@@ -56,7 +56,7 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         if (!hasStoragePerms()) throw SecurityException("no storage permissions")
-        (activity!!.application as App).component.inject(this)
+        (activity!!.application as App).dataProviderComponent.inject(this)
 
         viewModel = ViewModelProviders.of(activity!!, viewModelFactory).get(LibraryViewModel::class.java)
 
@@ -124,6 +124,12 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
         if (requestCode == 100 && resultCode == RESULT_OK) {
             println(data!!.data)
             LibraryPrefs.addLibUri(context!!, data!!.data)
+            (activity!!.application as App).updateDataProvider(data!!.data)
+
+            // have to reinstatiate and update the provider manager instance in the view model
+            (activity!!.application as App).dataProviderComponent.inject(this)
+            viewModel.dataProvider = providerManager
+
             swapData(data!!.data)
         }
     }

@@ -14,7 +14,7 @@ import com.freddieptf.malry.commons.SingleEvent
 /**
  * Created by freddieptf on 9/16/18.
  */
-class LibraryViewModel constructor(val dataProvider: ProviderManager) : ViewModel() {
+class LibraryViewModel constructor(var dataProvider: ProviderManager) : ViewModel() {
 
     fun getLibraryDirs(ctx: Context, libTreeUri: Uri): LiveData<List<LibraryItem>> {
         return dataProvider.getLibraryItems()

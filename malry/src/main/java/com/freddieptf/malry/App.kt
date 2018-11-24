@@ -1,12 +1,12 @@
 package com.freddieptf.malry
 
 import android.app.Application
+import android.net.Uri
 import android.preference.PreferenceManager
 import com.facebook.stetho.Stetho
-import com.freddieptf.malry.di.AppComponent
-import com.freddieptf.malry.di.AppModule
-import com.freddieptf.malry.di.DaggerAppComponent
 import com.freddieptf.localstorage.data.ArchiveCacheManager
+import com.freddieptf.malry.di.*
+import com.freddieptf.malry.library.LibraryPrefs
 import com.freddieptf.mangatest.R
 import com.squareup.leakcanary.LeakCanary
 
@@ -19,6 +19,10 @@ class App : Application() {
     lateinit var component: AppComponent
         get
 
+    lateinit var dataProviderComponent: DataProviderComponent
+        private set
+        get
+
     override fun onCreate() {
         super.onCreate()
         Stetho.initializeWithDefaults(this)
@@ -28,9 +32,15 @@ class App : Application() {
         LeakCanary.install(this)
 
         component = DaggerAppComponent.builder().appModule(AppModule(this)).build()
+        updateDataProvider(LibraryPrefs.getLibUri(this)?: Uri.EMPTY)
 
         initChCache(null)
 
+    }
+
+    fun updateDataProvider(uri: Uri) {
+        println("update the damn uri $uri")
+        dataProviderComponent = component.dataProviderComponent(DataProviderModule(uri))
     }
 
     /**

@@ -29,14 +29,4 @@ class AppModule(private val context: Context) {
                 .build()
     }
 
-    @Provides
-    @Singleton
-    fun provideDataProvider(context: Context, db: LibraryDB): DataProvider
-            = LocalStorageProvider(context, db,LibraryPrefs.getLibUri(context)?: Uri.EMPTY)
-
-    @Provides
-    @Singleton
-    fun provideDataProviderManager(storageProvider: DataProvider): ProviderManager
-            = ProviderManager(storageProvider)
-
 }
