@@ -16,7 +16,7 @@ import com.freddieptf.malry.ProviderManager
 import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.api.LibraryItem
 import com.freddieptf.malry.library.LibraryViewModel
-import com.freddieptf.localstorage.R
+import com.freddieptf.mangatest.R
 import com.freddieptf.reader.ChapterProvider
 import com.freddieptf.reader.ReaderActivity
 import javax.inject.Inject

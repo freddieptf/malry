@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.freddieptf.malry.api.Chapter
-import com.freddieptf.localstorage.R
+import com.freddieptf.mangatest.R
 
 /**
  * Created by freddieptf on 9/1/18.

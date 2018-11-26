@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -17,9 +16,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.freddieptf.malry.App
 import com.freddieptf.malry.ProviderManager
-import com.freddieptf.malry.detail.ChapterListFragment
 import com.freddieptf.malry.api.LibraryItem
-import com.freddieptf.localstorage.R
+import com.freddieptf.malry.detail.ChapterListFragment
+import com.freddieptf.mangatest.R
 import com.freddieptf.reader.ChapterProvider
 import com.freddieptf.reader.ReaderActivity
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +31,6 @@ import javax.inject.Inject
  */
 class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
 
-    lateinit var btn: Button
     private val adapter = LibraryAdapter()
     private lateinit var recyler: RecyclerView
     private lateinit var viewModel: LibraryViewModel
@@ -55,21 +53,14 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        if (!hasStoragePerms()) throw SecurityException("no storage permissions")
         (activity!!.application as App).dataProviderComponent.inject(this)
-
         viewModel = ViewModelProviders.of(activity!!, viewModelFactory).get(LibraryViewModel::class.java)
 
         recyler = view.findViewById(R.id.rv_libraryList)
         recyler.layoutManager = LinearLayoutManager(context!!)
         recyler.adapter = adapter
         adapter.setClickListener(this)
-
-        var uri = LibraryPrefs.getLibUri(context!!)
-        if (uri == null) {
-            startLibSelector()
-        } else swapData(uri)
-
+        swapData()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -78,13 +69,10 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
         (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(false)
     }
 
-    override fun onLibraryItemClick(libraryItem: LibraryItem) {
-        onDirClick(libraryItem)
-    }
 
-    fun onDirClick(item: LibraryItem) {
+    override fun onLibraryItemClick(libraryItem: LibraryItem) {
         GlobalScope.launch(Dispatchers.Main) {
-            resumeOrNot(item)
+            resumeOrNot(libraryItem)
         }
     }
 
@@ -125,12 +113,10 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
             println(data!!.data)
             LibraryPrefs.addLibUri(context!!, data!!.data)
             (activity!!.application as App).updateDataProvider(data!!.data)
-
             // have to reinstatiate and update the provider manager instance in the view model
             (activity!!.application as App).dataProviderComponent.inject(this)
             viewModel.dataProvider = providerManager
-
-            swapData(data!!.data)
+            swapData()
         }
     }
 
@@ -149,13 +135,8 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun hasStoragePerms(): Boolean {
-        return (ContextCompat.checkSelfPermission(context!!, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED)
-    }
-
-    private fun swapData(uri: Uri) {
-        viewModel.getLibraryDirs(context!!, uri).observe(this, Observer {
+    private fun swapData() {
+        viewModel.getLibraryDirs().observe(this, Observer {
             adapter.swapData(it)
         })
     }

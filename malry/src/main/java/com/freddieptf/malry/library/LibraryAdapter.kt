@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.freddieptf.malry.api.LibraryItem
-import com.freddieptf.localstorage.R
+import com.freddieptf.mangatest.R
 
 /**
  * Created by freddieptf on 9/1/18.
