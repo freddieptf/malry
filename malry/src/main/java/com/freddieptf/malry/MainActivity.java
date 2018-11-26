@@ -1,48 +1,33 @@
 package com.freddieptf.malry;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.freddieptf.malry.library.LibViewModelFactory;
+import com.freddieptf.malry.intro.IntroFragment;
 import com.freddieptf.malry.library.LibraryFragment;
 import com.freddieptf.mangatest.R;
 
-import java.util.Objects;
-
-import javax.inject.Inject;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 
 public class MainActivity extends AppCompatActivity implements LibraryFragment.LibraryFragmentContainer {
 
-    final public static String ACTION_UPDATE = "update";
-    public static boolean DEBUG = true;
-    private static final int STORAGE_REQ_CODE = 100;
-    final String LOG_TAG = this.getClass().getSimpleName();
-    Toolbar toolbar;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar_actionBar);
+        toolbar = findViewById(R.id.toolbar_actionBar);
         setSupportActionBar(toolbar);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED) {
-            showLibraryFragment();
-        } else {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_REQ_CODE);
-        }
+        if (PrefUtils.INSTANCE.hasSetUp(this)) showLibraryFragment();
+        else showIntroFragment();
 
     }
 
@@ -57,13 +42,13 @@ public class MainActivity extends AppCompatActivity implements LibraryFragment.L
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == STORAGE_REQ_CODE && permissions.length > 0 &&
-                Objects.equals(permissions[0], Manifest.permission.WRITE_EXTERNAL_STORAGE) &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            showLibraryFragment();
+    private void showIntroFragment() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(IntroFragment.class.getSimpleName());
+        if (fragment == null) {
+            fragment = new IntroFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, fragment, IntroFragment.class.getSimpleName())
+                    .commit();
         }
     }
 
