@@ -80,15 +80,23 @@ class SideFrag : Fragment() {
         }
         fun bind(chapter: Chapter) {
             tvChTitle.text = chapter.title
+
             val typedVal = TypedValue()
-            if(isSelected) {
-                itemView.context.theme.resolveAttribute(android.R.attr.textColorPrimary, typedVal, true)
-                itemView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.grey))
+            if (chapter.totalPages == 0 || chapter.lastReadPage < chapter.totalPages - 1) {
+                itemView.context.theme.resolveAttribute(
+                        android.R.attr.textColorPrimary, typedVal, true)
             } else {
-                itemView.context.theme.resolveAttribute(android.R.attr.textColorSecondary, typedVal, true)
-                itemView.setBackground(null)
+                itemView.context.theme.resolveAttribute(
+                        android.R.attr.textColorSecondary, typedVal, true)
             }
             tvChTitle.setTextColor(ContextCompat.getColor(itemView.context, typedVal.resourceId))
+
+            if(isSelected) {
+                itemView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.grey))
+            } else {
+                itemView.setBackground(null)
+            }
+
         }
         fun setSelected(selected: Boolean): ChHolder {
             isSelected = selected

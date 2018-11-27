@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -56,17 +57,25 @@ class ReaderActivity : AppCompatActivity() {
 
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.reader_activity_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item!!.itemId) {
             android.R.id.home -> {
                 finish()
             }
+            R.id.menu_chListDrawer -> {
+                showDrawer()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    fun hideDrawer() {
-        drawerLayout.closeDrawer(Gravity.RIGHT)
+    fun showDrawer() {
+        drawerLayout.openDrawer(Gravity.RIGHT)
     }
 
     fun hideDrawer(listener: DrawerLayout.SimpleDrawerListener) {
