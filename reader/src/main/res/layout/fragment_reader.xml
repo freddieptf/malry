@@ -1,12 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical">
 
     <com.freddieptf.reader.widgets.ReaderViewPager
-        android:id="@+id/pager_MangaPics"
+        android:id="@+id/reader_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/reader_actionLayout"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:background="@color/transparent_grey"
+        android:layout_gravity="bottom"
+        android:gravity="top"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <com.freddieptf.reader.widgets.ReaderSeekbar
+            android:id="@+id/reader_seekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp" />
+
+    </LinearLayout>
+
+</FrameLayout>

@@ -2,8 +2,8 @@
 <resources>
 
     <style name="ReaderTheme" parent="@style/Theme.AppCompat.DayNight.NoActionBar">
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">@color/transparent_grey</item>
+        <item name="android:navigationBarColor">@color/transparent_grey</item>
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
 

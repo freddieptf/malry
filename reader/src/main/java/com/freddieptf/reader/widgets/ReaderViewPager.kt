@@ -19,12 +19,20 @@ class ReaderViewPager @JvmOverloads constructor(context: Context, attrs: Attribu
 
     private var startDragXPos = 0f
     private var readProgressListener: ReadProgressListener? = null
-    private var readSignals: ReadSignals? = null
-    private var direction: DIRECTION? = null
+    private var readSignals = ArrayList<SimpleReadSignals>()
+    var direction: DIRECTION? = null
+        private set
+        get
     private var detector: GestureDetectorCompat? = null
 
     enum class DIRECTION {
+        /**
+         * LEFT TO RIGHT THE MANGA WAY
+         * **/
         LEFT_TO_RIGHT,
+        /**
+         * RIGHT TO LEFT THE NORMAL COMIC WAY
+         * */
         RIGHT_TO_LEFT
     }
 
@@ -34,10 +42,11 @@ class ReaderViewPager @JvmOverloads constructor(context: Context, attrs: Attribu
 
     fun setReadDirection(direction: DIRECTION) {
         this.direction = direction
+        readSignals.forEach { it.onReadDirectionChange(this.direction!!) }
     }
 
-    fun setReadSignalCallback(callbacks: ReadSignals) {
-        this.readSignals = callbacks
+    fun addReadSignalCallback(callbacks: SimpleReadSignals) {
+        if (!readSignals.contains(callbacks)) readSignals.add(callbacks)
     }
 
     override fun setCurrentItem(item: Int, smoothScroll: Boolean) {
@@ -98,16 +107,23 @@ class ReaderViewPager @JvmOverloads constructor(context: Context, attrs: Attribu
         fun onSwipeToPreviousCh()
     }
 
-    interface ReadSignals {
-        fun pageReadToggle()
+    private interface ReadSignals {
+        fun onPagerTapToFocus()
+        fun onReadDirectionChange(direction: DIRECTION)
+    }
+
+    open class SimpleReadSignals : ReadSignals {
+        override fun onPagerTapToFocus() {}
+        override fun onReadDirectionChange(direction: DIRECTION) {}
     }
 
     private var gestureListenere = object : GestureDetector.SimpleOnGestureListener() {
         override fun onSingleTapUp(e: MotionEvent?): Boolean {
             return true
         }
+
         override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
-            readSignals?.pageReadToggle()
+            readSignals.forEach { it.onPagerTapToFocus() }
             return true
         }
     }

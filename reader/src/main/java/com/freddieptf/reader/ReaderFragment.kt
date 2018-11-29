@@ -1,13 +1,17 @@
 package com.freddieptf.reader
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
+import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.freddieptf.malry.api.Chapter
+import com.freddieptf.reader.utils.DisplayUtils
+import com.freddieptf.reader.widgets.ReaderSeekbar
 import com.freddieptf.reader.widgets.ReaderViewPager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -18,16 +22,19 @@ import kotlin.collections.ArrayList
 /**
  * Created by fred on 3/22/15.
  */
-class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, ReaderViewPager.ReadSignals {
+class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
 
     private var adapter: PicPagerAdapter? = null
     private lateinit var viewPager: ReaderViewPager
+    private lateinit var seekbar: ReaderSeekbar
+    private lateinit var actionLayout: View
     private lateinit var chapterTitle: String
     private lateinit var parent: String
     private lateinit var viewModel: ReaderFragViewModel
     private var dialog: AlertDialog? = null
     private var currentRead: Chapter? = null
-    private var showingBars = 1
+    private var showingBars = 1 // if one, then showing
+    private lateinit var simpleReadSignals: ReaderViewPager.SimpleReadSignals
 
     companion object {
         private val SHOWING_BARS = "showing_bars"
@@ -75,13 +82,27 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, ReaderV
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        viewPager = view.findViewById(R.id.reader_pager)
+        seekbar = view.findViewById(R.id.reader_seekBar)
+        actionLayout = view.findViewById(R.id.reader_actionLayout)
+        setActionBarMargin()
 
-        viewPager = view.findViewById<View>(R.id.pager_MangaPics) as ReaderViewPager
         viewPager.setReadProgressListener(this)
-        viewPager.setReadSignalCallback(this)
+
+        simpleReadSignals = object : ReaderViewPager.SimpleReadSignals() {
+            override fun onPagerTapToFocus() {
+                if (showingBars == 1)
+                    (activity!! as ReaderActivity).hideSystemUI()
+                else
+                    (activity!! as ReaderActivity).showSystemUI()
+            }
+        }
+
+        viewPager.addReadSignalCallback(simpleReadSignals)
 
         savedInstanceState?.let { showingBars = it.getInt(SHOWING_BARS, 1) }
         if (showingBars != 1) (activity as ReaderActivity).hideSystemUI()
+        else actionLayout.visibility = View.VISIBLE
         (activity as ReaderActivity).lockDrawer(showingBars == 0)
 
         viewModel = ViewModelProviders.of(activity!!).get(ReaderFragViewModel::class.java)
@@ -121,12 +142,6 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, ReaderV
         outState.apply {
             putInt(SHOWING_BARS, showingBars)
         }
-    }
-
-    // just hides the system bars
-    override fun pageReadToggle() {
-        if (showingBars == 1) (activity!! as ReaderActivity).hideSystemUI()
-        else (activity!! as ReaderActivity).showSystemUI()
     }
 
     override fun onSwipeToNextCh() {
@@ -189,6 +204,7 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, ReaderV
             }
         }
 
+        seekbar.setUpWithPager(viewPager)
         viewPager.setCurrentItem(chapter.lastReadPage, false)
         viewModel.setCurrentRead(currentRead!!)
 
@@ -205,11 +221,24 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, ReaderV
                 (activity as AppCompatActivity).supportActionBar!!.show()
                 showingBars = 1
                 (activity as ReaderActivity).lockDrawer(false)
+                actionLayout.visibility = View.VISIBLE
             } else {
                 // The system bars are NOT visible.
                 showingBars = 0
                 (activity as ReaderActivity).lockDrawer(true)
+                actionLayout.visibility = View.INVISIBLE
             }
         }
     }
+
+    private fun setActionBarMargin() {
+        val params: FrameLayout.LayoutParams = actionLayout.layoutParams as FrameLayout.LayoutParams
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
+        } else {
+            params.bottomMargin = DisplayUtils.getNavigationBarSize(context!!).y
+        }
+        actionLayout.layoutParams = params
+    }
+
 }
