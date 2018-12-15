@@ -1,20 +1,17 @@
 package com.freddieptf.reader
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-
-import com.bumptech.glide.Glide
-
 import androidx.viewpager.widget.PagerAdapter
+import com.bumptech.glide.Glide
 import com.github.chrisbanes.photoview.PhotoView
 
 /**
  * Created by fred on 3/22/15.
  */
-class PicPagerAdapter(private val pages: List<String>?) : PagerAdapter() {
+class PicPagerAdapter(val pages: List<String>?) : PagerAdapter() {
 
     override fun getCount(): Int {
         return pages?.size ?: 0

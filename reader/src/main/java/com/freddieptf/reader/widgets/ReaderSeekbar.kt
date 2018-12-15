@@ -5,17 +5,18 @@ import android.graphics.PorterDuff
 import android.graphics.drawable.LayerDrawable
 import android.util.AttributeSet
 import android.util.TypedValue
-import android.widget.SeekBar
 import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
 import com.freddieptf.reader.R
+import com.github.rubensousa.previewseekbar.PreviewSeekBar
+import com.github.rubensousa.previewseekbar.PreviewView
 
 
 /**
  * Created by freddieptf on 11/28/18.
  */
 class ReaderSeekbar @JvmOverloads constructor(context: Context,
-                                              attrs: AttributeSet? = null) : SeekBar(context, attrs) {
+                                              attrs: AttributeSet? = null) : PreviewSeekBar(context, attrs) {
 
     private val pagerPageChangeListener: ViewPager.SimpleOnPageChangeListener
     private val readDirectionChangeListener: ReaderViewPager.SimpleReadSignals
@@ -38,9 +39,10 @@ class ReaderSeekbar @JvmOverloads constructor(context: Context,
 
     }
 
-    override fun getProgress(): Int {
-        return if (direction == ReaderViewPager.DIRECTION.LEFT_TO_RIGHT) max - super.getProgress()
-        else super.getProgress()
+    // couldn't override getProgress..it messes up the preview seekbar
+    private fun getRealProgress(): Int {
+        return if (direction == ReaderViewPager.DIRECTION.LEFT_TO_RIGHT) max - getProgress()
+        else getProgress()
     }
 
     fun setUpWithPager(pager: ReaderViewPager) {
@@ -54,13 +56,13 @@ class ReaderSeekbar @JvmOverloads constructor(context: Context,
         pager.addOnPageChangeListener(pagerPageChangeListener)
         pager.addReadSignalCallback(readDirectionChangeListener)
 
-        setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onStartTrackingTouch(p0: SeekBar) {}
-            override fun onStopTrackingTouch(p0: SeekBar) {
-                if (p0.progress != pager.currentItem) pager.setCurrentItem(p0.progress, true)
+        addOnPreviewChangeListener(object : PreviewView.OnPreviewChangeListener {
+            override fun onPreview(previewView: PreviewView?, progress: Int, fromUser: Boolean) {}
+            override fun onStartPreview(previewView: PreviewView?, progress: Int) {}
+            override fun onStopPreview(previewView: PreviewView?, progress: Int) {
+                if (getRealProgress() != pager.currentItem)
+                    pager.setCurrentItem(getRealProgress(), false)
             }
-
-            override fun onProgressChanged(p0: SeekBar, p1: Int, p2: Boolean) {}
         })
 
     }

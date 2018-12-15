@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import androidx.core.view.GestureDetectorCompat
-
 import androidx.viewpager.widget.ViewPager
 
 /**
@@ -28,7 +27,7 @@ class ReaderViewPager @JvmOverloads constructor(context: Context, attrs: Attribu
     enum class DIRECTION {
         /**
          * LEFT TO RIGHT THE MANGA WAY
-         * **/
+         **/
         LEFT_TO_RIGHT,
         /**
          * RIGHT TO LEFT THE NORMAL COMIC WAY
@@ -109,12 +108,14 @@ class ReaderViewPager @JvmOverloads constructor(context: Context, attrs: Attribu
 
     private interface ReadSignals {
         fun onPagerTapToFocus()
+        fun onPageLongPress()
         fun onReadDirectionChange(direction: DIRECTION)
     }
 
     open class SimpleReadSignals : ReadSignals {
         override fun onPagerTapToFocus() {}
         override fun onReadDirectionChange(direction: DIRECTION) {}
+        override fun onPageLongPress() {}
     }
 
     private var gestureListenere = object : GestureDetector.SimpleOnGestureListener() {
@@ -125,6 +126,10 @@ class ReaderViewPager @JvmOverloads constructor(context: Context, attrs: Attribu
         override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
             readSignals.forEach { it.onPagerTapToFocus() }
             return true
+        }
+
+        override fun onLongPress(e: MotionEvent?) {
+            readSignals.forEach { it.onPageLongPress() }
         }
     }
 

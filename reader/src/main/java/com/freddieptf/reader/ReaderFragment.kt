@@ -3,16 +3,19 @@ package com.freddieptf.reader
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
-import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import com.bumptech.glide.Glide
 import com.freddieptf.malry.api.Chapter
 import com.freddieptf.reader.utils.DisplayUtils
 import com.freddieptf.reader.widgets.ReaderSeekbar
 import com.freddieptf.reader.widgets.ReaderViewPager
+import com.github.rubensousa.previewseekbar.PreviewLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -22,12 +25,13 @@ import kotlin.collections.ArrayList
 /**
  * Created by fred on 3/22/15.
  */
-class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
+class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, PreviewLoader {
 
     private var adapter: PicPagerAdapter? = null
     private lateinit var viewPager: ReaderViewPager
     private lateinit var seekbar: ReaderSeekbar
     private lateinit var actionLayout: View
+    private lateinit var previewImage: ImageView
     private lateinit var chapterTitle: String
     private lateinit var parent: String
     private lateinit var viewModel: ReaderFragViewModel
@@ -84,9 +88,10 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewPager = view.findViewById(R.id.reader_pager)
         seekbar = view.findViewById(R.id.reader_seekBar)
+        previewImage = view.findViewById(R.id.imageView)
         actionLayout = view.findViewById(R.id.reader_actionLayout)
-        setActionBarMargin()
 
+        setActionBarMargin()
         viewPager.setReadProgressListener(this)
 
         simpleReadSignals = object : ReaderViewPager.SimpleReadSignals() {
@@ -96,6 +101,8 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
                 else
                     (activity!! as ReaderActivity).showSystemUI()
             }
+
+            override fun onPageLongPress() {}
         }
 
         viewPager.addReadSignalCallback(simpleReadSignals)
@@ -130,6 +137,13 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
             }
         }
 
+    }
+
+    override fun loadPreview(currentPosition: Long, max: Long) {
+        Glide.with(this)
+                .load(adapter!!.pages!!.get(currentPosition.toInt()))
+                .thumbnail()
+                .into(previewImage)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -204,6 +218,8 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
             }
         }
 
+        seekbar.attachPreviewFrameLayout(view!!.findViewById(R.id.previewFrameLayout))
+        seekbar.setPreviewLoader(this)
         seekbar.setUpWithPager(viewPager)
         viewPager.setCurrentItem(chapter.lastReadPage, false)
         viewModel.setCurrentRead(currentRead!!)
@@ -232,7 +248,7 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener {
     }
 
     private fun setActionBarMargin() {
-        val params: FrameLayout.LayoutParams = actionLayout.layoutParams as FrameLayout.LayoutParams
+        val params: CoordinatorLayout.LayoutParams = actionLayout.layoutParams as CoordinatorLayout.LayoutParams
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
 
         } else {
