@@ -6,42 +6,46 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.viewpager.widget.PagerAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.transition.Transition
 import com.github.chrisbanes.photoview.PhotoViewAttacher
 
 /**
- * Created by fred on 3/22/15.
+ * Created by freddieptf on 12/16/18.
  */
-class PicPagerAdapter(val pages: List<String>?) : PagerAdapter() {
+class PagerRecyclerAdapter() :
+        RecyclerView.Adapter<PagerRecyclerAdapter.Holder>() {
 
-    override fun getCount(): Int {
+    var pages = ArrayList<String>()
+
+    fun swap(data: ArrayList<String>) {
+        this.pages = data
+        notifyDataSetChanged()
+    }
+
+    override fun onBindViewHolder(holder: Holder, position: Int) {
+        holder.itemView.tag = position
+        holder.bind(pages.get(position))
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+        val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.pager_pic_item, parent, false)
+        return Holder(view)
+    }
+
+    override fun getItemCount(): Int {
         return pages?.size ?: 0
     }
 
-    override fun isViewFromObject(view: View, `object`: Any): Boolean {
-        return view == `object`
-    }
 
-    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-        container.removeView(`object` as View)
-    }
-
-    override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        val view = LayoutInflater.from(container.context).inflate(R.layout.pager_pic_item, container, false)
-        val viewHolder = ViewHolder(view)
-        viewHolder.bind(pages!![position])
-        container.addView(view)
-        return view
-    }
-
-    internal inner class ViewHolder(view: View) {
+    class Holder constructor(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var imageView: ImageView
 
         init {
-            imageView = view.findViewById(R.id.pager_ImageView_item)
+            imageView = itemView.findViewById(R.id.pager_ImageView_item)
         }
 
         fun bind(path: String) {
@@ -67,10 +71,8 @@ class PicPagerAdapter(val pages: List<String>?) : PagerAdapter() {
                     imageView.imageMatrix = matrix
                     imageView.setImageDrawable(resource)
                 }
-
             })
         }
+
     }
 }
-
-

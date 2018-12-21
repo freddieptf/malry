@@ -10,11 +10,16 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.freddieptf.malry.api.Chapter
+import com.freddieptf.reader.pagelist.CustomRecyclerView
+import com.freddieptf.reader.pagelist.CustomSnapHelper
 import com.freddieptf.reader.utils.DisplayUtils
+import com.freddieptf.reader.utils.ReadMode
+import com.freddieptf.reader.utils.ReadSignals
 import com.freddieptf.reader.widgets.ReaderSeekbar
-import com.freddieptf.reader.widgets.ReaderViewPager
 import com.github.rubensousa.previewseekbar.PreviewLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -25,20 +30,24 @@ import kotlin.collections.ArrayList
 /**
  * Created by fred on 3/22/15.
  */
-class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, PreviewLoader {
+class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
 
-    private var adapter: PicPagerAdapter? = null
-    private lateinit var viewPager: ReaderViewPager
+    private lateinit var recyclerAdapter: PagerRecyclerAdapter
     private lateinit var seekbar: ReaderSeekbar
     private lateinit var actionLayout: View
     private lateinit var previewImage: ImageView
+    private lateinit var recyclerView: CustomRecyclerView
+    private lateinit var layoutManager: LinearLayoutManager
     private lateinit var chapterTitle: String
     private lateinit var parent: String
     private lateinit var viewModel: ReaderFragViewModel
     private var dialog: AlertDialog? = null
     private var currentRead: Chapter? = null
+    private var currentPage: Int = 0
+    private lateinit var readDirection: ReadMode
     private var showingBars = 1 // if one, then showing
-    private lateinit var simpleReadSignals: ReaderViewPager.SimpleReadSignals
+    private var startDragXPos = 0f
+    private lateinit var simpleReadSignals: ReadSignals.SimpleReadSignals
 
     companion object {
         private val SHOWING_BARS = "showing_bars"
@@ -46,10 +55,6 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, Preview
 
     init {
         setHasOptionsMenu(true)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_reader, container, false)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -60,10 +65,10 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, Preview
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
         when (ReaderPrefUtils.getReadDirection(context!!)) {
-            ReaderViewPager.DIRECTION.LEFT_TO_RIGHT -> {
+            ReadMode.LEFT_TO_RIGHT -> {
                 menu.findItem(R.id.menu_read_ltr).setChecked(true)
             }
-            ReaderViewPager.DIRECTION.RIGHT_TO_LEFT -> {
+            ReadMode.RIGHT_TO_LEFT -> {
                 menu.findItem(R.id.menu_read_rtl).setChecked(true)
             }
         }
@@ -72,30 +77,63 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, Preview
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_read_ltr -> {
-                ReaderPrefUtils.setReadDirection(context!!, ReaderViewPager.DIRECTION.LEFT_TO_RIGHT)
                 activity?.invalidateOptionsMenu()
-                showChapter(currentRead!!)
+                viewModel.setReadDirection(ReadMode.LEFT_TO_RIGHT)
             }
             R.id.menu_read_rtl -> {
-                ReaderPrefUtils.setReadDirection(context!!, ReaderViewPager.DIRECTION.RIGHT_TO_LEFT)
                 activity?.invalidateOptionsMenu()
-                showChapter(currentRead!!)
+                viewModel.setReadDirection(ReadMode.RIGHT_TO_LEFT)
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_reader, container, false)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewPager = view.findViewById(R.id.reader_pager)
+
+        viewModel = ViewModelProviders.of(activity!!).get(ReaderFragViewModel::class.java)
+
         seekbar = view.findViewById(R.id.reader_seekBar)
         previewImage = view.findViewById(R.id.imageView)
         actionLayout = view.findViewById(R.id.reader_actionLayout)
+        recyclerView = view.findViewById(R.id.recycler)
+
+        savedInstanceState?.let {
+            showingBars = it.getInt(SHOWING_BARS, 1)
+        }
+        if (showingBars != 1)
+            (activity as ReaderActivity).hideSystemUI()
+        else
+            actionLayout.visibility = View.VISIBLE
+
+        (activity as ReaderActivity).lockDrawer(showingBars == 0)
+
+        readDirection = ReaderPrefUtils.getReadDirection(context!!)
+
+        layoutManager = LinearLayoutManager(context!!, LinearLayoutManager.HORIZONTAL, false)
+        recyclerView.layoutManager = layoutManager
+        recyclerAdapter = PagerRecyclerAdapter()
+        recyclerView.adapter = recyclerAdapter
+        val snapHelper = CustomSnapHelper()
+        snapHelper.attachToRecyclerView(recyclerView)
+
+        snapHelper.addOnPageChangeListener(seekbar)
+        snapHelper.addOnPageChangeListener(object : CustomSnapHelper.OnPageChangeListener {
+            override fun onPageChange(position: Int) {
+                currentPage = position
+            }
+        })
+        seekbar.setOnSeekListener(this)
+        seekbar.attachPreviewFrameLayout(view.findViewById(R.id.previewFrameLayout))
+        seekbar.setPreviewLoader(this)
 
         setActionBarMargin()
-        viewPager.setReadProgressListener(this)
 
-        simpleReadSignals = object : ReaderViewPager.SimpleReadSignals() {
-            override fun onPagerTapToFocus() {
+        simpleReadSignals = object : ReadSignals.SimpleReadSignals() {
+            override fun onPageTapToFocus() {
                 if (showingBars == 1)
                     (activity!! as ReaderActivity).hideSystemUI()
                 else
@@ -105,14 +143,9 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, Preview
             override fun onPageLongPress() {}
         }
 
-        viewPager.addReadSignalCallback(simpleReadSignals)
+        recyclerView.addReadSignalCallback(simpleReadSignals)
+        addRecyclerItemTouchListener()
 
-        savedInstanceState?.let { showingBars = it.getInt(SHOWING_BARS, 1) }
-        if (showingBars != 1) (activity as ReaderActivity).hideSystemUI()
-        else actionLayout.visibility = View.VISIBLE
-        (activity as ReaderActivity).lockDrawer(showingBars == 0)
-
-        viewModel = ViewModelProviders.of(activity!!).get(ReaderFragViewModel::class.java)
 
         viewModel.openChapterChannel().observe(this, androidx.lifecycle.Observer {
             if (it.seen) return@Observer
@@ -130,6 +163,16 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, Preview
             }
         })
 
+        viewModel.getReadDirection().observe(this, androidx.lifecycle.Observer {
+            if (it.seen) return@Observer
+            val direction = it.getData()!!
+            this.readDirection = direction
+            if (ReaderPrefUtils.getReadDirection(context!!) == direction) return@Observer
+            currentPage = recyclerAdapter.itemCount - currentPage - 1
+            ReaderPrefUtils.setReadDirection(context!!, direction)
+            configureForDirection(direction, ArrayList(currentRead!!.paths))
+        })
+
         GlobalScope.launch {
             val read = ChapterProvider.getProvider().getCurrentRead()
             GlobalScope.launch(Dispatchers.Main) {
@@ -139,11 +182,51 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, Preview
 
     }
 
+    private fun addRecyclerItemTouchListener() {
+        recyclerView.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
+            override fun onInterceptTouchEvent(rv: RecyclerView, ev: MotionEvent): Boolean {
+                val inDragX = ev.x
+                when (ev.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        startDragXPos = ev.x
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        if (currentPage == 0) {
+                            when {
+                                readDirection == ReadMode.LEFT_TO_RIGHT && startDragXPos < inDragX -> {
+                                    onSwipeToNextCh()
+                                }
+                                readDirection == ReadMode.RIGHT_TO_LEFT && startDragXPos < inDragX -> {
+                                    onSwipeToPreviousCh()
+                                }
+                            }
+                        } else if (currentPage == recyclerAdapter.itemCount - 1) {
+                            when {
+                                readDirection == ReadMode.LEFT_TO_RIGHT && startDragXPos > inDragX -> {
+                                    onSwipeToPreviousCh()
+                                }
+                                readDirection == ReadMode.RIGHT_TO_LEFT && startDragXPos > inDragX -> {
+                                    onSwipeToNextCh()
+                                }
+                            }
+                        }
+                    }
+                }
+                return false
+            }
+        })
+    }
+
     override fun loadPreview(currentPosition: Long, max: Long) {
         Glide.with(this)
-                .load(adapter!!.pages!!.get(currentPosition.toInt()))
+                .load(recyclerAdapter.pages.get(currentPosition.toInt()))
                 .thumbnail()
                 .into(previewImage)
+    }
+
+    override fun onSeekTo(position: Int) {
+        layoutManager.scrollToPosition(position)
+        currentPage = position
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -158,7 +241,7 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, Preview
         }
     }
 
-    override fun onSwipeToNextCh() {
+    fun onSwipeToNextCh() {
         val hasNext = ChapterProvider.getProvider().hasNextRead()
         if (hasNext && (dialog == null || !dialog!!.isShowing)) {
             dialog = AlertDialog.Builder(context!!)
@@ -174,7 +257,7 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, Preview
 
     }
 
-    override fun onSwipeToPreviousCh() {
+    fun onSwipeToPreviousCh() {
         val hasPrev = ChapterProvider.getProvider().hasPreviousRead()
         if (hasPrev && (dialog == null || !dialog!!.isShowing)) {
             dialog = AlertDialog.Builder(context!!)
@@ -196,38 +279,33 @@ class ReaderFragment : Fragment(), ReaderViewPager.ReadProgressListener, Preview
 
     private fun showChapter(chapter: Chapter) {
         this.currentRead = chapter
-
-        val pages = ArrayList<String>()
-        pages += currentRead!!.paths
+        val pages = ArrayList<String>(currentRead!!.paths)
+        currentPage = if (readDirection == ReadMode.LEFT_TO_RIGHT) pages.size - currentRead!!.lastReadPage - 1
+        else currentRead!!.lastReadPage
         chapterTitle = currentRead!!.title
         parent = currentRead!!.parentTitle
         (activity as AppCompatActivity).supportActionBar!!.title = chapterTitle
 
         val direction = ReaderPrefUtils.getReadDirection(context!!)
-        viewPager.setReadDirection(direction)
+        configureForDirection(direction, pages)
+        viewModel.setCurrentRead(currentRead!!)
+    }
 
+    private fun configureForDirection(direction: ReadMode, pages: ArrayList<String>) {
         when (direction) {
-            ReaderViewPager.DIRECTION.LEFT_TO_RIGHT -> {
+            ReadMode.LEFT_TO_RIGHT -> {
                 Collections.reverse(pages)
-                adapter = PicPagerAdapter(pages)
-                viewPager.adapter = adapter
-            }
-            ReaderViewPager.DIRECTION.RIGHT_TO_LEFT -> {
-                adapter = PicPagerAdapter(pages)
-                viewPager.adapter = adapter
             }
         }
-
-        seekbar.attachPreviewFrameLayout(view!!.findViewById(R.id.previewFrameLayout))
-        seekbar.setPreviewLoader(this)
-        seekbar.setUpWithPager(viewPager)
-        viewPager.setCurrentItem(chapter.lastReadPage, false)
-        viewModel.setCurrentRead(currentRead!!)
-
+        recyclerAdapter.swap(pages)
+        seekbar.setUp(direction, currentPage, pages.size - 1)
+        layoutManager.scrollToPosition(currentPage)
     }
 
     private fun cacheLastSeenPage() {
-        viewModel.saveLastViewedPage(currentRead!!.id, viewPager.currentItem, adapter!!.count)
+        val i = if (readDirection == ReadMode.LEFT_TO_RIGHT) recyclerAdapter.itemCount - currentPage - 1
+        else currentPage
+        viewModel.saveLastViewedPage(currentRead!!.id, i, recyclerAdapter.itemCount)
     }
 
     private fun addSystemUiVisibiltyChangeListener() {
