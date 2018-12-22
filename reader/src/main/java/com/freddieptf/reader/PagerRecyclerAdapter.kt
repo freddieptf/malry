@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.transition.Transition
+import com.freddieptf.reader.utils.PageApsectMode
 import com.github.chrisbanes.photoview.PhotoViewAttacher
 
 /**
@@ -19,14 +20,21 @@ class PagerRecyclerAdapter() :
         RecyclerView.Adapter<PagerRecyclerAdapter.Holder>() {
 
     var pages = ArrayList<String>()
+    private var pageAspect: PageApsectMode? = null
 
     fun swap(data: ArrayList<String>) {
         this.pages = data
         notifyDataSetChanged()
     }
 
+    fun setPageAspect(aspect: PageApsectMode) {
+        this.pageAspect = aspect
+        notifyDataSetChanged()
+    }
+
     override fun onBindViewHolder(holder: Holder, position: Int) {
         holder.itemView.tag = position
+        holder.aspect = pageAspect
         holder.bind(pages.get(position))
     }
 
@@ -37,12 +45,12 @@ class PagerRecyclerAdapter() :
     }
 
     override fun getItemCount(): Int {
-        return pages?.size ?: 0
+        return pages.size
     }
 
-
     class Holder constructor(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var imageView: ImageView
+        private var imageView: ImageView
+        var aspect: PageApsectMode? = null
 
         init {
             imageView = itemView.findViewById(R.id.pager_ImageView_item)
@@ -55,20 +63,24 @@ class PagerRecyclerAdapter() :
                 override fun onResourceCleared(placeholder: Drawable?) {}
                 override fun onLoadFailed(errorDrawable: Drawable?) {}
                 override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                    var rh = resource.intrinsicHeight
-                    var rw = resource.intrinsicWidth
-                    var ivh = imageView.height
-                    var ivw = imageView.width
-                    var matrix = Matrix()
-                    val scale: Float
-                    if (rw * ivh > ivw * rh) {
-                        scale = ivh.toFloat() / rh.toFloat()
+                    if (aspect?.equals(PageApsectMode.PAGE_FILL) == true) {
+                        var rh = resource.intrinsicHeight
+                        var rw = resource.intrinsicWidth
+                        var ivh = imageView.height
+                        var ivw = imageView.width
+                        var matrix = Matrix()
+                        val scale: Float
+                        if (rw * ivh > ivw * rh) {
+                            scale = ivh.toFloat() / rh.toFloat()
+                        } else {
+                            scale = ivw.toFloat() / rw.toFloat()
+                        }
+                        matrix.setScale(scale, scale)
+                        imageView.scaleType = ImageView.ScaleType.MATRIX
+                        imageView.imageMatrix = matrix
                     } else {
-                        scale = ivw.toFloat() / rw.toFloat()
+                        imageView.scaleType = ImageView.ScaleType.FIT_CENTER
                     }
-                    matrix.setScale(scale, scale)
-                    imageView.scaleType = ImageView.ScaleType.MATRIX
-                    imageView.imageMatrix = matrix
                     imageView.setImageDrawable(resource)
                 }
             })

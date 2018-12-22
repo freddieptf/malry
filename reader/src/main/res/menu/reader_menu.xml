@@ -2,17 +2,36 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/menu_read_direction"
-        android:title="Read Direction"
+    <item
+        android:id="@+id/menu_read_direction"
         android:icon="@drawable/ic_read_direction_white_24dp"
-        app:showAsAction="always">
+        android:title="@string/reading_mode"
+        app:showAsAction="ifRoom">
         <menu>
-            <group
-                android:checkableBehavior="single">
-                <item android:id="@+id/menu_read_rtl"
-                    android:title="Comic" />
-                <item android:id="@+id/menu_read_ltr"
-                    android:title="Manga" />
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/menu_read_rtl"
+                    android:title="@string/read_mode_comic" />
+                <item
+                    android:id="@+id/menu_read_ltr"
+                    android:title="@string/read_mode_manga" />
+            </group>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/menu_page_aspect"
+        android:icon="@drawable/ic_aspect_ratio_white_24dp"
+        app:showAsAction="ifRoom"
+        android:title="@string/page_aspect">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/menu_page_aspect_fit"
+                    android:title="@string/page_aspect_fit" />
+                <item
+                    android:id="@+id/menu_page_aspect_fill"
+                    android:title="@string/page_aspect_fill" />
             </group>
         </menu>
     </item>

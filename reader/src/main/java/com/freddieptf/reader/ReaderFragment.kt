@@ -16,9 +16,7 @@ import com.bumptech.glide.Glide
 import com.freddieptf.malry.api.Chapter
 import com.freddieptf.reader.pagelist.CustomRecyclerView
 import com.freddieptf.reader.pagelist.CustomSnapHelper
-import com.freddieptf.reader.utils.DisplayUtils
-import com.freddieptf.reader.utils.ReadMode
-import com.freddieptf.reader.utils.ReadSignals
+import com.freddieptf.reader.utils.*
 import com.freddieptf.reader.widgets.ReaderSeekbar
 import com.github.rubensousa.previewseekbar.PreviewLoader
 import kotlinx.coroutines.Dispatchers
@@ -72,6 +70,10 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
                 menu.findItem(R.id.menu_read_rtl).setChecked(true)
             }
         }
+        when (ReaderPrefUtils.getPageApsectMode(context!!)) {
+            PageApsectMode.PAGE_FILL -> menu.findItem(R.id.menu_page_aspect_fill).setChecked(true)
+            PageApsectMode.PAGE_FIT -> menu.findItem(R.id.menu_page_aspect_fit).setChecked(true)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -83,6 +85,16 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
             R.id.menu_read_rtl -> {
                 activity?.invalidateOptionsMenu()
                 viewModel.setReadDirection(ReadMode.RIGHT_TO_LEFT)
+            }
+            R.id.menu_page_aspect_fit -> {
+                activity?.invalidateOptionsMenu()
+                ReaderPrefUtils.setPageAspectMode(context!!, PageApsectMode.PAGE_FIT)
+                recyclerAdapter.setPageAspect(PageApsectMode.PAGE_FIT)
+            }
+            R.id.menu_page_aspect_fill -> {
+                activity?.invalidateOptionsMenu()
+                ReaderPrefUtils.setPageAspectMode(context!!, PageApsectMode.PAGE_FILL)
+                recyclerAdapter.setPageAspect(PageApsectMode.PAGE_FILL)
             }
         }
         return super.onOptionsItemSelected(item)
@@ -117,6 +129,7 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
         recyclerView.layoutManager = layoutManager
         recyclerAdapter = PagerRecyclerAdapter()
         recyclerView.adapter = recyclerAdapter
+        recyclerAdapter.setPageAspect(ReaderPrefUtils.getPageApsectMode(context!!))
         val snapHelper = CustomSnapHelper()
         snapHelper.attachToRecyclerView(recyclerView)
 
@@ -145,7 +158,6 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
 
         recyclerView.addReadSignalCallback(simpleReadSignals)
         addRecyclerItemTouchListener()
-
 
         viewModel.openChapterChannel().observe(this, androidx.lifecycle.Observer {
             if (it.seen) return@Observer
