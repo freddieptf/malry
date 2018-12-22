@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">reader</string>
+    <string name="reading_mode">Reading Mode</string>
+    <string name="read_mode_comic">Comic</string>
+    <string name="read_mode_manga">Manga</string>
+    <string name="page_aspect">Page Aspect</string>
+    <string name="page_aspect_fill">Page Fill</string>
+    <string name="page_aspect_fit">Page Fit</string>
 </resources>
