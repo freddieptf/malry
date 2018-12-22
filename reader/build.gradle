@@ -28,8 +28,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(":malry-api")
-    implementation project(":malry-commons")
+    implementation project(':api')
+    implementation project(':commons')
 
     def val = rootProject.ext
 
