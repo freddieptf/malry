@@ -39,8 +39,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':malry-commons')
-    implementation project(':malry-api')
+    implementation project(':commons')
+    implementation project(':api')
     implementation project(':storage-provider')
     implementation project(':reader')
 

@@ -39,8 +39,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(path: ':malry-api')
-    implementation project(path: ':malry-commons')
+    implementation project(path: ':api')
+    implementation project(path: ':commons')
 
     def val = rootProject.ext
 
