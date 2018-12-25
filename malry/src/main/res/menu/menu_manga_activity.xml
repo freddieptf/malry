@@ -1,13 +1,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.freddieptf.mangatest.MangaDetailsActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_providers"
+        android:title="Add Manga"
+        android:icon="@drawable/ic_library_add_white_24dp"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="500"
         android:title="@string/action_settings"
         app:showAsAction="never" />
-
 
 </menu>

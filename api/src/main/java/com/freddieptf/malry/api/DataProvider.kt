@@ -5,6 +5,11 @@ import androidx.lifecycle.LiveData
 
 /**
  * Created by freddieptf on 11/17/18.
+ *
+ * We might not need this...i don't see us using any other
+ * "first party" provider other than the storage one
+ *
+ * Premature abstraction? just maybe...
  */
 abstract class DataProvider {
 
