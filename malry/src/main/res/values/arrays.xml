@@ -6,4 +6,9 @@
         <item>@string/pref_theme_dark</item>
     </string-array>
 
+    <string-array name="caches">
+        <item>Image Cache</item>
+        <item>CBZ cache</item>
+    </string-array>
+
 </resources>

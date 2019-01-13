@@ -1,7 +1,7 @@
 package com.freddieptf.localstorage.data
 
-import com.freddieptf.malry.api.Chapter
 import com.freddieptf.localstorage.utils.ChapterUtils
+import com.freddieptf.malry.api.Chapter
 import org.apache.commons.compress.utils.IOUtils
 import java.io.File
 import java.io.FileOutputStream
@@ -14,14 +14,15 @@ import java.util.zip.ZipFile
 object ArchiveCacheManager {
 
     private lateinit var cacheDir: File
-    private val DEFAULT_MAX_SIZE: Long = 100 * 1024 * 1024
     private var maxSize: Long? = null
 
-    fun useCache(cachePath: String, maxSize: Long?) {
+    fun useCache(cachePath: String, maxSize: Long) {
         cacheDir = File(cachePath)
-        this.maxSize = maxSize?:DEFAULT_MAX_SIZE
-        if (!cacheDir.exists()) cacheDir.mkdirs()
+        this.maxSize = maxSize
+        if (!cacheDir.exists()) cacheDir.mkdirs() else trimToFit(cacheDir, maxSize, getDirSize(cacheDir))
     }
+
+    fun getCacheDir(): File = cacheDir
 
     @Throws(IOException::class)
     private fun extractCbz(cbzFilePath: String, chapter: Chapter): File {
@@ -46,29 +47,35 @@ object ArchiveCacheManager {
     internal fun getChapterFile(chapter: Chapter): File {
         var cacheEntry = cacheDir.listFiles().find { it.name.equals("${chapter.parentTitle}-${chapter.title}") }
         if (cacheEntry == null) {
-            val cacheDirSize = getCacheDirSize()
+            val cacheDirSize = getDirSize(cacheDir)
             if (cacheDirSize >= maxSize!!) {
                 println("trim cache: $cacheDirSize/$maxSize")
                 val f = File(ChapterUtils.getChapterPathFromDocID(chapter.id))
-                trimToFit(f.length(), cacheDirSize)
+                trimToFit(cacheDir, f.length(), cacheDirSize)
             }
             cacheEntry = extractCbz(ChapterUtils.getChapterPathFromDocID(chapter.id), chapter)
         }
         return cacheEntry
     }
 
-    fun getCacheDirSize(): Long {
+    fun getDirSize(dir: File): Long {
         var i: Long = 0
-        cacheDir.walkBottomUp().filter { it.isFile }.forEach {
+        dir.walkBottomUp().filter { it.isFile }.forEach {
             i += it.length()
         }
         return i
     }
 
-    private fun trimToFit(fitSize: Long, cacheSize: Long) {
+    fun trimToFit(dir: File, maxDepth: Int, fitSize: Long, cacheSize: Long) {
+        if (fitSize == cacheSize || cacheSize < fitSize) return
         val s = maxSize!! - fitSize
         var cSize = cacheSize
-        cacheDir.walkBottomUp().maxDepth(1).filter { !it.name.equals(cacheDir.name) }.forEach {
+
+        val walk = dir.walkBottomUp()
+        if (maxDepth > 0) {
+            walk.maxDepth(maxDepth)
+        }
+        walk.filter { !it.name.equals(dir.name) }.forEach {
             if (cSize > s) {
                 it.walkTopDown().forEach { img ->
                     val l = img.length()
@@ -77,6 +84,10 @@ object ArchiveCacheManager {
                 it.delete()
             }
         }
+    }
+
+    private fun trimToFit(dir: File, fitSize: Long, cacheSize: Long) {
+        trimToFit(dir, 1, fitSize, cacheSize)
     }
 
     fun clearAll() {

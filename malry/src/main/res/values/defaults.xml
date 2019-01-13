@@ -11,4 +11,8 @@
     <bool name="spb_default_reversed">false</bool>
     <bool name="spb_default_mirror_mode">false</bool>
     <bool name="spb_default_progressiveStart_activated">false</bool>
+
+    <integer name="cbz_cache_default_size">100</integer>
+    <integer name="glide_cache_default_size">100</integer>
+
 </resources>
