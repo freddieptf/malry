@@ -56,34 +56,42 @@ class PagerRecyclerAdapter() :
             imageView = itemView.findViewById(R.id.pager_ImageView_item)
         }
 
+        private var customViewTarget = object : CustomViewTarget<View, Drawable>(imageView) {
+            override fun onResourceCleared(placeholder: Drawable?) {
+                println("resource cleared!!! $placeholder")
+                imageView.setImageDrawable(placeholder)
+            }
+
+            override fun onLoadFailed(errorDrawable: Drawable?) {}
+            override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                println("resource ready!!!")
+                if (aspect?.equals(PageApsectMode.PAGE_FILL) == true) {
+                    var rh = resource.intrinsicHeight
+                    var rw = resource.intrinsicWidth
+                    var ivh = imageView.height
+                    var ivw = imageView.width
+                    var matrix = Matrix()
+                    val scale: Float
+                    if (rw * ivh > ivw * rh) {
+                        scale = ivh.toFloat() / rh.toFloat()
+                    } else {
+                        scale = ivw.toFloat() / rw.toFloat()
+                    }
+                    matrix.setScale(scale, scale)
+                    imageView.scaleType = ImageView.ScaleType.MATRIX
+                    imageView.imageMatrix = matrix
+                } else {
+                    imageView.scaleType = ImageView.ScaleType.FIT_CENTER
+                }
+                imageView.setImageDrawable(resource)
+            }
+        }
+
         fun bind(path: String) {
             var p = PhotoViewAttacher(imageView)
-            Glide.with(imageView.context).load(path).into(object :
-                    CustomViewTarget<View, Drawable>(imageView) {
-                override fun onResourceCleared(placeholder: Drawable?) {}
-                override fun onLoadFailed(errorDrawable: Drawable?) {}
-                override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                    if (aspect?.equals(PageApsectMode.PAGE_FILL) == true) {
-                        var rh = resource.intrinsicHeight
-                        var rw = resource.intrinsicWidth
-                        var ivh = imageView.height
-                        var ivw = imageView.width
-                        var matrix = Matrix()
-                        val scale: Float
-                        if (rw * ivh > ivw * rh) {
-                            scale = ivh.toFloat() / rh.toFloat()
-                        } else {
-                            scale = ivw.toFloat() / rw.toFloat()
-                        }
-                        matrix.setScale(scale, scale)
-                        imageView.scaleType = ImageView.ScaleType.MATRIX
-                        imageView.imageMatrix = matrix
-                    } else {
-                        imageView.scaleType = ImageView.ScaleType.FIT_CENTER
-                    }
-                    imageView.setImageDrawable(resource)
-                }
-            })
+            Glide.with(imageView.context)
+                    .load(path)
+                    .into(customViewTarget)
         }
 
     }
