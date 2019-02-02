@@ -65,8 +65,9 @@ dependencies {
     implementation 'com.google.dagger:dagger:2.19'
     kapt 'com.google.dagger:dagger-compiler:2.19'
 
-    compile 'com.afollestad.material-dialogs:core:0.9.0.1'
-    compile 'com.afollestad.material-dialogs:commons:0.9.0.1'
+    compile 'com.afollestad.material-dialogs:core:2.0.0-rc7'
+    api 'com.github.bumptech.glide:glide:4.8.0'
+    kapt 'com.github.bumptech.glide:compiler:4.8.0'
 
     compile 'com.hannesdorfmann.smoothprogressbar:library:1.0.0'
 

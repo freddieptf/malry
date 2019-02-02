@@ -48,11 +48,9 @@ class App : Application() {
      */
     fun initChCache(maxSize: Long?) {
         var maxCacheSize = maxSize?: PreferenceManager.getDefaultSharedPreferences(this)
-                .getString(getString(R.string.chapter_cache_size_pref_key), "100")
-                .toLongOrNull()
-
-        if(maxCacheSize != null) maxCacheSize = maxCacheSize * 1024 * 1024
-
+                .getString(getString(R.string.cbz_cache_size_pref_key), R.integer.cbz_cache_default_size.toString())
+                .toLong()
+        maxCacheSize *= 1024 * 1024
         ArchiveCacheManager.useCache(externalCacheDir!!.absolutePath + "/archives", maxCacheSize)
     }
 

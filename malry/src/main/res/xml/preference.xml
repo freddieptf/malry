@@ -3,53 +3,28 @@
 
     <PreferenceCategory
         android:layout="@layout/preference_category"
-        android:title="Chapter Caching">
+        android:title="Caching">
 
         <EditTextPreference
-            android:defaultValue="100"
-            android:key="@string/chapter_cache_size_pref_key"
+            android:defaultValue="@integer/glide_cache_default_size"
+            android:key="@string/image_cache_size_limit_key"
             android:layout="@layout/preference_custom"
             android:persistent="true"
-            android:title="@string/chapter_cache_size_pref"
+            android:title="@string/image_cache_size_lmt"
+            android:inputType="numberDecimal" />
+
+        <EditTextPreference
+            android:defaultValue="@integer/cbz_cache_default_size"
+            android:key="@string/cbz_cache_size_pref_key"
+            android:layout="@layout/preference_custom"
+            android:persistent="true"
+            android:title="@string/cbz_cache_size_pref"
             android:inputType="numberDecimal" />
 
         <Preference
             android:layout="@layout/preference_custom"
             android:title="Clear Cache"
             android:key="@string/clear_cache_key"/>
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:layout="@layout/preference_category"
-        android:title="Manga Cards">
-
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="@string/pref_my_manga_cards_key"
-            android:layout="@layout/preference_custom"
-            android:persistent="true"
-            android:summary="For smoother scroll on longer lists."
-            android:title="@string/pref_my_manga_cards_compact"
-            android:enabled="false"
-            />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:layout="@layout/preference_category"
-        android:title="Theme">
-
-        <com.afollestad.materialdialogs.prefs.MaterialListPreference
-            android:defaultValue="@string/pref_theme_light"
-            android:entries="@array/pref_theme_entries"
-            android:entryValues="@array/pref_theme_entries"
-            android:key="@string/pref_themes_key"
-            android:layout="@layout/preference_custom"
-            android:summary="Choose your theme."
-            android:title="@string/pref_themes_title"
-            android:enabled="false"
-            />
 
     </PreferenceCategory>
 
