@@ -50,9 +50,17 @@ class Settings : AppCompatActivity(), Preference.OnPreferenceChangeListener {
                     preference.summary = "${(ArchiveCacheManager.getDirSize(ArchiveCacheManager.getCacheDir())) / (1024 * 1024)}MB / ${v}MB"
                 }
                 getString(R.string.image_cache_size_limit_key) -> {
-                    val s = v.toLong()
-                    GlobalScope.launch(Dispatchers.IO) {
-                        CommonGlide.get(applicationContext).clearDiskCache()
+                    val newSize = v.toLong()
+                    val oldSize = PreferenceManager.getDefaultSharedPreferences(preference.context)
+                            .getString(preference.key, null).toLong()
+                    if (newSize != oldSize) {
+                        GlobalScope.launch(Dispatchers.IO) {
+                            CommonGlide.get(applicationContext).clearDiskCache()
+                            CommonGlide.tearDown()
+                            withContext(Dispatchers.Main) {
+                                preference.summary = "${getImgCacheSize(baseContext)}MB / ${v}MB"
+                            }
+                        }
                     }
                     preference.summary = "${getImgCacheSize(this)}MB / ${v}MB"
                 }
