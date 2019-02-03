@@ -2,10 +2,10 @@ package com.freddieptf.malry.di
 
 import android.content.Context
 import android.net.Uri
-import com.freddieptf.localstorage.LocalStorageProvider
-import com.freddieptf.localstorage.data.LibraryDB
 import com.freddieptf.malry.ProviderManager
 import com.freddieptf.malry.api.DataProvider
+import com.freddieptf.malry.data.LibraryDB
+import com.freddieptf.malry.data.LocalStorageProvider
 import dagger.Module
 import dagger.Provides
 

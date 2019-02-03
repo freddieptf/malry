@@ -1,4 +1,4 @@
-package com.freddieptf.localstorage
+package com.freddieptf.malry.data
 
 import android.content.Context
 import android.net.Uri
@@ -8,11 +8,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.freddieptf.malry.api.ChapterProvider
 import com.freddieptf.malry.api.DataProvider
-import com.freddieptf.localstorage.data.LibraryDB
-import com.freddieptf.localstorage.data.LibraryDataManager
-import com.freddieptf.localstorage.data.models.Chapter
-import com.freddieptf.localstorage.data.models.LibraryItem
-import com.freddieptf.localstorage.utils.ChapterTitleComparator
+import com.freddieptf.malry.data.models.Chapter
+import com.freddieptf.malry.data.models.LibraryItem
+import com.freddieptf.malry.data.utils.ChapterTitleComparator
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
@@ -52,7 +50,7 @@ class LocalStorageProvider(val ctx: Context, db: LibraryDB, var libLocation: Uri
     }
 
     override fun getChapterProvider(chapter: com.freddieptf.malry.api.Chapter): ChapterProvider {
-        return com.freddieptf.localstorage.ChapterProvider(LibraryDataManager).apply {
+        return ChapterProvider(LibraryDataManager).apply {
             setCurrentRead(chapter)
         }
     }

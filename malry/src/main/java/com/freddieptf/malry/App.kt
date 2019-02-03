@@ -4,7 +4,7 @@ import android.app.Application
 import android.net.Uri
 import android.preference.PreferenceManager
 import com.facebook.stetho.Stetho
-import com.freddieptf.localstorage.data.ArchiveCacheManager
+import com.freddieptf.malry.data.ArchiveCacheManager
 import com.freddieptf.malry.di.*
 import com.freddieptf.malry.library.LibraryPrefs
 import com.freddieptf.mangatest.R

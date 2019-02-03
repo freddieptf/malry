@@ -1,10 +1,10 @@
-package com.freddieptf.localstorage.data
+package com.freddieptf.malry.data
 
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.freddieptf.localstorage.data.models.Chapter
-import com.freddieptf.localstorage.data.models.LibraryItem
+import com.freddieptf.malry.data.models.Chapter
+import com.freddieptf.malry.data.models.LibraryItem
 
 /**
  * Created by freddieptf on 9/17/18.
@@ -14,7 +14,7 @@ internal object LibraryDataManager {
     private lateinit var db: LibraryDB
 
     fun use(db: LibraryDB) {
-        this.db = db
+        LibraryDataManager.db = db
     }
 
     fun getLibraryItems(): LiveData<List<LibraryItem>> {

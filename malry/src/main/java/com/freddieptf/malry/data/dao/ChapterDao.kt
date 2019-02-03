@@ -1,10 +1,10 @@
-package com.freddieptf.localstorage.data.dao
+package com.freddieptf.malry.data.dao
 
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.freddieptf.localstorage.data.models.Chapter
-import com.freddieptf.localstorage.utils.DBTypeConverters
+import com.freddieptf.malry.data.models.Chapter
+import com.freddieptf.malry.data.utils.DBTypeConverters
 
 /**
  * Created by freddieptf on 11/13/18.

@@ -1,14 +1,12 @@
-package com.freddieptf.localstorage
+package com.freddieptf.malry.data
 
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.api.ChapterProvider
-import com.freddieptf.localstorage.data.ArchiveCacheManager
 import com.freddieptf.malry.commons.AlphanumComparator
-import com.freddieptf.localstorage.data.LibraryDataManager
-import com.freddieptf.localstorage.utils.ChapterUtils
+import com.freddieptf.malry.data.utils.ChapterUtils
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList

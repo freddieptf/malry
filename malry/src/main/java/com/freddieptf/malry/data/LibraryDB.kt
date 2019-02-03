@@ -1,11 +1,11 @@
-package com.freddieptf.localstorage.data
+package com.freddieptf.malry.data
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.freddieptf.localstorage.data.dao.ChapterDao
-import com.freddieptf.localstorage.data.dao.LibraryDao
-import com.freddieptf.localstorage.data.models.Chapter
-import com.freddieptf.localstorage.data.models.LibraryItem
+import com.freddieptf.malry.data.dao.ChapterDao
+import com.freddieptf.malry.data.dao.LibraryDao
+import com.freddieptf.malry.data.models.Chapter
+import com.freddieptf.malry.data.models.LibraryItem
 
 /**
  * Created by freddieptf on 9/17/18.

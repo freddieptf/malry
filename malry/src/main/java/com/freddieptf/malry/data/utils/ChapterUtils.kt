@@ -1,4 +1,4 @@
-package com.freddieptf.localstorage.utils
+package com.freddieptf.malry.data.utils
 
 
 /**
