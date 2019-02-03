@@ -1,4 +1,4 @@
-package com.freddieptf.localstorage.data.models
+package com.freddieptf.malry.data.models
 
 import android.net.Uri
 import android.os.Parcel
@@ -6,7 +6,7 @@ import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.freddieptf.localstorage.utils.DBTypeConverters
+import com.freddieptf.malry.data.utils.DBTypeConverters
 
 /**
  * Created by freddieptf on 9/17/18.

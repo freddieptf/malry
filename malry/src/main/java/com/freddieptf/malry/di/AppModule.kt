@@ -1,16 +1,10 @@
 package com.freddieptf.malry.di
 
 import android.content.Context
-import android.net.Uri
 import androidx.room.Room
-import com.freddieptf.malry.ProviderManager
-import com.freddieptf.malry.api.DataProvider
-import com.freddieptf.malry.library.LibraryPrefs
-import com.freddieptf.localstorage.LocalStorageProvider
-import com.freddieptf.localstorage.data.LibraryDB
+import com.freddieptf.malry.data.LibraryDB
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
 
 /**
  * Created by freddieptf on 11/17/18.

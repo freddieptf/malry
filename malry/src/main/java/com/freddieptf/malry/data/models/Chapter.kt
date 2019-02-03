@@ -1,11 +1,11 @@
-package com.freddieptf.localstorage.data.models
+package com.freddieptf.malry.data.models
 
 import android.net.Uri
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.freddieptf.localstorage.utils.DBTypeConverters
+import com.freddieptf.malry.data.utils.DBTypeConverters
 
 /**
  * Created by freddieptf on 9/1/18.

@@ -1,7 +1,7 @@
-package com.freddieptf.localstorage.data
+package com.freddieptf.malry.data
 
-import com.freddieptf.localstorage.utils.ChapterUtils
 import com.freddieptf.malry.api.Chapter
+import com.freddieptf.malry.data.utils.ChapterUtils
 import org.apache.commons.compress.utils.IOUtils
 import java.io.File
 import java.io.FileOutputStream

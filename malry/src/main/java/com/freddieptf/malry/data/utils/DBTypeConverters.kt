@@ -1,4 +1,4 @@
-package com.freddieptf.localstorage.utils
+package com.freddieptf.malry.data.utils
 
 import android.net.Uri
 import androidx.room.TypeConverter

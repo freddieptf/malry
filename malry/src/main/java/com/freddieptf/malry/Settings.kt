@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
-import com.freddieptf.localstorage.data.ArchiveCacheManager
+import com.freddieptf.malry.data.ArchiveCacheManager
 import com.freddieptf.mangatest.R
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
