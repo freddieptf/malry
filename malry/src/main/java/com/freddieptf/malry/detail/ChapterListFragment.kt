@@ -12,10 +12,10 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.freddieptf.malry.App
-import com.freddieptf.malry.ProviderManager
 import com.freddieptf.malry.api.Chapter
+import com.freddieptf.malry.api.DataProvider
 import com.freddieptf.malry.api.LibraryItem
-import com.freddieptf.malry.library.LibraryViewModel
+import com.freddieptf.malry.di.LibViewModelFactory
 import com.freddieptf.mangatest.R
 import com.freddieptf.reader.ChapterProvider
 import com.freddieptf.reader.ReaderActivity
@@ -44,11 +44,13 @@ class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
     }
 
     private lateinit var recycler: RecyclerView
-    private lateinit var viewModel: LibraryViewModel
+    private lateinit var viewModel: DetailViewModel
     private val adapter = ChapterAdapter()
 
     @Inject
-    lateinit var providerManager: ProviderManager
+    lateinit var providerManager: DataProvider
+    @Inject
+    lateinit var viewModelFactory: LibViewModelFactory
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.detail_frag, container, false)
@@ -58,15 +60,17 @@ class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
         super.onActivityCreated(savedInstanceState)
         (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         (activity as AppCompatActivity).supportActionBar!!.title = arguments!!.getString(LIBRARY_ITEM_NAME)
-        (activity!!.application as App).dataProviderComponent.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        (activity!!.application as App).component.inject(this)
+
         recycler = view.findViewById(R.id.recycler)
         recycler.layoutManager = LinearLayoutManager(context)
         recycler.adapter = adapter
         adapter.setChapterClickListener(this)
-        viewModel = ViewModelProviders.of(activity!!).get(LibraryViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(DetailViewModel::class.java)
+
 
         val libraryItemUri = arguments!!.getParcelable<Uri>(LIBRARY_ITEM_URI)
 
@@ -78,10 +82,11 @@ class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
     }
 
     override fun onChapterClick(chapter: Chapter, pos: Int) {
-        val provider = providerManager.getChapterProvider(chapter)
-        ChapterProvider.useProvider(provider)
-        val i = ReaderActivity.newIntent(context!!)
-        startActivity(i)
+        viewModel.getChapterProvider(chapter).observe(this, Observer { provider ->
+            ChapterProvider.useProvider(provider)
+            val i = ReaderActivity.newIntent(context!!)
+            startActivity(i)
+        })
     }
 
 }

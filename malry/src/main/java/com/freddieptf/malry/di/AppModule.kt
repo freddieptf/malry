@@ -16,9 +16,8 @@ class AppModule(private val context: Context) {
     fun provideContext(): Context = context
 
     @Provides
-    fun provideLibraryDB(context: Context): LibraryDB {
+    fun provideAppDB(context: Context): LibraryDB {
         return Room.databaseBuilder(context, LibraryDB::class.java, "local.db")
-                .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build()
     }

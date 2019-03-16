@@ -1,6 +1,5 @@
 package com.freddieptf.malry.data.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.freddieptf.malry.data.models.LibraryItem
 import com.freddieptf.malry.data.utils.DBTypeConverters
@@ -13,7 +12,7 @@ import com.freddieptf.malry.data.utils.DBTypeConverters
 internal interface LibraryDao {
 
     @Query("SELECT * FROM library")
-    fun getLibraryItems(): LiveData<List<LibraryItem>>
+    fun getLibraryItems(): List<LibraryItem>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveLibraryItem(data: LibraryItem)
