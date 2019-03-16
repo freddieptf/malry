@@ -1,7 +1,7 @@
 package com.freddieptf.malry.data.utils;
 
 import com.freddieptf.malry.commons.AlphanumComparator;
-import com.freddieptf.malry.data.models.Chapter;
+import com.freddieptf.malry.data.db.models.Chapter;
 
 import java.util.Comparator;
 

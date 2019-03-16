@@ -4,6 +4,7 @@ import android.net.Uri
 import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.api.ChapterProvider
 import com.freddieptf.malry.commons.AlphanumComparator
+import com.freddieptf.malry.data.cache.ArchiveCacheManager
 import com.freddieptf.malry.data.utils.ChapterUtils
 import java.io.File
 import java.util.*
@@ -12,7 +13,7 @@ import kotlin.collections.ArrayList
 /**
  * Created by freddieptf on 9/22/18.
  */
-internal class ChapterProvider(var libraryDataManager: LibraryDBSource) : ChapterProvider() {
+internal class ChapterProvider(var libraryDataManager: DbDataSource) : ChapterProvider() {
 
     private var chapterIDs = ArrayList<String>()
     private var parentUri: Uri? = null
@@ -32,7 +33,7 @@ internal class ChapterProvider(var libraryDataManager: LibraryDBSource) : Chapte
 
     private fun getChapterAtPos(position: Int): Chapter {
         val chID = chapterIDs.get(position)
-        val ch = LibraryDBSource.getChapter(chID)
+        val ch = libraryDataManager.getChapter(chID)
         return ch.apply {
             setPaths(openChapter(ch))
         }

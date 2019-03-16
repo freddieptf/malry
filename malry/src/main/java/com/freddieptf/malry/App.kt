@@ -3,7 +3,7 @@ package com.freddieptf.malry
 import android.app.Application
 import android.preference.PreferenceManager
 import com.facebook.stetho.Stetho
-import com.freddieptf.malry.data.ArchiveCacheManager
+import com.freddieptf.malry.data.cache.ArchiveCacheManager
 import com.freddieptf.malry.di.AppComponent
 import com.freddieptf.malry.di.AppModule
 import com.freddieptf.malry.di.DaggerAppComponent

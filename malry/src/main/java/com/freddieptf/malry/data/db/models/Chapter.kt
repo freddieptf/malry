@@ -1,4 +1,4 @@
-package com.freddieptf.malry.data.models
+package com.freddieptf.malry.data.db.models
 
 import android.net.Uri
 import androidx.room.Entity
