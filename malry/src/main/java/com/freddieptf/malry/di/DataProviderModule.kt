@@ -1,28 +1,21 @@
 package com.freddieptf.malry.di
 
 import android.content.Context
-import android.net.Uri
-import com.freddieptf.malry.ProviderManager
 import com.freddieptf.malry.api.DataProvider
 import com.freddieptf.malry.data.LibraryDB
 import com.freddieptf.malry.data.LocalStorageProvider
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 /**
  * Created by freddieptf on 11/23/18.
  */
 @Module()
-class DataProviderModule(val uri: Uri) {
+class DataProviderModule {
 
     @Provides
-    @LibLocationScope
-    fun provideDataProvider(context: Context, db: LibraryDB): DataProvider
-            = LocalStorageProvider(context, db, uri)
-
-    @Provides
-    @LibLocationScope
-    fun provideDataProviderManager(storageProvider: DataProvider): ProviderManager
-            = ProviderManager(storageProvider)
+    @Singleton
+    fun provideDataProvider(context: Context, db: LibraryDB): DataProvider = LocalStorageProvider(context, db)
 
 }

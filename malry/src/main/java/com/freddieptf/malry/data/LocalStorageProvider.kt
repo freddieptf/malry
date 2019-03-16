@@ -4,53 +4,49 @@ import android.content.Context
 import android.net.Uri
 import android.provider.DocumentsContract
 import androidx.documentfile.provider.DocumentFile
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import com.freddieptf.malry.api.ChapterProvider
 import com.freddieptf.malry.api.DataProvider
 import com.freddieptf.malry.data.models.Chapter
 import com.freddieptf.malry.data.models.LibraryItem
 import com.freddieptf.malry.data.utils.ChapterTitleComparator
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
 
 /**
  * Created by freddieptf on 11/14/18.
  */
-class LocalStorageProvider(val ctx: Context, db: LibraryDB, var libLocation: Uri) : DataProvider() {
+class LocalStorageProvider(val ctx: Context, db: LibraryDB) : DataProvider() {
 
     init {
-        LibraryDataManager.use(db)
+        LibraryDBSource.use(db)
     }
 
-    override fun openLibraryItem(libraryItemUri: Uri): LiveData<List<com.freddieptf.malry.api.Chapter>> {
-        GlobalScope.launch {
-            LibraryDataManager.saveChapters(openMangaDir(ctx, libraryItemUri) ?: emptyList())
-        }
-        return LibraryDataManager.getChaptersLiveData(libraryItemUri)
+    override fun importLibrary(libLocation: Uri) {
+        genLibDirs(ctx, libLocation)
     }
 
-    override fun getLastRead(libraryItem: com.freddieptf.malry.api.LibraryItem): com.freddieptf.malry.api.Chapter? {
-        return LibraryDataManager.getLastRead(libraryItem.uri.toString())
-    }
-
-    override fun getLibraryItems(): LiveData<List<com.freddieptf.malry.api.LibraryItem>> {
-        GlobalScope.launch {
-            genLibDirs(ctx, libLocation)
-        }
-        return Transformations.map(LibraryDataManager.getLibraryItems()) { list ->
-            list.map { it ->
-                com.freddieptf.malry.api.LibraryItem(it.dirUri, it.name, "").apply {
-                    itemCount = it.itemCount
-                }
+    override suspend fun getLibraryItems(): List<com.freddieptf.malry.api.LibraryItem> {
+        return LibraryDBSource.getLibraryItems().map {
+            com.freddieptf.malry.api.LibraryItem(it.dirUri, it.name, "").apply {
+                itemCount = it.itemCount
             }
         }
     }
 
+    override suspend fun importLibraryItemChildren(libraryItemUri: Uri) {
+        LibraryDBSource.saveChapters(openMangaDir(ctx, libraryItemUri) ?: emptyList())
+    }
+
+    override suspend fun getLibraryItemChildren(libraryItemUri: Uri): List<com.freddieptf.malry.api.Chapter> {
+        return LibraryDBSource.getChapters(libraryItemUri)
+    }
+
+    override fun getLastRead(libraryItem: com.freddieptf.malry.api.LibraryItem): com.freddieptf.malry.api.Chapter? {
+        return LibraryDBSource.getLastRead(libraryItem.uri.toString())
+    }
+
     override fun getChapterProvider(chapter: com.freddieptf.malry.api.Chapter): ChapterProvider {
-        return ChapterProvider(LibraryDataManager).apply {
+        return ChapterProvider(LibraryDBSource).apply {
             setCurrentRead(chapter)
         }
     }
@@ -58,7 +54,7 @@ class LocalStorageProvider(val ctx: Context, db: LibraryDB, var libLocation: Uri
     private fun genLibDirs(ctx: Context, treeUri: Uri) {
         val libraryDocFile = DocumentFile.fromTreeUri(ctx, treeUri)
         libraryDocFile!!.listFiles().asList().forEach {
-            LibraryDataManager.saveLibraryItem(LibraryItem(it.uri, it.name!!, it.listFiles()!!.size, null))
+            LibraryDBSource.saveLibraryItem(LibraryItem(it.uri, it.name!!, it.listFiles()!!.size, null))
         }
     }
 

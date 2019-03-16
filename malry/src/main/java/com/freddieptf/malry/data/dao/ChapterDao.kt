@@ -1,7 +1,6 @@
 package com.freddieptf.malry.data.dao
 
 import android.net.Uri
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.freddieptf.malry.data.models.Chapter
 import com.freddieptf.malry.data.utils.DBTypeConverters
@@ -17,7 +16,7 @@ internal interface ChapterDao {
     fun saveChapters(data: List<Chapter>)
 
     @Query("SELECT * FROM chapters WHERE parentUri=:uri")
-    fun getChaptersLiveData(uri: Uri): LiveData<List<Chapter>>
+    fun getChaptersLiveData(uri: Uri): List<Chapter>
 
     @Query("SELECT * FROM chapters WHERE parentUri=:uri")
     fun getChapters(uri: Uri): List<Chapter>

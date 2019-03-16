@@ -1,23 +1,21 @@
 package com.freddieptf.malry.data
 
 import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import com.freddieptf.malry.data.models.Chapter
 import com.freddieptf.malry.data.models.LibraryItem
 
 /**
  * Created by freddieptf on 9/17/18.
  */
-internal object LibraryDataManager {
+internal object LibraryDBSource {
 
     private lateinit var db: LibraryDB
 
     fun use(db: LibraryDB) {
-        LibraryDataManager.db = db
+        LibraryDBSource.db = db
     }
 
-    fun getLibraryItems(): LiveData<List<LibraryItem>> {
+    fun getLibraryItems(): List<LibraryItem> {
         return db.LibraryItemDao().getLibraryItems()
     }
 
@@ -35,16 +33,6 @@ internal object LibraryDataManager {
                 }
     }
 
-    fun getChaptersLiveData(mangaDirUri: Uri): LiveData<List<com.freddieptf.malry.api.Chapter>> {
-        return Transformations.map(db.ChapterDao().getChaptersLiveData(mangaDirUri)) { items ->
-            items.map { c ->
-                com.freddieptf.malry.api.Chapter(c.docID, c.name, c.parentUri.toString(), c.parentName).apply {
-                    lastReadPage = c.lastReadPage
-                    totalPages = c.totalPages
-                }
-            }
-        }
-    }
 
     fun saveChapters(data: List<Chapter>) {
         if (data.isEmpty()) return

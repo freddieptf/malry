@@ -3,6 +3,7 @@ package com.freddieptf.malry.library
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -11,9 +12,10 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.freddieptf.malry.App
-import com.freddieptf.malry.ProviderManager
+import com.freddieptf.malry.api.DataProvider
 import com.freddieptf.malry.api.LibraryItem
 import com.freddieptf.malry.detail.ChapterListFragment
+import com.freddieptf.malry.di.LibViewModelFactory
 import com.freddieptf.mangatest.R
 import com.freddieptf.reader.ChapterProvider
 import com.freddieptf.reader.ReaderActivity
@@ -34,7 +36,7 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
     @Inject
     lateinit var viewModelFactory: LibViewModelFactory
     @Inject
-    lateinit var providerManager: ProviderManager
+    lateinit var providerManager: DataProvider
 
     interface LibraryFragmentContainer {
         fun getFragmentContainerId(): Int
@@ -49,14 +51,19 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        (activity!!.application as App).dataProviderComponent.inject(this)
+        (activity!!.application as App).component.inject(this)
         viewModel = ViewModelProviders.of(activity!!, viewModelFactory).get(LibraryViewModel::class.java)
 
         recyler = view.findViewById(R.id.rv_libraryList)
         recyler.layoutManager = LinearLayoutManager(context!!)
         recyler.adapter = adapter
         adapter.setClickListener(this)
-        swapData()
+
+        viewModel.getLibraryItems().observe(this, Observer {
+            Log.d(LibraryFragment::class.java.simpleName, "swapDATA ${it.size}")
+            adapter.swapData(it)
+        })
+
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -84,16 +91,17 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
                 .commit()
     }
 
-     private fun resumeOrNot(libraryItem: LibraryItem) {
-        val chapter = providerManager.getLastRead(libraryItem)
-        if (chapter == null) {
-            openChapterListFrag(libraryItem)
-        } else {
-            val provider = providerManager.getChapterProvider(chapter)
-            ChapterProvider.useProvider(provider)
-            val i = ReaderActivity.newIntent(context!!)
-            startActivity(i)
-        }
+    private fun resumeOrNot(libraryItem: LibraryItem) {
+        viewModel.getLastRead(libraryItem).observe(this, Observer { it ->
+            if (it.chapter == null) {
+                openChapterListFrag(libraryItem)
+            } else {
+                ChapterProvider.useProvider(it.provider!!)
+                val i = ReaderActivity.newIntent(context!!)
+                startActivity(i)
+            }
+        })
+
 
     }
 
@@ -107,12 +115,8 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 100 && resultCode == RESULT_OK) {
             println(data!!.data)
-            LibraryPrefs.addLibUri(context!!, data!!.data)
-            (activity!!.application as App).updateDataProvider(data!!.data)
-            // have to reinstatiate and update the provider manager instance in the view model
-            (activity!!.application as App).dataProviderComponent.inject(this)
-            viewModel.dataProvider = providerManager
-            swapData()
+            LibraryPrefs.addLibUri(context!!, data.data)
+            viewModel.populateLibrary(data.data)
         }
     }
 
@@ -129,12 +133,6 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun swapData() {
-        viewModel.getLibraryDirs().observe(this, Observer {
-            adapter.swapData(it)
-        })
     }
 
 }

@@ -1,8 +1,6 @@
 package com.freddieptf.malry.data
 
 import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.api.ChapterProvider
 import com.freddieptf.malry.commons.AlphanumComparator
@@ -14,7 +12,7 @@ import kotlin.collections.ArrayList
 /**
  * Created by freddieptf on 9/22/18.
  */
-internal class ChapterProvider(var libraryDataManager: LibraryDataManager) : ChapterProvider() {
+internal class ChapterProvider(var libraryDataManager: LibraryDBSource) : ChapterProvider() {
 
     private var chapterIDs = ArrayList<String>()
     private var parentUri: Uri? = null
@@ -34,7 +32,7 @@ internal class ChapterProvider(var libraryDataManager: LibraryDataManager) : Cha
 
     private fun getChapterAtPos(position: Int): Chapter {
         val chID = chapterIDs.get(position)
-        val ch = LibraryDataManager.getChapter(chID)
+        val ch = LibraryDBSource.getChapter(chID)
         return ch.apply {
             setPaths(openChapter(ch))
         }
@@ -68,20 +66,15 @@ internal class ChapterProvider(var libraryDataManager: LibraryDataManager) : Cha
         libraryDataManager.setLastReadPage(chapterID, page, totalPages)
     }
 
-    private var d : LiveData<List<Chapter>>? = null
 
-    override fun getReadList(): LiveData<List<Chapter>> {
-        if (d == null) d = Transformations.map(LibraryDataManager.getChaptersLiveData(parentUri!!)) { items ->
-            this.chapterIDs = items.map { it.id } as ArrayList<String>
-            items
-        }
-        return d!!
+    override fun getReadList(): List<Chapter> {
+        return libraryDataManager.getChapters(parentUri!!)
     }
 
     override fun setCurrentRead(chapter: Chapter) {
         parentUri = Uri.parse(chapter.parentID)
         if (chapterIDs.isEmpty()) {
-            chapterIDs = LibraryDataManager.getChapters(parentUri!!).map { it.id } as ArrayList<String>
+            chapterIDs = libraryDataManager.getChapters(parentUri!!).map { it.id } as ArrayList<String>
         }
         pos = chapterIDs.indexOf(chapter.id)
     }

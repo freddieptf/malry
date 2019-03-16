@@ -1,16 +1,19 @@
 package com.freddieptf.malry.api
 
 import android.net.Uri
-import androidx.lifecycle.LiveData
 
 /**
  * Created by freddieptf on 11/17/18.
  */
 abstract class DataProvider {
 
-    abstract fun getLibraryItems(): LiveData<List<LibraryItem>>
+    abstract fun importLibrary(libLocation: Uri)
 
-    abstract fun openLibraryItem(libraryItemUri: Uri): LiveData<List<Chapter>>
+    abstract suspend fun getLibraryItems(): List<LibraryItem>
+
+    abstract suspend fun importLibraryItemChildren(libraryItemUri: Uri)
+
+    abstract suspend fun getLibraryItemChildren(libraryItemUri: Uri): List<Chapter>
 
     abstract fun getLastRead(libraryItem: LibraryItem): Chapter?
 

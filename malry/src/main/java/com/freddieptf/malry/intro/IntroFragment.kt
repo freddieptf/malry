@@ -13,7 +13,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.freddieptf.malry.App
 import com.freddieptf.malry.PrefUtils
 import com.freddieptf.malry.library.LibraryFragment
 import com.freddieptf.malry.library.LibraryPrefs
@@ -70,7 +69,6 @@ class IntroFragment : Fragment() {
             when (resultCode) {
                 RESULT_OK -> {
                     LibraryPrefs.addLibUri(context!!, data!!.data)
-                    (activity!!.application as App).updateDataProvider(data!!.data)
                     finishSetup()
                 }
                 RESULT_CANCELED -> {
