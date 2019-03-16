@@ -6,14 +6,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.api.ChapterProvider
-import com.freddieptf.malry.api.DataProvider
+import com.freddieptf.malry.data.LocalStorageProvider
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 /**
  * Created by freddieptf on 9/16/18.
  */
-class DetailViewModel constructor(var dataProvider: DataProvider) : ViewModel(), CoroutineScope {
+class DetailViewModel constructor(var dataProvider: LocalStorageProvider) : ViewModel(), CoroutineScope {
 
     private var job: Job
 
