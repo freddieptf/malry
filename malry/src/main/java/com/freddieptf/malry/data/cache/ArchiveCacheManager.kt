@@ -1,4 +1,4 @@
-package com.freddieptf.malry.data
+package com.freddieptf.malry.data.cache
 
 import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.data.utils.ChapterUtils
@@ -18,7 +18,7 @@ object ArchiveCacheManager {
 
     fun useCache(cachePath: String, maxSize: Long) {
         cacheDir = File(cachePath)
-        this.maxSize = maxSize
+        ArchiveCacheManager.maxSize = maxSize
         if (!cacheDir.exists()) cacheDir.mkdirs() else trimToFit(cacheDir, maxSize, getDirSize(cacheDir))
     }
 

@@ -1,25 +1,20 @@
 package com.freddieptf.malry.data
 
 import android.net.Uri
-import com.freddieptf.malry.data.models.Chapter
-import com.freddieptf.malry.data.models.LibraryItem
+import com.freddieptf.malry.data.db.LibraryDB
+import com.freddieptf.malry.data.db.models.Chapter
+import com.freddieptf.malry.data.db.models.LibraryItem
 
 /**
  * Created by freddieptf on 9/17/18.
  */
-internal object LibraryDBSource {
+class DbDataSource(val db: LibraryDB) {
 
-    private lateinit var db: LibraryDB
-
-    fun use(db: LibraryDB) {
-        LibraryDBSource.db = db
-    }
-
-    fun getLibraryItems(): List<LibraryItem> {
+    internal fun getLibraryItems(): List<LibraryItem> {
         return db.LibraryItemDao().getLibraryItems()
     }
 
-    fun saveLibraryItem(item: LibraryItem) {
+    internal fun saveLibraryItem(item: LibraryItem) {
         return db.LibraryItemDao().saveLibraryItem(item)
     }
 
@@ -34,7 +29,7 @@ internal object LibraryDBSource {
     }
 
 
-    fun saveChapters(data: List<Chapter>) {
+    internal fun saveChapters(data: List<Chapter>) {
         if (data.isEmpty()) return
         db.ChapterDao().saveChapters(data)
     }

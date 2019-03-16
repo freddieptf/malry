@@ -7,14 +7,14 @@ import androidx.lifecycle.ViewModel
 import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.api.ChapterProvider
 import com.freddieptf.malry.api.LibraryItem
-import com.freddieptf.malry.data.LocalStorageProvider
+import com.freddieptf.malry.data.DataProvider
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 /**
  * Created by freddieptf on 9/16/18.
  */
-class LibraryViewModel constructor(var dataProvider: LocalStorageProvider) : ViewModel(), CoroutineScope {
+class LibraryViewModel constructor(var dataProvider: DataProvider) : ViewModel(), CoroutineScope {
 
     private var job: Job
 
@@ -37,7 +37,7 @@ class LibraryViewModel constructor(var dataProvider: LocalStorageProvider) : Vie
     fun populateLibrary(libLocationUri: Uri) {
         launch {
             withContext(Dispatchers.Default) {
-                dataProvider.importLibrary(libLocationUri)
+                dataProvider.saveToLibrary(libLocationUri)
             }
             val items: MutableList<LibraryItem> = ArrayList()
             withContext(Dispatchers.Default) {

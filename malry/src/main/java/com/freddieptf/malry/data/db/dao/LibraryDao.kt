@@ -1,7 +1,7 @@
-package com.freddieptf.malry.data.dao
+package com.freddieptf.malry.data.db.dao
 
 import androidx.room.*
-import com.freddieptf.malry.data.models.LibraryItem
+import com.freddieptf.malry.data.db.models.LibraryItem
 import com.freddieptf.malry.data.utils.DBTypeConverters
 
 /**

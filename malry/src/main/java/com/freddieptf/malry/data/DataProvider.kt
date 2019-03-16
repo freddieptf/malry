@@ -5,8 +5,8 @@ import android.net.Uri
 import android.provider.DocumentsContract
 import androidx.documentfile.provider.DocumentFile
 import com.freddieptf.malry.api.ChapterProvider
-import com.freddieptf.malry.data.models.Chapter
-import com.freddieptf.malry.data.models.LibraryItem
+import com.freddieptf.malry.data.db.models.Chapter
+import com.freddieptf.malry.data.db.models.LibraryItem
 import com.freddieptf.malry.data.utils.ChapterTitleComparator
 import java.util.*
 import kotlin.collections.ArrayList
@@ -14,38 +14,34 @@ import kotlin.collections.ArrayList
 /**
  * Created by freddieptf on 11/14/18.
  */
-class LocalStorageProvider(val ctx: Context, db: LibraryDB) {
+class DataProvider(val ctx: Context, val localDbSource: DbDataSource) {
 
-    init {
-        LibraryDBSource.use(db)
-    }
-
-    fun importLibrary(libLocation: Uri) {
+    fun saveToLibrary(libLocation: Uri) {
         genLibDirs(ctx, libLocation)
     }
 
     suspend fun getLibraryItems(): List<com.freddieptf.malry.api.LibraryItem> {
-        return LibraryDBSource.getLibraryItems().map {
+        return localDbSource.getLibraryItems().map {
             com.freddieptf.malry.api.LibraryItem(it.dirUri, it.name, "").apply {
                 itemCount = it.itemCount
             }
         }
     }
 
-    suspend fun importLibraryItemChildren(libraryItemUri: Uri) {
-        LibraryDBSource.saveChapters(openMangaDir(ctx, libraryItemUri) ?: emptyList())
+    suspend fun saveLibraryItemChildren(libraryItemUri: Uri) {
+        localDbSource.saveChapters(openMangaDir(ctx, libraryItemUri) ?: emptyList())
     }
 
     suspend fun getLibraryItemChildren(libraryItemUri: Uri): List<com.freddieptf.malry.api.Chapter> {
-        return LibraryDBSource.getChapters(libraryItemUri)
+        return localDbSource.getChapters(libraryItemUri)
     }
 
     fun getLastRead(libraryItem: com.freddieptf.malry.api.LibraryItem): com.freddieptf.malry.api.Chapter? {
-        return LibraryDBSource.getLastRead(libraryItem.uri.toString())
+        return localDbSource.getLastRead(libraryItem.uri.toString())
     }
 
     fun getChapterProvider(chapter: com.freddieptf.malry.api.Chapter): ChapterProvider {
-        return ChapterProvider(LibraryDBSource).apply {
+        return ChapterProvider(localDbSource).apply {
             setCurrentRead(chapter)
         }
     }
@@ -53,7 +49,7 @@ class LocalStorageProvider(val ctx: Context, db: LibraryDB) {
     private fun genLibDirs(ctx: Context, treeUri: Uri) {
         val libraryDocFile = DocumentFile.fromTreeUri(ctx, treeUri)
         libraryDocFile!!.listFiles().asList().forEach {
-            LibraryDBSource.saveLibraryItem(LibraryItem(it.uri, it.name!!, it.listFiles()!!.size, null))
+            localDbSource.saveLibraryItem(LibraryItem(it.uri, it.name!!, it.listFiles()!!.size, null))
         }
     }
 

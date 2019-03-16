@@ -6,14 +6,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.api.ChapterProvider
-import com.freddieptf.malry.data.LocalStorageProvider
+import com.freddieptf.malry.data.DataProvider
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 /**
  * Created by freddieptf on 9/16/18.
  */
-class DetailViewModel constructor(var dataProvider: LocalStorageProvider) : ViewModel(), CoroutineScope {
+class DetailViewModel constructor(var dataProvider: DataProvider) : ViewModel(), CoroutineScope {
 
     private var job: Job
 
@@ -45,7 +45,7 @@ class DetailViewModel constructor(var dataProvider: LocalStorageProvider) : View
         val refreshedDB = async(start = CoroutineStart.LAZY) {
             val items = mutableListOf<Chapter>()
             withContext(Dispatchers.Default) {
-                dataProvider.importLibraryItemChildren(libraryItemUri)
+                dataProvider.saveLibraryItemChildren(libraryItemUri)
                 items.addAll(dataProvider.getLibraryItemChildren(libraryItemUri))
             }
             items
