@@ -1,7 +1,6 @@
 package com.freddieptf.malry.di
 
 import android.content.Context
-import com.freddieptf.malry.api.DataProvider
 import com.freddieptf.malry.data.LibraryDB
 import com.freddieptf.malry.data.LocalStorageProvider
 import dagger.Module
@@ -16,6 +15,6 @@ class DataProviderModule {
 
     @Provides
     @Singleton
-    fun provideDataProvider(context: Context, db: LibraryDB): DataProvider = LocalStorageProvider(context, db)
+    fun provideDataProvider(context: Context, db: LibraryDB): LocalStorageProvider = LocalStorageProvider(context, db)
 
 }

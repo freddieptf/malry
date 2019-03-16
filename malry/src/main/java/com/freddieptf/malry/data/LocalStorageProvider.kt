@@ -5,7 +5,6 @@ import android.net.Uri
 import android.provider.DocumentsContract
 import androidx.documentfile.provider.DocumentFile
 import com.freddieptf.malry.api.ChapterProvider
-import com.freddieptf.malry.api.DataProvider
 import com.freddieptf.malry.data.models.Chapter
 import com.freddieptf.malry.data.models.LibraryItem
 import com.freddieptf.malry.data.utils.ChapterTitleComparator
@@ -15,17 +14,17 @@ import kotlin.collections.ArrayList
 /**
  * Created by freddieptf on 11/14/18.
  */
-class LocalStorageProvider(val ctx: Context, db: LibraryDB) : DataProvider() {
+class LocalStorageProvider(val ctx: Context, db: LibraryDB) {
 
     init {
         LibraryDBSource.use(db)
     }
 
-    override fun importLibrary(libLocation: Uri) {
+    fun importLibrary(libLocation: Uri) {
         genLibDirs(ctx, libLocation)
     }
 
-    override suspend fun getLibraryItems(): List<com.freddieptf.malry.api.LibraryItem> {
+    suspend fun getLibraryItems(): List<com.freddieptf.malry.api.LibraryItem> {
         return LibraryDBSource.getLibraryItems().map {
             com.freddieptf.malry.api.LibraryItem(it.dirUri, it.name, "").apply {
                 itemCount = it.itemCount
@@ -33,19 +32,19 @@ class LocalStorageProvider(val ctx: Context, db: LibraryDB) : DataProvider() {
         }
     }
 
-    override suspend fun importLibraryItemChildren(libraryItemUri: Uri) {
+    suspend fun importLibraryItemChildren(libraryItemUri: Uri) {
         LibraryDBSource.saveChapters(openMangaDir(ctx, libraryItemUri) ?: emptyList())
     }
 
-    override suspend fun getLibraryItemChildren(libraryItemUri: Uri): List<com.freddieptf.malry.api.Chapter> {
+    suspend fun getLibraryItemChildren(libraryItemUri: Uri): List<com.freddieptf.malry.api.Chapter> {
         return LibraryDBSource.getChapters(libraryItemUri)
     }
 
-    override fun getLastRead(libraryItem: com.freddieptf.malry.api.LibraryItem): com.freddieptf.malry.api.Chapter? {
+    fun getLastRead(libraryItem: com.freddieptf.malry.api.LibraryItem): com.freddieptf.malry.api.Chapter? {
         return LibraryDBSource.getLastRead(libraryItem.uri.toString())
     }
 
-    override fun getChapterProvider(chapter: com.freddieptf.malry.api.Chapter): ChapterProvider {
+    fun getChapterProvider(chapter: com.freddieptf.malry.api.Chapter): ChapterProvider {
         return ChapterProvider(LibraryDBSource).apply {
             setCurrentRead(chapter)
         }

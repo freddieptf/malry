@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.freddieptf.malry.App
-import com.freddieptf.malry.api.DataProvider
 import com.freddieptf.malry.api.LibraryItem
 import com.freddieptf.malry.detail.ChapterListFragment
 import com.freddieptf.malry.di.LibViewModelFactory
@@ -35,8 +34,6 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
 
     @Inject
     lateinit var viewModelFactory: LibViewModelFactory
-    @Inject
-    lateinit var providerManager: DataProvider
 
     interface LibraryFragmentContainer {
         fun getFragmentContainerId(): Int

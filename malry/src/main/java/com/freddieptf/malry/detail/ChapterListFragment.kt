@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.freddieptf.malry.App
 import com.freddieptf.malry.api.Chapter
-import com.freddieptf.malry.api.DataProvider
 import com.freddieptf.malry.api.LibraryItem
 import com.freddieptf.malry.di.LibViewModelFactory
 import com.freddieptf.mangatest.R
@@ -47,8 +46,6 @@ class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
     private lateinit var viewModel: DetailViewModel
     private val adapter = ChapterAdapter()
 
-    @Inject
-    lateinit var providerManager: DataProvider
     @Inject
     lateinit var viewModelFactory: LibViewModelFactory
 
