@@ -1,6 +1,8 @@
 package com.freddieptf.malry.data
 
 import android.net.Uri
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import com.freddieptf.malry.data.db.LibraryDB
 import com.freddieptf.malry.data.db.models.Chapter
 import com.freddieptf.malry.data.db.models.LibraryItem
@@ -26,6 +28,18 @@ class DbDataSource(val db: LibraryDB) {
                         totalPages = c.totalPages
                     }
                 }
+    }
+
+    internal fun getChaptersLive(mangaDirUri: Uri): LiveData<List<com.freddieptf.malry.api.Chapter>> {
+        return Transformations.map(db.ChapterDao().getChaptersLiveData(mangaDirUri))
+        { items ->
+            items.map { c ->
+                com.freddieptf.malry.api.Chapter(c.docID, c.name, c.parentUri.toString(), c.parentName).apply {
+                    lastReadPage = c.lastReadPage
+                    totalPages = c.totalPages
+                }
+            }
+        }
     }
 
 

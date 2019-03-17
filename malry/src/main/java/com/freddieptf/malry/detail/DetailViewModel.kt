@@ -30,36 +30,12 @@ class DetailViewModel constructor(var dataProvider: DataProvider) : ViewModel(),
         super.onCleared()
     }
 
-    private var libraryItemChildrenLD = MutableLiveData<List<com.freddieptf.malry.api.Chapter>>()
 
     fun getDbChapterList(libraryItemUri: Uri): LiveData<List<Chapter>> {
-
-        val db = async(start = CoroutineStart.LAZY) {
-            val items = mutableListOf<Chapter>()
-            withContext(Dispatchers.Default) {
-                items.addAll(dataProvider.getLibraryItemChildren(libraryItemUri))
-            }
-            items
+        launch(Dispatchers.Default) {
+            dataProvider.saveLibraryItemChildren(libraryItemUri)
         }
-
-        val refreshedDB = async(start = CoroutineStart.LAZY) {
-            val items = mutableListOf<Chapter>()
-            withContext(Dispatchers.Default) {
-                dataProvider.saveLibraryItemChildren(libraryItemUri)
-                items.addAll(dataProvider.getLibraryItemChildren(libraryItemUri))
-            }
-            items
-        }
-
-        launch {
-            db.start()
-            refreshedDB.start()
-            libraryItemChildrenLD.value = db.await()
-            libraryItemChildrenLD.value = refreshedDB.await()
-        }
-
-
-        return libraryItemChildrenLD
+        return dataProvider.getLibraryItemChildren(libraryItemUri)
     }
 
     fun getChapterProvider(chapter: Chapter): LiveData<ChapterProvider> {

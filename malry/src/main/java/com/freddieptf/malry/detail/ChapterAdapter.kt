@@ -66,7 +66,6 @@ class ChapterAdapter : RecyclerView.Adapter<ChapterAdapter.ChapterViewHolder>(),
         fun bind(chapter: Chapter) {
             tvName.text = chapter.title
             val typedVal = TypedValue()
-            println("chapter ${chapter.totalPages}  ${chapter.lastReadPage}")
             if (chapter.totalPages == 0 || chapter.lastReadPage < chapter.totalPages-1) {
                 itemView.context.theme.resolveAttribute(
                         android.R.attr.textColorPrimary, typedVal, true)

@@ -1,6 +1,7 @@
 package com.freddieptf.malry.data.db.dao
 
 import android.net.Uri
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.freddieptf.malry.data.db.models.Chapter
 import com.freddieptf.malry.data.utils.DBTypeConverters
@@ -12,11 +13,11 @@ import com.freddieptf.malry.data.utils.DBTypeConverters
 @TypeConverters(DBTypeConverters::class)
 internal interface ChapterDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveChapters(data: List<Chapter>)
 
     @Query("SELECT * FROM chapters WHERE parentUri=:uri")
-    fun getChaptersLiveData(uri: Uri): List<Chapter>
+    fun getChaptersLiveData(uri: Uri): LiveData<List<Chapter>>
 
     @Query("SELECT * FROM chapters WHERE parentUri=:uri")
     fun getChapters(uri: Uri): List<Chapter>
