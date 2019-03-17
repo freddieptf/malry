@@ -13,7 +13,7 @@ import kotlin.collections.ArrayList
 /**
  * Created by freddieptf on 9/22/18.
  */
-internal class ChapterProvider(var libraryDataManager: DbDataSource) : ChapterProvider() {
+internal class ChapterProvider(var dbDataSource: DbDataSource) : ChapterProvider() {
 
     private var chapterIDs = ArrayList<String>()
     private var parentUri: Uri? = null
@@ -33,7 +33,7 @@ internal class ChapterProvider(var libraryDataManager: DbDataSource) : ChapterPr
 
     private fun getChapterAtPos(position: Int): Chapter {
         val chID = chapterIDs.get(position)
-        val ch = libraryDataManager.getChapter(chID)
+        val ch = dbDataSource.getChapter(chID)
         return ch.apply {
             setPaths(openChapter(ch))
         }
@@ -64,18 +64,18 @@ internal class ChapterProvider(var libraryDataManager: DbDataSource) : ChapterPr
     }
 
     override fun setLastReadPage(chapterID: String, page: Int, totalPages: Int) {
-        libraryDataManager.setLastReadPage(chapterID, page, totalPages)
+        dbDataSource.setLastReadPage(chapterID, page, totalPages)
     }
 
 
     override fun getReadList(): List<Chapter> {
-        return libraryDataManager.getChapters(parentUri!!)
+        return dbDataSource.getChapters(parentUri!!)
     }
 
     override fun setCurrentRead(chapter: Chapter) {
         parentUri = Uri.parse(chapter.parentID)
         if (chapterIDs.isEmpty()) {
-            chapterIDs = libraryDataManager.getChapters(parentUri!!).map { it.id } as ArrayList<String>
+            chapterIDs = dbDataSource.getChapters(parentUri!!).map { it.id } as ArrayList<String>
         }
         pos = chapterIDs.indexOf(chapter.id)
     }

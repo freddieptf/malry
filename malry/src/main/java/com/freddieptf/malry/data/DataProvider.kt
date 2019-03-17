@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.provider.DocumentsContract
 import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.LiveData
 import com.freddieptf.malry.api.ChapterProvider
 import com.freddieptf.malry.data.db.models.Chapter
 import com.freddieptf.malry.data.db.models.LibraryItem
@@ -20,7 +21,7 @@ class DataProvider(val ctx: Context, val localDbSource: DbDataSource) {
         genLibDirs(ctx, libLocation)
     }
 
-    suspend fun getLibraryItems(): List<com.freddieptf.malry.api.LibraryItem> {
+    fun getLibraryItems(): List<com.freddieptf.malry.api.LibraryItem> {
         return localDbSource.getLibraryItems().map {
             com.freddieptf.malry.api.LibraryItem(it.dirUri, it.name, "").apply {
                 itemCount = it.itemCount
@@ -28,12 +29,12 @@ class DataProvider(val ctx: Context, val localDbSource: DbDataSource) {
         }
     }
 
-    suspend fun saveLibraryItemChildren(libraryItemUri: Uri) {
+    fun saveLibraryItemChildren(libraryItemUri: Uri) {
         localDbSource.saveChapters(openMangaDir(ctx, libraryItemUri) ?: emptyList())
     }
 
-    suspend fun getLibraryItemChildren(libraryItemUri: Uri): List<com.freddieptf.malry.api.Chapter> {
-        return localDbSource.getChapters(libraryItemUri)
+    fun getLibraryItemChildren(libraryItemUri: Uri): LiveData<List<com.freddieptf.malry.api.Chapter>> {
+        return localDbSource.getChaptersLive(libraryItemUri)
     }
 
     fun getLastRead(libraryItem: com.freddieptf.malry.api.LibraryItem): com.freddieptf.malry.api.Chapter? {
