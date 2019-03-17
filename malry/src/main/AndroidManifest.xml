@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name="com.freddieptf.malry.MainActivity"
+            android:name="com.freddieptf.malry.ui.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,8 +22,8 @@
         </activity>
 
         <activity
-            android:name="com.freddieptf.malry.Settings"
-            android:parentActivityName="com.freddieptf.malry.MainActivity">
+            android:name="com.freddieptf.malry.ui.Settings"
+            android:parentActivityName="com.freddieptf.malry.ui.MainActivity">
         </activity>
 
     </application>

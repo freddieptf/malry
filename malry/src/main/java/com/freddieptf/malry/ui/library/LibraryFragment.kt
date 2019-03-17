@@ -1,4 +1,4 @@
-package com.freddieptf.malry.library
+package com.freddieptf.malry.ui.library
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.freddieptf.malry.App
 import com.freddieptf.malry.api.LibraryItem
-import com.freddieptf.malry.detail.ChapterListFragment
 import com.freddieptf.malry.di.LibViewModelFactory
+import com.freddieptf.malry.ui.detail.ChapterListFragment
 import com.freddieptf.mangatest.R
 import com.freddieptf.reader.ChapterProvider
 import com.freddieptf.reader.ReaderActivity

@@ -3,8 +3,8 @@ package com.freddieptf.malry.di
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.freddieptf.malry.data.DataProvider
-import com.freddieptf.malry.detail.DetailViewModel
-import com.freddieptf.malry.library.LibraryViewModel
+import com.freddieptf.malry.ui.detail.DetailViewModel
+import com.freddieptf.malry.ui.library.LibraryViewModel
 import javax.inject.Inject
 
 /**

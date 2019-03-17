@@ -1,4 +1,4 @@
-package com.freddieptf.malry.detail
+package com.freddieptf.malry.ui.detail
 
 import android.net.Uri
 import android.os.Bundle

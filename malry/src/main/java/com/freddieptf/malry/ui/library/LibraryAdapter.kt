@@ -1,4 +1,4 @@
-package com.freddieptf.malry.library
+package com.freddieptf.malry.ui.library
 
 import android.view.LayoutInflater
 import android.view.View

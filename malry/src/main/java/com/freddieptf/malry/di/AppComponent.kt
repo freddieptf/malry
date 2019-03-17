@@ -1,7 +1,7 @@
 package com.freddieptf.malry.di
 
-import com.freddieptf.malry.detail.ChapterListFragment
-import com.freddieptf.malry.library.LibraryFragment
+import com.freddieptf.malry.ui.detail.ChapterListFragment
+import com.freddieptf.malry.ui.library.LibraryFragment
 import dagger.Component
 import javax.inject.Singleton
 

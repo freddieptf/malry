@@ -1,12 +1,13 @@
-package com.freddieptf.malry;
+package com.freddieptf.malry.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.freddieptf.malry.intro.IntroFragment;
-import com.freddieptf.malry.library.LibraryFragment;
+import com.freddieptf.malry.PrefUtils;
+import com.freddieptf.malry.ui.intro.IntroFragment;
+import com.freddieptf.malry.ui.library.LibraryFragment;
 import com.freddieptf.mangatest.R;
 
 import androidx.appcompat.app.AppCompatActivity;

@@ -1,4 +1,4 @@
-package com.freddieptf.malry
+package com.freddieptf.malry.ui
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
+import com.freddieptf.malry.App
+import com.freddieptf.malry.CommonGlide
 import com.freddieptf.malry.data.cache.ArchiveCacheManager
 import com.freddieptf.mangatest.R
 import kotlinx.coroutines.*

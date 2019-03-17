@@ -1,4 +1,4 @@
-package com.freddieptf.malry.intro
+package com.freddieptf.malry.ui.intro
 
 import android.Manifest
 import android.app.Activity.RESULT_CANCELED
@@ -14,8 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.freddieptf.malry.PrefUtils
-import com.freddieptf.malry.library.LibraryFragment
-import com.freddieptf.malry.library.LibraryPrefs
+import com.freddieptf.malry.ui.library.LibraryFragment
+import com.freddieptf.malry.ui.library.LibraryPrefs
 import com.freddieptf.mangatest.R
 
 /**
