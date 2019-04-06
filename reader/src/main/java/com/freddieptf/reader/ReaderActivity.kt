@@ -78,9 +78,11 @@ class ReaderActivity : AppCompatActivity() {
         drawerLayout.openDrawer(Gravity.RIGHT)
     }
 
-    fun hideDrawer(listener: DrawerLayout.SimpleDrawerListener) {
-        drawerLayout.removeDrawerListener(listener)
-        drawerLayout.addDrawerListener(listener)
+    fun hideDrawer(listener: DrawerLayout.SimpleDrawerListener?) {
+        if (listener != null) {
+            drawerLayout.removeDrawerListener(listener)
+            drawerLayout.addDrawerListener(listener)
+        }
         drawerLayout.closeDrawer(Gravity.RIGHT)
     }
 

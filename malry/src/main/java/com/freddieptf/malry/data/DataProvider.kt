@@ -36,9 +36,7 @@ class DataProvider(private val localDbSource: DbDataSource,
     }
 
     fun getChapterProvider(chapter: com.freddieptf.malry.api.Chapter): ChapterProvider {
-        return ChapterProvider(localDbSource).apply {
-            setCurrentRead(chapter)
-        }
+        return ChapterProvider(chapter, localDbSource)
     }
 
 }

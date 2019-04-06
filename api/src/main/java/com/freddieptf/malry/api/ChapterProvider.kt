@@ -5,6 +5,12 @@ package com.freddieptf.malry.api
  */
 abstract class ChapterProvider {
 
+    var initialized = false
+
+    open fun initialize() {
+        initialized = true
+    }
+
     abstract fun hasNextRead(): Boolean
 
     abstract fun getNextRead(): Chapter?

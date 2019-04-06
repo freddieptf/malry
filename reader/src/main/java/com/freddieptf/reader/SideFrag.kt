@@ -47,13 +47,14 @@ class SideFrag : Fragment() {
             adapter.swapData(it as ArrayList<Chapter>)
         })
 
-        viewModel.currentReadChannel().observe(this, Observer {
+        viewModel.observeCurrentRead().observe(this, Observer {
             adapter.setActive(it)
         })
 
         adapter.setClickCallbacks(object: Adapter.ClickCallbacks {
             override fun onClick(chapter: Chapter) {
-                viewModel.notifyOpenChapter(chapter)
+                viewModel.notifyCurrentChapterChange(chapter)
+                (activity as ReaderActivity).hideDrawer(null)
             }
         })
 
