@@ -17,4 +17,7 @@ internal interface LibraryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveLibraryItem(data: LibraryItem)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun saveLibraryItems(data: List<LibraryItem>)
+
 }

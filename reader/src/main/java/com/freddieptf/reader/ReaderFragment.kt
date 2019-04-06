@@ -7,7 +7,6 @@ import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,9 +18,6 @@ import com.freddieptf.reader.pagelist.CustomSnapHelper
 import com.freddieptf.reader.utils.*
 import com.freddieptf.reader.widgets.ReaderSeekbar
 import com.github.rubensousa.previewseekbar.PreviewLoader
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -49,6 +45,7 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
 
     companion object {
         private val SHOWING_BARS = "showing_bars"
+        private val CURRENT_PAGE = "cur_page"
     }
 
     init {
@@ -80,11 +77,11 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
         when (item.itemId) {
             R.id.menu_read_ltr -> {
                 activity?.invalidateOptionsMenu()
-                viewModel.setReadDirection(ReadMode.LEFT_TO_RIGHT)
+                viewModel.setReadDirection(context!!, ReadMode.LEFT_TO_RIGHT)
             }
             R.id.menu_read_rtl -> {
                 activity?.invalidateOptionsMenu()
-                viewModel.setReadDirection(ReadMode.RIGHT_TO_LEFT)
+                viewModel.setReadDirection(context!!, ReadMode.RIGHT_TO_LEFT)
             }
             R.id.menu_page_aspect_fit -> {
                 activity?.invalidateOptionsMenu()
@@ -115,6 +112,7 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
 
         savedInstanceState?.let {
             showingBars = it.getInt(SHOWING_BARS, 1)
+            currentPage = it.getInt(CURRENT_PAGE, 0)
         }
         if (showingBars != 1)
             (activity as ReaderActivity).hideSystemUI()
@@ -159,38 +157,25 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
         recyclerView.addReadSignalCallback(simpleReadSignals)
         addRecyclerItemTouchListener()
 
-        viewModel.openChapterChannel().observe(this, androidx.lifecycle.Observer {
-            if (it.seen) return@Observer
-            GlobalScope.launch {
-                cacheLastSeenPage()
-                ChapterProvider.getProvider().setCurrentRead(it.getData()!!)
-                currentRead = ChapterProvider.getProvider().getCurrentRead()
-                GlobalScope.launch(Dispatchers.Main) {
-                    (activity as ReaderActivity).hideDrawer(object : DrawerLayout.SimpleDrawerListener() {
-                        override fun onDrawerClosed(drawerView: View) {
-                            showChapter(currentRead!!)
-                        }
-                    })
-                }
-            }
+        viewModel.observeCurrentRead().observe(this, androidx.lifecycle.Observer {
+            cacheLastSeenPage()
+            currentRead = it
+            // if saveInstance is not null we override the last read page here
+            savedInstanceState?.let { currentRead!!.lastReadPage = currentPage }
+            showChapter(currentRead!!)
         })
 
-        viewModel.getReadDirection().observe(this, androidx.lifecycle.Observer {
+        viewModel.observeReadDirection().observe(this, androidx.lifecycle.Observer {
             if (it.seen) return@Observer
             val direction = it.getData()!!
-            this.readDirection = direction
-            if (ReaderPrefUtils.getReadDirection(context!!) == direction) return@Observer
-            currentPage = recyclerAdapter.itemCount - currentPage - 1
-            ReaderPrefUtils.setReadDirection(context!!, direction)
+            if (this.readDirection == direction) return@Observer // it changed
+            this.readDirection = direction // manga or comic..
+            currentPage = recyclerAdapter.itemCount - currentPage - 1 // flip this..kinda safe since there's really only two states we can be in
             configureForDirection(direction, ArrayList(currentRead!!.paths))
         })
 
-        GlobalScope.launch {
-            val read = ChapterProvider.getProvider().getCurrentRead()
-            GlobalScope.launch(Dispatchers.Main) {
-                showChapter(read)
-            }
-        }
+
+        viewModel.initializeChapterProvider()
 
     }
 
@@ -250,6 +235,7 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
         super.onSaveInstanceState(outState)
         outState.apply {
             putInt(SHOWING_BARS, showingBars)
+            putInt(CURRENT_PAGE, getTrueCurrentPage())
         }
     }
 
@@ -259,8 +245,7 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
             dialog = AlertDialog.Builder(context!!)
                     .setMessage("Would you like to move the next chapter")
                     .setPositiveButton("Next") { dialogInterface, _ ->
-                        cacheLastSeenPage()
-                        showChapter(ChapterProvider.getProvider().getNextRead()!!)
+                        viewModel.switchChapter(ReaderFragViewModel.ChapterSwitch.NEXT)
                         dialogInterface!!.dismiss()
                     }
                     .setNegativeButton("Cancel", { dialogInterface, _ -> dialogInterface.dismiss() })
@@ -275,8 +260,7 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
             dialog = AlertDialog.Builder(context!!)
                     .setMessage("Would you like to move the previous chapter")
                     .setPositiveButton("Previous") { dialogInterface, _ ->
-                        cacheLastSeenPage()
-                        showChapter(ChapterProvider.getProvider().getPreviousRead()!!)
+                        viewModel.switchChapter(ReaderFragViewModel.ChapterSwitch.PREVIOUS)
                         dialogInterface!!.dismiss()
                     }
                     .setNegativeButton("Cancel", { dialogInterface, i -> dialogInterface.dismiss() })
@@ -300,7 +284,6 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
 
         val direction = ReaderPrefUtils.getReadDirection(context!!)
         configureForDirection(direction, pages)
-        viewModel.setCurrentRead(currentRead!!)
     }
 
     private fun configureForDirection(direction: ReadMode, pages: ArrayList<String>) {
@@ -315,9 +298,16 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
     }
 
     private fun cacheLastSeenPage() {
+        if (currentRead == null) return
+        val i = getTrueCurrentPage()
+        viewModel.saveLastViewedPage(currentRead!!.id, i, recyclerAdapter.itemCount)
+    }
+
+    // get current page in normal linear orientation?
+    private fun getTrueCurrentPage(): Int {
         val i = if (readDirection == ReadMode.LEFT_TO_RIGHT) recyclerAdapter.itemCount - currentPage - 1
         else currentPage
-        viewModel.saveLastViewedPage(currentRead!!.id, i, recyclerAdapter.itemCount)
+        return i
     }
 
     private fun addSystemUiVisibiltyChangeListener() {

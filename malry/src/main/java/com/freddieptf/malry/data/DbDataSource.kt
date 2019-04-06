@@ -10,7 +10,7 @@ import com.freddieptf.malry.data.db.models.LibraryItem
 /**
  * Created by freddieptf on 9/17/18.
  */
-class DbDataSource(val db: LibraryDB) {
+class DbDataSource(private val db: LibraryDB) {
 
     internal fun getLibraryItems(): List<LibraryItem> {
         return db.LibraryItemDao().getLibraryItems()
@@ -18,6 +18,10 @@ class DbDataSource(val db: LibraryDB) {
 
     internal fun saveLibraryItem(item: LibraryItem) {
         return db.LibraryItemDao().saveLibraryItem(item)
+    }
+
+    internal fun saveLibraryItems(items: List<LibraryItem>) {
+        return db.LibraryItemDao().saveLibraryItems(items)
     }
 
     fun getChapters(mangaDirUri: Uri): List<com.freddieptf.malry.api.Chapter> {

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.freddieptf.malry.data.DataProvider
 import com.freddieptf.malry.data.DbDataSource
+import com.freddieptf.malry.data.StorageDataSource
 import com.freddieptf.malry.data.db.LibraryDB
 import dagger.Module
 import dagger.Provides
@@ -27,6 +28,12 @@ class DataProviderModule {
 
     @Provides
     @Singleton
-    fun provideDataProvider(context: Context, dbSource: DbDataSource): DataProvider = DataProvider(context, dbSource)
+    fun provideStorageDataSource(ctx: Context): StorageDataSource = StorageDataSource(ctx)
+
+    @Provides
+    @Singleton
+    fun provideDataProvider(dbSource: DbDataSource,
+                            storageDataSource: StorageDataSource): DataProvider =
+            DataProvider(dbSource, storageDataSource)
 
 }
