@@ -3,7 +3,6 @@ package com.freddieptf.malry.data
 import android.content.Context
 import android.net.Uri
 import android.provider.DocumentsContract
-import androidx.documentfile.provider.DocumentFile
 import com.freddieptf.malry.data.db.models.Chapter
 import com.freddieptf.malry.data.db.models.LibraryItem
 import com.freddieptf.malry.data.utils.ChapterTitleComparator
@@ -12,33 +11,53 @@ import java.util.*
 class StorageDataSource(private val ctx: Context) {
 
     internal suspend fun getLibraryItems(treeUri: Uri): List<LibraryItem> {
-        val libraryDocFile = DocumentFile.fromTreeUri(ctx, treeUri)
-        return libraryDocFile!!.listFiles().map { LibraryItem(it.uri, it.name!!, it.listFiles().size, null) }
-    }
-
-    internal suspend fun getChapters(dirUri: Uri): List<Chapter> {
-
-        val manga = Uri.parse(dirUri.path.replace(":", "/")).lastPathSegment
-
-        val uri = DocumentsContract.buildChildDocumentsUriUsingTree(
-                dirUri,
-                DocumentsContract.getDocumentId(dirUri)
-        )
-
+        val uri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, DocumentsContract.getTreeDocumentId(treeUri))
         val PROJECTION = arrayOf<String>(
                 DocumentsContract.Document.COLUMN_DOCUMENT_ID,
-                DocumentsContract.Document.COLUMN_DISPLAY_NAME,
-                DocumentsContract.Document.COLUMN_MIME_TYPE
+                DocumentsContract.Document.COLUMN_DISPLAY_NAME
         )
-
         val cursor = ctx.contentResolver.query(uri,
                 PROJECTION,
                 null,
                 null,
                 null)
+        if (cursor?.moveToFirst() == false) return emptyList()
+        val items = mutableListOf<LibraryItem>()
+        do {
+            if (!cursor.getString(1).startsWith(".nomedia", ignoreCase = true)) {
+                val docURI = DocumentsContract.buildDocumentUriUsingTree(treeUri, cursor.getString(0))
+                val item = LibraryItem(docURI, cursor.getString(1), getChildDirChildCount(docURI), null)
+                items.add(item)
+            }
+        } while (cursor.moveToNext())
 
-        if (!cursor.moveToFirst()) return mutableListOf()
+        return items
+    }
 
+    private fun getChildDirChildCount(dirUri: Uri): Int {
+        val uri = DocumentsContract.buildChildDocumentsUriUsingTree(dirUri, DocumentsContract.getDocumentId(dirUri))
+        val PROJECTION = arrayOf(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
+        val cursor = ctx.contentResolver.query(uri, PROJECTION, null, null, null)
+        return if (cursor?.moveToFirst() == false) 0 else cursor.count
+    }
+
+    internal suspend fun getChapters(dirUri: Uri): List<Chapter> {
+        val manga = Uri.parse(dirUri.path.replace(":", "/")).lastPathSegment
+        val uri = DocumentsContract.buildChildDocumentsUriUsingTree(
+                dirUri,
+                DocumentsContract.getDocumentId(dirUri)
+        )
+        val PROJECTION = arrayOf<String>(
+                DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                DocumentsContract.Document.COLUMN_MIME_TYPE
+        )
+        val cursor = ctx.contentResolver.query(uri,
+                PROJECTION,
+                null,
+                null,
+                null)
+        if (cursor?.moveToFirst() == false) return mutableListOf()
         val chapters = ArrayList<Chapter>()
         do {
             val chapter = Chapter(
@@ -49,10 +68,7 @@ class StorageDataSource(private val ctx: Context) {
                     dirUri)
             chapters.add(chapter)
         } while (cursor.moveToNext())
-
-        Collections.sort(chapters, ChapterTitleComparator())
-
-        return chapters
+        return chapters.apply { sortWith(ChapterTitleComparator()) }
     }
 
 }
