@@ -31,37 +31,15 @@ class LibraryViewModel constructor(var dataProvider: DataProvider) : ViewModel()
         super.onCleared()
     }
 
-    private var libraryItemsLD = MutableLiveData<List<com.freddieptf.malry.api.LibraryItem>>()
-    private var libraryItemChildrenLD = MutableLiveData<List<com.freddieptf.malry.api.Chapter>>()
 
     fun populateLibrary(libLocationUri: Uri) {
-        launch {
-            withContext(Dispatchers.Default) {
-                dataProvider.saveToLibrary(libLocationUri)
-            }
-            val items: MutableList<LibraryItem> = ArrayList()
-            withContext(Dispatchers.Default) {
-                items.addAll(dataProvider.getLibraryItems())
-            }
-            libraryItemsLD.value = items
+        launch(Dispatchers.Default) {
+            dataProvider.saveToLibrary(libLocationUri)
         }
     }
 
     fun getLibraryItems(): LiveData<List<com.freddieptf.malry.api.LibraryItem>> {
-        val db = async(start = CoroutineStart.LAZY) {
-            val items: MutableList<LibraryItem> = ArrayList()
-            withContext(Dispatchers.Default) {
-                items.addAll(dataProvider.getLibraryItems())
-            }
-            items
-        }
-
-        launch {
-            db.start()
-            libraryItemsLD.value = db.await()
-        }
-
-        return libraryItemsLD
+        return dataProvider.getLibraryItems()
     }
 
     data class LastReadData(val chapter: Chapter?, val provider: ChapterProvider?)

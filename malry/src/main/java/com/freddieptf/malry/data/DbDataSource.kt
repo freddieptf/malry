@@ -12,7 +12,7 @@ import com.freddieptf.malry.data.db.models.LibraryItem
  */
 class DbDataSource(private val db: LibraryDB) {
 
-    internal fun getLibraryItems(): List<LibraryItem> {
+    internal fun getLibraryItems(): LiveData<List<LibraryItem>> {
         return db.LibraryItemDao().getLibraryItems()
     }
 

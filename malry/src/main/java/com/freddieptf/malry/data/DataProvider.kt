@@ -2,6 +2,7 @@ package com.freddieptf.malry.data
 
 import android.net.Uri
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import com.freddieptf.malry.api.ChapterProvider
 
 /**
@@ -15,10 +16,13 @@ class DataProvider(private val localDbSource: DbDataSource,
         localDbSource.saveLibraryItems(items)
     }
 
-    fun getLibraryItems(): List<com.freddieptf.malry.api.LibraryItem> {
-        return localDbSource.getLibraryItems().map {
-            com.freddieptf.malry.api.LibraryItem(it.dirUri, it.name, "").apply {
-                itemCount = it.itemCount
+    fun getLibraryItems(): LiveData<List<com.freddieptf.malry.api.LibraryItem>> {
+        return Transformations.map(localDbSource.getLibraryItems())
+        {
+            it.map {
+                com.freddieptf.malry.api.LibraryItem(it.dirUri, it.name, "").apply {
+                    itemCount = it.itemCount
+                }
             }
         }
     }
