@@ -2,6 +2,8 @@ package com.freddieptf.malry.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.freddieptf.malry.data.DataProvider
 import com.freddieptf.malry.data.DbDataSource
 import com.freddieptf.malry.data.StorageDataSource
@@ -17,10 +19,21 @@ import javax.inject.Singleton
 class DataProviderModule {
 
     @Provides
-    fun provideDb(context: Context): LibraryDB =
-            Room.databaseBuilder(context, LibraryDB::class.java, "local.db")
-                    .fallbackToDestructiveMigration()
-                    .build()
+    fun provideDb(context: Context): LibraryDB {
+        var libraryDB: LibraryDB? = null
+        libraryDB = Room.databaseBuilder(context, LibraryDB::class.java, "local.db")
+                .addCallback(object : RoomDatabase.Callback() {
+                    override fun onCreate(db: SupportSQLiteDatabase) {
+                        super.onCreate(db)
+//                        GlobalScope.launch(Dispatchers.Default) {
+//                            libraryDB!!.MangaSourceDao().insert(MangaSource(StorageDataSource.SOURCE_PKG, "","Local Storage"))
+//                        }
+                    }
+                })
+                .fallbackToDestructiveMigration()
+                .build()
+        return libraryDB!!
+    }
 
     @Provides
     @Singleton

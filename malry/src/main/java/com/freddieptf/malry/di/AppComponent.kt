@@ -1,5 +1,6 @@
 package com.freddieptf.malry.di
 
+import com.freddieptf.malry.App
 import com.freddieptf.malry.ui.detail.ChapterListFragment
 import com.freddieptf.malry.ui.library.LibraryFragment
 import dagger.Component
@@ -13,4 +14,5 @@ import javax.inject.Singleton
 interface AppComponent {
     fun inject(fragment: LibraryFragment)
     fun inject(fragment: ChapterListFragment)
+    fun inject(app: App)
 }

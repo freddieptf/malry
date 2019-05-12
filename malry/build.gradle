@@ -42,6 +42,7 @@ dependencies {
     implementation project(':commons')
     implementation project(':api')
     implementation project(':reader')
+    implementation project(':tachiyomicompat')
 
     def val = rootProject.ext
 
@@ -75,4 +76,6 @@ dependencies {
     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
 
     implementation 'com.facebook.stetho:stetho:1.5.0'
+
+    implementation("androidx.collection:collection:1.0.0")
 }
