@@ -10,6 +10,10 @@ import java.util.*
 
 class StorageDataSource(private val ctx: Context) {
 
+    companion object {
+        const val SOURCE_PKG = "malry.localstorage"
+    }
+
     internal suspend fun getLibraryItems(treeUri: Uri): List<LibraryItem> {
         val uri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, DocumentsContract.getTreeDocumentId(treeUri))
         val PROJECTION = arrayOf<String>(
@@ -26,7 +30,7 @@ class StorageDataSource(private val ctx: Context) {
         do {
             if (!cursor.getString(1).startsWith(".nomedia", ignoreCase = true)) {
                 val docURI = DocumentsContract.buildDocumentUriUsingTree(treeUri, cursor.getString(0))
-                val item = LibraryItem(docURI, cursor.getString(1), getChildDirChildCount(docURI), null)
+                val item = LibraryItem(docURI, 1, cursor.getString(1), getChildDirChildCount(docURI), null)
                 items.add(item)
             }
         } while (cursor.moveToNext())

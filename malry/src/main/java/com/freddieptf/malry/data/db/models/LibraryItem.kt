@@ -4,23 +4,27 @@ import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.freddieptf.malry.data.utils.DBTypeConverters
+import com.freddieptf.malry.tachiyomicompat.data.MangaSource
 
 /**
  * Created by freddieptf on 9/17/18.
  */
 @Entity(tableName = "library")
 @TypeConverters(DBTypeConverters::class)
+@ForeignKey(entity = MangaSource::class, parentColumns = ["id"], childColumns = ["sourceID"])
 internal data class LibraryItem(
         @PrimaryKey val dirUri: Uri,
+        val sourceID: Long,
         val name: String,
         val itemCount: Int,
-        val coverImg: String?): Parcelable {
-
+        val coverImg: String?) : Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readParcelable(Uri::class.java.classLoader),
+            parcel.readLong(),
             parcel.readString(),
             parcel.readInt(),
             parcel.readString()) {
@@ -28,6 +32,7 @@ internal data class LibraryItem(
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeParcelable(dirUri, flags)
+        parcel.writeLong(sourceID)
         parcel.writeString(name)
         parcel.writeInt(itemCount)
         parcel.writeString(coverImg)
@@ -46,4 +51,5 @@ internal data class LibraryItem(
             return arrayOfNulls(size)
         }
     }
+
 }

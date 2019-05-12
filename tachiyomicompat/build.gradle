@@ -1,0 +1,64 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(":api")
+
+    implementation("androidx.appcompat:appcompat:1.0.0")
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha3'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$rootProject.ext.kotlinCoroutines"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$rootProject.ext.kotlinCoroutines"
+
+    implementation "androidx.room:room-runtime:$rootProject.ext.roomVersion"
+    kapt "androidx.room:room-compiler:$rootProject.ext.roomVersion"
+
+
+    implementation 'io.reactivex:rxandroid:1.2.1'
+    implementation 'io.reactivex:rxjava:1.3.6'
+    implementation "com.android.support:preference-v7:27.0.2"
+    // HTML parser
+    implementation 'org.jsoup:jsoup:1.10.2'
+    // Network client
+    implementation "com.squareup.okhttp3:okhttp:3.10.0"
+    implementation 'com.squareup.okio:okio:1.14.0'
+    // Dependency injection
+    implementation "com.github.inorichi.injekt:injekt-core:65b0440"
+
+    // JSON
+    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'com.github.salomonbrys.kotson:kotson:2.5.0'
+
+
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://dl.bintray.com/inorichi/tachiyomi' }
+}
