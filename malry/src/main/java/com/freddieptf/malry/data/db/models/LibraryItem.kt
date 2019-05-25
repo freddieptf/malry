@@ -17,12 +17,14 @@ import com.freddieptf.malry.tachiyomicompat.data.MangaSource
 @TypeConverters(DBTypeConverters::class)
 @ForeignKey(entity = MangaSource::class, parentColumns = ["id"], childColumns = ["sourceID"])
 internal data class LibraryItem(
-        @PrimaryKey val dirUri: Uri,
+        @PrimaryKey val ID: String,
+        val dirUri: Uri,
         val sourceID: Long,
         val name: String,
         val itemCount: Int,
         val coverImg: String?) : Parcelable {
     constructor(parcel: Parcel) : this(
+            parcel.readString(),
             parcel.readParcelable(Uri::class.java.classLoader),
             parcel.readLong(),
             parcel.readString(),
@@ -31,6 +33,7 @@ internal data class LibraryItem(
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(ID)
         parcel.writeParcelable(dirUri, flags)
         parcel.writeLong(sourceID)
         parcel.writeString(name)

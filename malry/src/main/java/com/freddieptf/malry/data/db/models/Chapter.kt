@@ -1,6 +1,5 @@
 package com.freddieptf.malry.data.db.models
 
-import android.net.Uri
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
@@ -13,14 +12,14 @@ import com.freddieptf.malry.data.utils.DBTypeConverters
 @Entity(tableName = "chapters")
 @TypeConverters(DBTypeConverters::class)
 @ForeignKey(entity = LibraryItem::class,
-        parentColumns = ["dirUri"],
-        childColumns = ["parentUri"],
+        parentColumns = ["ID"],
+        childColumns = ["parentID"],
         onDelete = ForeignKey.CASCADE)
-internal data class Chapter(@PrimaryKey val docID: String,
-                   val name: String,
-                   val mimeType: String,
-                   val parentName: String,
-                   val parentUri: Uri) {
+internal data class Chapter(@PrimaryKey val ID: String,
+                            val docID: String?,
+                            val name: String,
+                            val mimeType: String,
+                            val parentID: String) {
 
     var lastReadPage: Int = 0
         set

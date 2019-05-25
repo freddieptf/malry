@@ -2,8 +2,9 @@ package com.freddieptf.malry.data
 
 import android.net.Uri
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.api.ChapterProvider
+import com.freddieptf.malry.api.LibraryItem
 
 /**
  * Created by freddieptf on 11/14/18.
@@ -16,27 +17,30 @@ class DataProvider(private val localDbSource: DbDataSource,
         localDbSource.saveLibraryItems(items)
     }
 
+    fun getLibraryItemFromLibrary(ID: String): LibraryItem? {
+        return localDbSource.getLibraryItem(ID)
+    }
+
     fun getLibraryItems(): LiveData<List<com.freddieptf.malry.api.LibraryItem>> {
-        return Transformations.map(localDbSource.getLibraryItems())
-        {
-            it.map {
-                com.freddieptf.malry.api.LibraryItem(it.dirUri, it.name, "").apply {
-                    itemCount = it.itemCount
-                }
-            }
-        }
+        return localDbSource.getLibraryItems()
     }
 
-    suspend fun saveLibraryItemChildren(libraryItemUri: Uri) {
-        localDbSource.saveChapters(storageDataSource.getChapters(libraryItemUri))
+    suspend fun saveChapters(dirUri: Uri) {
+        localDbSource.saveChapters(storageDataSource.getChapters(dirUri))
     }
 
-    fun getLibraryItemChildren(libraryItemUri: Uri): LiveData<List<com.freddieptf.malry.api.Chapter>> {
-        return localDbSource.getChaptersLive(libraryItemUri)
+    suspend fun saveChapters(chapters: List<Chapter>) {
+        localDbSource.saveChapters(chapters.map {
+            com.freddieptf.malry.data.db.models.Chapter(it.id, it.docID, it.title, "", it.parentID)
+        })
+    }
+
+    fun getChapters(libraryItemID: String): LiveData<List<com.freddieptf.malry.api.Chapter>> {
+        return localDbSource.getChaptersLive(libraryItemID)
     }
 
     fun getLastRead(libraryItem: com.freddieptf.malry.api.LibraryItem): com.freddieptf.malry.api.Chapter? {
-        return localDbSource.getLastRead(libraryItem.uri.toString())
+        return localDbSource.getLastRead(libraryItem.ID)
     }
 
     fun getChapterProvider(chapter: com.freddieptf.malry.api.Chapter): ChapterProvider {

@@ -1,6 +1,5 @@
 package com.freddieptf.malry.data
 
-import android.net.Uri
 import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.api.ChapterProvider
 import com.freddieptf.malry.commons.AlphanumComparator
@@ -16,15 +15,15 @@ import kotlin.collections.ArrayList
 internal class ChapterProvider(var chapter: Chapter, var dbDataSource: DbDataSource) : ChapterProvider() {
 
     private var chapterIDs = ArrayList<String>()
-    private var parentUri: Uri
+    private var parentID: String
     private var pos: Int = 0
 
     init {
-        parentUri = Uri.parse(chapter.parentID)
+        parentID = chapter.parentID
     }
 
     override fun initialize() {
-        chapterIDs = dbDataSource.getChapters(parentUri).map { it.id } as ArrayList<String>
+        chapterIDs = dbDataSource.getChapters(parentID).map { it.id } as ArrayList<String>
         pos = chapterIDs.indexOf(chapter.id)
         super.initialize()
     }
@@ -78,13 +77,13 @@ internal class ChapterProvider(var chapter: Chapter, var dbDataSource: DbDataSou
     }
 
     override fun getReadList(): List<Chapter> {
-        val chs = dbDataSource.getChapters(parentUri)
+        val chs = dbDataSource.getChapters(parentID)
         chapterIDs = chs.mapTo(chapterIDs) { it.id }
         return chs
     }
 
     override fun setCurrentRead(chapter: Chapter) {
-        parentUri = Uri.parse(chapter.parentID)
+        parentID = chapter.parentID
         pos = chapterIDs.indexOf(chapter.id)
     }
 

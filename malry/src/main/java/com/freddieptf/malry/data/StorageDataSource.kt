@@ -11,7 +11,7 @@ import java.util.*
 class StorageDataSource(private val ctx: Context) {
 
     companion object {
-        const val SOURCE_PKG = "malry.localstorage"
+        const val SOURCE_PKG: Long = 1
     }
 
     internal suspend fun getLibraryItems(treeUri: Uri): List<LibraryItem> {
@@ -30,7 +30,7 @@ class StorageDataSource(private val ctx: Context) {
         do {
             if (!cursor.getString(1).startsWith(".nomedia", ignoreCase = true)) {
                 val docURI = DocumentsContract.buildDocumentUriUsingTree(treeUri, cursor.getString(0))
-                val item = LibraryItem(docURI, 1, cursor.getString(1), getChildDirChildCount(docURI), null)
+                val item = LibraryItem(docURI.toString(), docURI, StorageDataSource.SOURCE_PKG, cursor.getString(1), getChildDirChildCount(docURI), null)
                 items.add(item)
             }
         } while (cursor.moveToNext())
@@ -45,11 +45,10 @@ class StorageDataSource(private val ctx: Context) {
         return if (cursor?.moveToFirst() == false) 0 else cursor.count
     }
 
-    internal suspend fun getChapters(dirUri: Uri): List<Chapter> {
-        val manga = Uri.parse(dirUri.path.replace(":", "/")).lastPathSegment
+    internal suspend fun getChapters(parentDirURI: Uri): List<Chapter> {
         val uri = DocumentsContract.buildChildDocumentsUriUsingTree(
-                dirUri,
-                DocumentsContract.getDocumentId(dirUri)
+                parentDirURI,
+                DocumentsContract.getDocumentId(parentDirURI)
         )
         val PROJECTION = arrayOf<String>(
                 DocumentsContract.Document.COLUMN_DOCUMENT_ID,
@@ -65,11 +64,11 @@ class StorageDataSource(private val ctx: Context) {
         val chapters = ArrayList<Chapter>()
         do {
             val chapter = Chapter(
-                    cursor.getString(0),
-                    cursor.getString(1),
-                    cursor.getString(2),
-                    manga,
-                    dirUri)
+                    ID = cursor.getString(0),
+                    docID = cursor.getString(0),
+                    name = cursor.getString(1),
+                    mimeType = cursor.getString(2),
+                    parentID = parentDirURI.toString()) //
             chapters.add(chapter)
         } while (cursor.moveToNext())
         return chapters.apply { sortWith(ChapterTitleComparator()) }

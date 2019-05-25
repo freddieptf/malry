@@ -1,6 +1,5 @@
 package com.freddieptf.malry.data.db.dao
 
-import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.freddieptf.malry.data.db.models.Chapter
@@ -16,22 +15,22 @@ internal interface ChapterDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveChapters(data: List<Chapter>)
 
-    @Query("SELECT * FROM chapters WHERE parentUri=:uri")
-    fun getChaptersLiveData(uri: Uri): LiveData<List<Chapter>>
+    @Query("SELECT * FROM chapters WHERE parentID=:ID")
+    fun getChaptersLiveData(ID: String): LiveData<List<Chapter>>
 
-    @Query("SELECT * FROM chapters WHERE parentUri=:uri")
-    fun getChapters(uri: Uri): List<Chapter>
+    @Query("SELECT * FROM chapters WHERE parentID=:ID")
+    fun getChapters(ID: String): List<Chapter>
 
-    @Query("SELECT * FROM chapters WHERE docID=:chapterID")
+    @Query("SELECT * FROM chapters WHERE ID=:chapterID")
     fun getChapter(chapterID: String): Chapter
 
-    @Query("SELECT * FROM chapters WHERE parentURI=:libraryItemID ORDER BY lastRead DESC LIMIT 1")
+    @Query("SELECT * FROM chapters WHERE parentID=:libraryItemID ORDER BY lastRead DESC LIMIT 1")
     fun getLastReadChapter(libraryItemID: String): Chapter?
 
     @Query("UPDATE chapters SET lastReadPage=:page, " +
             "totalPages=:totalPages, " +
             "lastRead=:lastRead " +
-            "WHERE docID=:chapterID")
+            "WHERE ID=:chapterID")
     fun setLastReadPage(chapterID: String, page: Int, totalPages: Int, lastRead: Long)
 
 }

@@ -11,7 +11,10 @@ import androidx.room.PrimaryKey
  *
  * */
 @Entity(tableName = "manga_source")
-data class MangaSource(@PrimaryKey val id: Long, val extensionPkg: String, val extensionClass: String, val name: String) {
+data class MangaSource(@PrimaryKey val id: Long,
+                       val extensionPkg: String,
+                       val extensionClass: String,
+                       val name: String) {
 
     var installed: Boolean = false
         get
