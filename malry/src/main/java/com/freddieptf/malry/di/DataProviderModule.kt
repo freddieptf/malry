@@ -8,8 +8,12 @@ import com.freddieptf.malry.data.DataProvider
 import com.freddieptf.malry.data.DbDataSource
 import com.freddieptf.malry.data.StorageDataSource
 import com.freddieptf.malry.data.db.LibraryDB
+import com.freddieptf.malry.tachiyomicompat.data.MangaSource
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
 /**
@@ -25,14 +29,16 @@ class DataProviderModule {
                 .addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
-//                        GlobalScope.launch(Dispatchers.Default) {
-//                            libraryDB!!.MangaSourceDao().insert(MangaSource(StorageDataSource.SOURCE_PKG, "","Local Storage"))
-//                        }
+                        GlobalScope.launch(Dispatchers.Default) {
+                            libraryDB!!.MangaSourceDao().insert(
+                                    MangaSource(StorageDataSource.SOURCE_PKG, "", "", "Local Storage")
+                            )
+                        }
                     }
                 })
                 .fallbackToDestructiveMigration()
                 .build()
-        return libraryDB!!
+        return libraryDB
     }
 
     @Provides

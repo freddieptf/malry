@@ -26,14 +26,17 @@ import javax.inject.Inject
 class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
 
     companion object {
-
+        private val LIBRARY_ITEM_ID = "library_item_id"
         private val LIBRARY_ITEM_URI = "library_item_uri"
         private val LIBRARY_ITEM_NAME = "library_item_name"
+        private val LIBRARY_ITEM_SOURCE = "library_item_src "
 
         fun newInstance(libraryItem: LibraryItem): ChapterListFragment {
             val bundle = Bundle().apply {
-                putParcelable(LIBRARY_ITEM_URI, libraryItem.uri)
+                putString(LIBRARY_ITEM_ID, libraryItem.ID)
+                putParcelable(LIBRARY_ITEM_URI, libraryItem.dirURI)
                 putString(LIBRARY_ITEM_NAME, libraryItem.title)
+                putLong(LIBRARY_ITEM_SOURCE, libraryItem.sourceID)
             }
             return ChapterListFragment().apply {
                 arguments = bundle
@@ -68,10 +71,11 @@ class ChapterListFragment : Fragment(), ChapterAdapter.ChapterClickListener {
         adapter.setChapterClickListener(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(DetailViewModel::class.java)
 
+        val sourceID = arguments!!.getLong(LIBRARY_ITEM_SOURCE)
+        val itemURI = arguments!!.getParcelable<Uri>(LIBRARY_ITEM_URI)
+        val libraryItemID = arguments!!.getString(LIBRARY_ITEM_ID)
 
-        val libraryItemUri = arguments!!.getParcelable<Uri>(LIBRARY_ITEM_URI)
-
-        viewModel.getDbChapterList(libraryItemUri).observe(this,
+        viewModel.getChapterList(libraryItemID, itemURI, sourceID).observe(this,
                 Observer {
                         adapter.swapData(data = it)
                 })

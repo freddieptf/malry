@@ -6,7 +6,7 @@ import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.api.ChapterProvider
 import com.freddieptf.malry.api.LibraryItem
 import com.freddieptf.malry.data.DataProvider
-import com.freddieptf.malry.tachiyomicompat.TachiyomiSourceSearch
+import com.freddieptf.malry.tachiyomicompat.TachiyomiSource
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -16,17 +16,18 @@ import kotlin.coroutines.CoroutineContext
 class LibraryViewModel constructor(private val dataProvider: DataProvider) : ViewModel(), CoroutineScope {
 
     private val job: Job
-    private val sourceSearch: TachiyomiSourceSearch = TachiyomiSourceSearch()
+    private val sourceSearch: TachiyomiSource = TachiyomiSource()
 
     private val searchInput = MutableLiveData<String>()
     private val searchResultsLiveData = MutableLiveData<MutableList<LibraryItem>>()
     private val combinedSearchResults = MediatorLiveData<MutableList<LibraryItem>>().apply {
         addSource(searchResultsLiveData) { data ->
-            value = value ?: mutableListOf<LibraryItem>().apply { addAll(data) }
+            value = (value ?: mutableListOf())
+                    .apply { addAll(data); }.distinct().toMutableList()
         }
     }
     private val combinedResults = MediatorLiveData<List<LibraryItem>>()
-    private val dbItemsLiveData = dataProvider.getLibraryItems() as MutableLiveData<List<LibraryItem>>
+    private val dbItemsLiveData = dataProvider.getLibraryItems()
 
     private val dbItemsObserver = Observer<Any> { /**do nothing**/ }
 
@@ -59,7 +60,7 @@ class LibraryViewModel constructor(private val dataProvider: DataProvider) : Vie
 
     private fun combineLatest(search: MutableLiveData<String>,
                               externalItems: MutableLiveData<MutableList<LibraryItem>>,
-                              localItems: MutableLiveData<List<LibraryItem>>): MutableList<LibraryItem> {
+                              localItems: LiveData<List<LibraryItem>>): MutableList<LibraryItem> {
 
         if (search.value.isNullOrEmpty()) return localItems.value as MutableList<LibraryItem>?
                 ?: mutableListOf()
@@ -70,7 +71,7 @@ class LibraryViewModel constructor(private val dataProvider: DataProvider) : Vie
             it.title.contains(searchTerm, true)
         } as MutableList<LibraryItem>? ?: mutableListOf()
 
-        results.addAll(externalItems.value?.filter { it.title.contains(searchTerm, true) }
+        results.addAll(externalItems.value?.filter { it.title.startsWith(searchTerm, true) }
                 ?: mutableListOf())
 
         return results

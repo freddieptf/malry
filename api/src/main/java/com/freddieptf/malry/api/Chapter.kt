@@ -6,9 +6,10 @@ import java.util.*
  * Created by freddieptf on 9/22/18.
  */
 data class Chapter(val id: String,
+                   val docID: String?, // from the document provider
                    val title: String,
                    val parentID: String,
-                   val parentTitle: String) {
+                   var parentTitle: String?) {
 
     var lastReadPage: Int = 0
         set

@@ -279,7 +279,7 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
         currentPage = if (readDirection == ReadMode.LEFT_TO_RIGHT) pages.size - currentRead!!.lastReadPage - 1
         else currentRead!!.lastReadPage
         chapterTitle = currentRead!!.title
-        parent = currentRead!!.parentTitle
+        parent = currentRead!!.parentTitle ?: ""
         (activity as AppCompatActivity).supportActionBar!!.title = chapterTitle
 
         val direction = ReaderPrefUtils.getReadDirection(context!!)

@@ -12,7 +12,7 @@ import com.freddieptf.malry.tachiyomicompat.data.MangaSourceDao
 /**
  * Created by freddieptf on 9/17/18.
  */
-@Database(entities = [LibraryItem::class, Chapter::class, MangaSource::class], version = 5)
+@Database(entities = [LibraryItem::class, Chapter::class, MangaSource::class], version = 9)
 abstract class LibraryDB: RoomDatabase() {
 
     internal abstract fun LibraryItemDao(): LibraryDao
