@@ -13,18 +13,18 @@ abstract class ChapterProvider {
 
     abstract fun hasNextRead(): Boolean
 
-    abstract fun getNextRead(): Chapter?
+    abstract suspend fun getNextRead(): Chapter?
 
-    abstract fun getCurrentRead(): Chapter
+    abstract suspend fun getCurrentRead(): Chapter
 
     abstract fun setCurrentRead(chapter: Chapter)
 
     abstract fun hasPreviousRead(): Boolean
 
-    abstract fun getPreviousRead(): Chapter?
+    abstract suspend fun getPreviousRead(): Chapter?
 
     abstract fun setLastReadPage(chapterID: String, page: Int, totalPages: Int)
 
-    abstract fun getReadList(): List<Chapter>
+    abstract suspend fun getReadList(): List<Chapter>
 
 }

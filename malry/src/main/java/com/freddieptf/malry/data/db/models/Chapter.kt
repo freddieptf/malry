@@ -15,9 +15,9 @@ import com.freddieptf.malry.data.utils.DBTypeConverters
         parentColumns = ["ID"],
         childColumns = ["parentID"],
         onDelete = ForeignKey.CASCADE)
-internal data class Chapter(@PrimaryKey val ID: String,
+internal data class Chapter(@PrimaryKey val id: String,
                             val docID: String?,
-                            val name: String,
+                            val title: String,
                             val mimeType: String,
                             val parentID: String) {
 

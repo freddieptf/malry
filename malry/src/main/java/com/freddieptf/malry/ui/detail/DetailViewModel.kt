@@ -63,10 +63,10 @@ class DetailViewModel constructor(var dataProvider: DataProvider) : ViewModel(),
         }
     }
 
-    fun getChapterProvider(chapter: Chapter): LiveData<ChapterProvider> {
+    fun getChapterProvider(position: Int, chapters: List<Chapter>): LiveData<ChapterProvider> {
         val rl = MutableLiveData<ChapterProvider>()
         launch(Dispatchers.Default) {
-            val provider = dataProvider.getChapterProvider(chapter)
+            val provider = dataProvider.getChapterProvider(position, chapters)
             withContext(Dispatchers.Main) {
                 rl.value = provider
             }

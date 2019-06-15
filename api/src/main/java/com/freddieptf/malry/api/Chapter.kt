@@ -1,7 +1,5 @@
 package com.freddieptf.malry.api
 
-import java.util.*
-
 /**
  * Created by freddieptf on 9/22/18.
  */
@@ -9,6 +7,7 @@ data class Chapter(val id: String,
                    val docID: String?, // from the document provider
                    val title: String,
                    val parentID: String,
+                   val sourceID: Long,
                    var parentTitle: String?) {
 
     var lastReadPage: Int = 0
@@ -19,7 +18,9 @@ data class Chapter(val id: String,
         set
         get
 
-    var paths: List<String> = ArrayList()
+    @Transient
+    var paths: List<String>? = emptyList()
+        set
         get
 
     fun setPaths(paths: List<String>): Chapter {

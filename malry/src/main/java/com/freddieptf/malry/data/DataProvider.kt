@@ -39,12 +39,17 @@ class DataProvider(private val localDbSource: DbDataSource,
         return localDbSource.getChaptersLive(libraryItemID)
     }
 
+    fun getChapterList(libraryItemID: String): List<com.freddieptf.malry.api.Chapter> {
+        return localDbSource.getChapters(libraryItemID)
+    }
+
+
     fun getLastRead(libraryItem: com.freddieptf.malry.api.LibraryItem): com.freddieptf.malry.api.Chapter? {
         return localDbSource.getLastRead(libraryItem.ID)
     }
 
-    fun getChapterProvider(chapter: com.freddieptf.malry.api.Chapter): ChapterProvider {
-        return ChapterProvider(chapter, localDbSource)
+    fun getChapterProvider(currentPos: Int, chapters: List<com.freddieptf.malry.api.Chapter>): ChapterProvider {
+        return ChapterProvider(currentPos, chapters, localDbSource)
     }
 
 }
