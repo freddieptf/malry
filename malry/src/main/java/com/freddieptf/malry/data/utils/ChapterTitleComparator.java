@@ -15,6 +15,6 @@ public class ChapterTitleComparator implements Comparator<Chapter> {
 
     @Override
     public int compare(Chapter chapter, Chapter t1) {
-        return alphanumComparator.compare(chapter.getName(), t1.getName());
+        return alphanumComparator.compare(chapter.getTitle(), t1.getTitle());
     }
 }

@@ -64,9 +64,9 @@ class StorageDataSource(private val ctx: Context) {
         val chapters = ArrayList<Chapter>()
         do {
             val chapter = Chapter(
-                    ID = cursor.getString(0),
+                    id = cursor.getString(0),
                     docID = cursor.getString(0),
-                    name = cursor.getString(1),
+                    title = cursor.getString(1),
                     mimeType = cursor.getString(2),
                     parentID = parentDirURI.toString()) //
             chapters.add(chapter)

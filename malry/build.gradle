@@ -39,10 +39,10 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':commons')
+    implementation project(':library:commons')
     implementation project(':api')
-    implementation project(':reader')
-    implementation project(':tachiyomicompat')
+    implementation project(':library:reader')
+    implementation project(':library:tachiyomicompat')
 
     def val = rootProject.ext
 

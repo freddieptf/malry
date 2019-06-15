@@ -20,7 +20,7 @@ internal data class LibraryItem(
         @PrimaryKey val ID: String,
         val dirUri: Uri,
         val sourceID: Long,
-        val name: String,
+        val title: String,
         val itemCount: Int,
         val coverImg: String?) : Parcelable {
     constructor(parcel: Parcel) : this(
@@ -36,7 +36,7 @@ internal data class LibraryItem(
         parcel.writeString(ID)
         parcel.writeParcelable(dirUri, flags)
         parcel.writeLong(sourceID)
-        parcel.writeString(name)
+        parcel.writeString(title)
         parcel.writeInt(itemCount)
         parcel.writeString(coverImg)
     }

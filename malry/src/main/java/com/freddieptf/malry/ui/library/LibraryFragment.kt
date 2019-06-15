@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.freddieptf.malry.App
 import com.freddieptf.malry.api.LibraryItem
 import com.freddieptf.malry.di.LibViewModelFactory
-import com.freddieptf.malry.ui.detail.ChapterListFragment
+import com.freddieptf.malry.ui.detail.MangaDetailFragment
 import com.freddieptf.mangatest.R
-import com.freddieptf.reader.ChapterProvider
+import com.freddieptf.reader.ChapterLoader
 import com.freddieptf.reader.ReaderActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -78,14 +78,14 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
     }
 
     private fun openChapterListFrag(dir: LibraryItem) {
-        val detailFragment = ChapterListFragment.newInstance(dir)
+        val detailFragment = MangaDetailFragment.newInstance(dir)
         fragmentManager!!.beginTransaction()
                 .replace(
                         (activity!! as LibraryFragmentContainer).getFragmentContainerId(),
                         detailFragment,
-                        ChapterListFragment::class.java.simpleName
+                        MangaDetailFragment::class.java.simpleName
                 )
-                .addToBackStack(ChapterListFragment::class.java.simpleName)
+                .addToBackStack(MangaDetailFragment::class.java.simpleName)
                 .commit()
     }
 
@@ -94,7 +94,7 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
             if (it.chapter == null) {
                 openChapterListFrag(libraryItem)
             } else {
-                ChapterProvider.useProvider(it.provider!!)
+                ChapterLoader.useProvider(it.provider!!)
                 val i = ReaderActivity.newIntent(context!!)
                 startActivity(i)
             }

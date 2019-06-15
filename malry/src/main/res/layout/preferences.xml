@@ -12,16 +12,10 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-
     <FrameLayout
         android:id="@+id/preferencesContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:background="?toolBar_shadow" />
 
     </FrameLayout>
 

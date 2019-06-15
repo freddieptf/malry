@@ -102,7 +102,8 @@ class LibraryViewModel constructor(private val dataProvider: DataProvider) : Vie
                     lr.value = LastReadData(null, null)
                 }
             } else {
-                val provider = dataProvider.getChapterProvider(chapter)
+                val chs = dataProvider.getChapterList(libraryItem.ID)
+                val provider = dataProvider.getChapterProvider(chs.indexOf(chapter), chs)
                 withContext(Dispatchers.Main) {
                     lr.value = LastReadData(chapter, provider)
                 }
