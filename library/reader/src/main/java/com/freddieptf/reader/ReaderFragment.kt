@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import com.freddieptf.imageloader.ImageLoader
 import com.freddieptf.malry.api.Chapter
 import com.freddieptf.reader.pagelist.CustomRecyclerView
 import com.freddieptf.reader.pagelist.CustomSnapHelper
@@ -215,10 +215,9 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
     }
 
     override fun loadPreview(currentPosition: Long, max: Long) {
-        Glide.with(this)
-                .load(recyclerAdapter.pages.get(currentPosition.toInt()))
-                .thumbnail()
-                .into(previewImage)
+        ImageLoader.load(recyclerAdapter.pages.get(currentPosition.toInt()), true) {
+            previewImage.setImageBitmap(it)
+        }
     }
 
     override fun onSeekTo(position: Int) {
@@ -292,7 +291,7 @@ class ReaderFragment : Fragment(), PreviewLoader, ReaderSeekbar.OnSeekListener {
                 Collections.reverse(pages)
             }
         }
-        recyclerAdapter.swap(pages)
+        recyclerAdapter.swap(pages, direction)
         seekbar.setUp(direction, currentPage, pages.size - 1)
         layoutManager.scrollToPosition(currentPage)
     }

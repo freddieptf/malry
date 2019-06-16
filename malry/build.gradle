@@ -43,6 +43,7 @@ dependencies {
     implementation project(':api')
     implementation project(':library:reader')
     implementation project(':library:tachiyomicompat')
+    implementation project(':library:imageloader')
 
     def val = rootProject.ext
 
@@ -67,9 +68,6 @@ dependencies {
     kapt 'com.google.dagger:dagger-compiler:2.19'
 
     implementation 'com.afollestad.material-dialogs:core:2.0.0-rc7'
-
-    implementation 'com.github.bumptech.glide:glide:4.8.0'
-    kapt 'com.github.bumptech.glide:compiler:4.8.0'
 
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'

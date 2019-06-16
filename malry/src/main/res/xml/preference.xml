@@ -6,7 +6,7 @@
         android:title="Caching">
 
         <EditTextPreference
-            android:defaultValue="@integer/glide_cache_default_size"
+            android:defaultValue="@integer/img_cache_default_size"
             android:key="@string/image_cache_size_limit_key"
             android:layout="@layout/preference_custom"
             android:persistent="true"

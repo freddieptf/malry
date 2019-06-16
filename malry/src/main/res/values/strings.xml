@@ -13,7 +13,7 @@
     <string name="pref_theme_dark">Dark</string>
     <string name="pref_about_title">About</string>
     <string name="cbz_cache_size_pref_key">chapter_cache_size</string>
-    <string name="cbz_cache_size_pref">CBZ cache Size Limit</string>
+    <string name="cbz_cache_size_pref">App cache</string>
     <string name="clear_cache_key">clear_cache</string>
 
     <string name="single_lib_location_text">It\'s best to organize all your manga/comics into one directory</string>
@@ -21,7 +21,7 @@
     <string name="select_loation">Set</string>
     <string name="set_lib_loc_b4_continue">I need you to set the location of your library before we continue</string>
     <string name="image_cache_size_limit_key">image_cache_size_limit</string>
-    <string name="image_cache_size_lmt">Image Cache Size Limit</string>
+    <string name="image_cache_size_lmt">Image Cache</string>
     <string name="clear_cache">Clear Cache</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
