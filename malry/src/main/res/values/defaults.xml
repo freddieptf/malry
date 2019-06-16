@@ -13,6 +13,6 @@
     <bool name="spb_default_progressiveStart_activated">false</bool>
 
     <integer name="cbz_cache_default_size">100</integer>
-    <integer name="glide_cache_default_size">100</integer>
+    <integer name="img_cache_default_size">100</integer>
 
 </resources>

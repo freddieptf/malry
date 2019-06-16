@@ -3,6 +3,7 @@ package com.freddieptf.malry
 import android.app.Application
 import android.preference.PreferenceManager
 import com.facebook.stetho.Stetho
+import com.freddieptf.imageloader.ImageLoader
 import com.freddieptf.malry.data.cache.ArchiveCacheManager
 import com.freddieptf.malry.data.db.LibraryDB
 import com.freddieptf.malry.di.AppComponent
@@ -39,6 +40,7 @@ class App : Application() {
         component = DaggerAppComponent.builder().appModule(AppModule(this)).build()
         component.inject(this)
 
+        initImageLoader()
         TachiyomiCompat.init(this)
         initChCache(null)
 
@@ -57,6 +59,13 @@ class App : Application() {
                 .toLong()
         maxCacheSize *= 1024 * 1024
         ArchiveCacheManager.useCache(externalCacheDir!!.absolutePath + "/archives", maxCacheSize)
+    }
+
+    fun initImageLoader() {
+        var maxCacheSize = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(getString(R.string.image_cache_size_limit_key), R.integer.img_cache_default_size.toString())
+                .toLong()
+        ImageLoader.init(this, maxCacheSize * 1024 * 1024)
     }
 
 }

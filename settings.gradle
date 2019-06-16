@@ -1,5 +1,6 @@
 include ':malry'
 include ':api'
 include ':library:commons'
+include ':library:imageloader'
 include ':library:reader'
 include ':library:tachiyomicompat'

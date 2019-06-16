@@ -12,9 +12,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
+import com.freddieptf.imageloader.ImageLoader
 import com.freddieptf.malry.App
-import com.freddieptf.malry.CommonGlide
 import com.freddieptf.malry.data.cache.ArchiveCacheManager
+import com.freddieptf.malry.data.utils.FileUtils
 import com.freddieptf.mangatest.R
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
@@ -49,7 +50,7 @@ class Settings : AppCompatActivity(), Preference.OnPreferenceChangeListener {
             when (preference.key) {
                 getString(R.string.cbz_cache_size_pref_key) -> {
                     (application as App).initChCache(v.toLong())
-                    preference.summary = "${(ArchiveCacheManager.getDirSize(ArchiveCacheManager.getCacheDir())) / (1024 * 1024)}MB / ${v}MB"
+                    preference.summary = "${FileUtils.toMB(ArchiveCacheManager.getDirSize(ArchiveCacheManager.getCacheDir()))}MB / ${v}MB"
                 }
                 getString(R.string.image_cache_size_limit_key) -> {
                     val newSize = v.toLong()
@@ -57,14 +58,13 @@ class Settings : AppCompatActivity(), Preference.OnPreferenceChangeListener {
                             .getString(preference.key, null).toLong()
                     if (newSize != oldSize) {
                         GlobalScope.launch(Dispatchers.IO) {
-                            CommonGlide.get(applicationContext).clearDiskCache()
-                            CommonGlide.tearDown()
+                            ImageLoader.rebuild(context = baseContext, diskCacheMaxSize = newSize)
                             withContext(Dispatchers.Main) {
-                                preference.summary = "${getImgCacheSize(baseContext)}MB / ${v}MB"
+                                preference.summary = "${FileUtils.toMB(ImageLoader.getUsedDiskCacheSize())}MB / ${v}MB"
                             }
                         }
                     }
-                    preference.summary = "${getImgCacheSize(this)}MB / ${v}MB"
+                    preference.summary = "${FileUtils.toMB(ImageLoader.getUsedDiskCacheSize())}MB / ${v}MB"
                 }
                 else -> {
                     preference.summary = v
@@ -92,14 +92,6 @@ class Settings : AppCompatActivity(), Preference.OnPreferenceChangeListener {
 
         return super.onOptionsItemSelected(item)
 
-    }
-
-    companion object {
-        private fun getImgCacheSize(ctx: Context): Long {
-            var imgCacheSize: Long = ArchiveCacheManager.getDirSize(CommonGlide.getPhotoCacheDir(ctx)!!)
-            imgCacheSize /= (1024 * 1024).toLong()
-            return imgCacheSize
-        }
     }
     
 
@@ -129,8 +121,8 @@ class Settings : AppCompatActivity(), Preference.OnPreferenceChangeListener {
             (activity as Settings).bindPrefToSummary(cbzCacheLimitPref)
             (activity as Settings).bindPrefToSummary(imgCacheLimitPref)
 
-            val imgCacheSize: Long = getImgCacheSize(activity!!)
-            val cbzCacheSize = (ArchiveCacheManager.getDirSize(ArchiveCacheManager.getCacheDir())) / (1024 * 1024)
+            val imgCacheSize = FileUtils.toMB(ImageLoader.getUsedDiskCacheSize())
+            val cbzCacheSize = FileUtils.toMB(ArchiveCacheManager.getDirSize(ArchiveCacheManager.getCacheDir()))
 
             findPreference(getString(R.string.clear_cache_key)).summary =
                     (cbzCacheSize.plus(imgCacheSize)).toString() + "MB used"
@@ -144,19 +136,19 @@ class Settings : AppCompatActivity(), Preference.OnPreferenceChangeListener {
                                 0 -> {
                                     launch {
                                         withContext(Dispatchers.IO) {
-                                            CommonGlide.get(activity!!).clearDiskCache()
+                                            ImageLoader.clearCache()
                                         }
-                                        val imgCacheSize: Long = getImgCacheSize(activity!!)
+                                        val imgCacheSize = FileUtils.toMB(ImageLoader.getUsedDiskCacheSize())
                                         val cbzCacheSize = (ArchiveCacheManager.getDirSize(ArchiveCacheManager.getCacheDir())) / (1024 * 1024)
                                         preference.summary = "${cbzCacheSize.plus(imgCacheSize) - imgCacheSize}MB Used"
                                         imgCacheLimitPref.summary = "OMB / " +
-                                                "${imgCacheLimitPref.sharedPreferences.getString(imgCacheLimitPref.key, R.integer.glide_cache_default_size.toString())}MB"
+                                                "${imgCacheLimitPref.sharedPreferences.getString(imgCacheLimitPref.key, R.integer.img_cache_default_size.toString())}MB"
                                     }
                                 }
                                 1 -> {
                                     ArchiveCacheManager.clearAll()
-                                    val imgCacheSize: Long = getImgCacheSize(activity!!)
-                                    val cbzCacheSize = (ArchiveCacheManager.getDirSize(ArchiveCacheManager.getCacheDir())) / (1024 * 1024)
+                                    val imgCacheSize = FileUtils.toMB(ImageLoader.getUsedDiskCacheSize())
+                                    val cbzCacheSize = FileUtils.toMB(ArchiveCacheManager.getDirSize(ArchiveCacheManager.getCacheDir()))
                                     preference.summary = "${cbzCacheSize.plus(imgCacheSize) - cbzCacheSize}MB Used"
                                     cbzCacheLimitPref.summary = "OMB / " +
                                             "${cbzCacheLimitPref.sharedPreferences.getString(cbzCacheLimitPref.key, R.integer.cbz_cache_default_size.toString())}MB"

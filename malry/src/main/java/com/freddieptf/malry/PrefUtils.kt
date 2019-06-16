@@ -25,7 +25,7 @@ object PrefUtils {
 
     fun getImgCacheSizeLimit(ctx: Context): Long {
         return PreferenceManager.getDefaultSharedPreferences(ctx)
-                .getString(ctx.getString(R.string.image_cache_size_limit_key), R.integer.glide_cache_default_size.toString())
+                .getString(ctx.getString(R.string.image_cache_size_limit_key), R.integer.img_cache_default_size.toString())
                 .toLong() * (1024 * 1024)
     }
 
