@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="ReaderTheme" parent="@style/Theme.AppCompat.DayNight.NoActionBar">
+    <style name="ReaderTheme" parent="@style/Theme.AppCompat.NoActionBar">
         <item name="android:statusBarColor">@color/transparent_grey</item>
         <item name="android:navigationBarColor">@color/transparent_grey</item>
         <item name="android:windowTranslucentNavigation">true</item>
