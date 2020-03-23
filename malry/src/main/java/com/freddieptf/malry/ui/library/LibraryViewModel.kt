@@ -6,51 +6,38 @@ import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.api.ChapterProvider
 import com.freddieptf.malry.api.LibraryItem
 import com.freddieptf.malry.data.DataProvider
-import com.freddieptf.malry.tachiyomicompat.TachiyomiSource
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 /**
  * Created by freddieptf on 9/16/18.
  */
-class LibraryViewModel constructor(private val dataProvider: DataProvider) : ViewModel(), CoroutineScope {
+internal class LibraryViewModel constructor(private val dataProvider: DataProvider) : ViewModel(), CoroutineScope {
 
     private val job: Job
-    private val sourceSearch: TachiyomiSource = TachiyomiSource()
-
     private val searchInput = MutableLiveData<String>()
-    private val searchResultsLiveData = MutableLiveData<MutableList<LibraryItem>>()
-    private val combinedSearchResults = MediatorLiveData<MutableList<LibraryItem>>().apply {
-        addSource(searchResultsLiveData) { data ->
-            value = (value ?: mutableListOf())
-                    .apply { addAll(data); }.distinct().toMutableList()
-        }
-    }
-    private val combinedResults = MediatorLiveData<List<LibraryItem>>()
-    private val dbItemsLiveData = dataProvider.getLibraryItems()
 
-    private val dbItemsObserver = Observer<Any> { /**do nothing**/ }
+    internal data class ViewState(var progress: Boolean = false, var data: List<LibraryItem>, var error: String? = null)
+
+    private val viewData = MediatorLiveData<ViewState>()
+    private val dbItemsLiveData = dataProvider.getLibraryItems()
+    private val dbItemsObserver = Observer<Any> {}
 
     init {
         job = Job()
-
-        combinedResults.addSource(searchInput) { title ->
-            launch(Dispatchers.Default) { sourceSearch.search(title, searchResultsLiveData); };
-            combinedResults.value = combineLatest(searchInput, combinedSearchResults, dbItemsLiveData)
+        viewData.value = ViewState(progress = true, data = mutableListOf(), error = null)
+        viewData.addSource(searchInput) { term ->
+            viewData.value = viewData.value!!.copy(data = combineLatest(term, dbItemsLiveData.value), error = null)
         }
-        combinedResults.addSource(dbItemsLiveData) { data ->
-            combinedResults.value = combineLatest(searchInput, combinedSearchResults, dbItemsLiveData)
+        // @TODO should't depend on this directly like this..first time it will always return an empty list and set progress to false..
+        viewData.addSource(dbItemsLiveData) { data ->
+            viewData.value = viewData.value!!.copy(progress = false, data = combineLatest(searchInput.value, data), error = null)
         }
-        combinedResults.addSource(combinedSearchResults) { data ->
-            combinedResults.value = combineLatest(searchInput, combinedSearchResults, dbItemsLiveData)
-        }
-
         dbItemsLiveData.observeForever(dbItemsObserver)
     }
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
-
 
     override fun onCleared() {
         dbItemsLiveData.removeObserver(dbItemsObserver)
@@ -58,26 +45,15 @@ class LibraryViewModel constructor(private val dataProvider: DataProvider) : Vie
         super.onCleared()
     }
 
-    private fun combineLatest(search: MutableLiveData<String>,
-                              externalItems: MutableLiveData<MutableList<LibraryItem>>,
-                              localItems: LiveData<List<LibraryItem>>): MutableList<LibraryItem> {
-
-        if (search.value.isNullOrEmpty()) return localItems.value as MutableList<LibraryItem>?
-                ?: mutableListOf()
-
-        val searchTerm = search.value!!
-
-        val results: MutableList<LibraryItem> = localItems.value?.filter {
-            it.title.contains(searchTerm, true)
-        } as MutableList<LibraryItem>? ?: mutableListOf()
-
-        results.addAll(externalItems.value?.filter { it.title.startsWith(searchTerm, true) }
-                ?: mutableListOf())
-
-        return results
+    private fun combineLatest(searchTerm: String?,
+                              localItems: List<LibraryItem>?): List<LibraryItem> {
+        return (if (!searchTerm.isNullOrEmpty())
+            localItems?.filter { it.title.contains(searchTerm, true) }
+        else localItems) ?: mutableListOf()
     }
 
     fun populateLibrary(libLocationUri: Uri) {
+        viewData.value = viewData.value!!.copy(progress = true, error = null)
         launch(Dispatchers.Default) {
             dataProvider.saveToLibrary(libLocationUri)
         }
@@ -87,8 +63,8 @@ class LibraryViewModel constructor(private val dataProvider: DataProvider) : Vie
         searchInput.value = mangaTitle
     }
 
-    fun getLibraryItems(): LiveData<List<com.freddieptf.malry.api.LibraryItem>> {
-        return combinedResults
+    fun getData(): LiveData<ViewState> {
+        return viewData
     }
 
     data class LastReadData(val chapter: Chapter?, val provider: ChapterProvider?)

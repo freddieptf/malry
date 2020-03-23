@@ -1,9 +1,6 @@
 package com.freddieptf.malry.ui.library
 
-import android.app.Activity.RESULT_OK
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -12,6 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.freddieptf.malry.App
 import com.freddieptf.malry.api.LibraryItem
 import com.freddieptf.malry.di.LibViewModelFactory
@@ -31,6 +29,7 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
 
     private val adapter = LibraryAdapter()
     private lateinit var recyler: RecyclerView
+    private lateinit var swRefresh: SwipeRefreshLayout
     private lateinit var viewModel: LibraryViewModel
 
     @Inject
@@ -53,13 +52,21 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
         viewModel = ViewModelProviders.of(activity!!, viewModelFactory).get(LibraryViewModel::class.java)
 
         recyler = view.findViewById(R.id.rv_libraryList)
+        swRefresh = view.findViewById(R.id.sw_library_refresh)
         recyler.layoutManager = LinearLayoutManager(context!!)
         recyler.adapter = adapter
         adapter.setClickListener(this)
 
-        viewModel.getLibraryItems().observe(this, Observer {
-            Log.d(LibraryFragment::class.java.simpleName, "swapDATA ${it.size}")
-            adapter.swapData(it)
+        swRefresh.setOnRefreshListener {
+            LibraryPrefs.getLibUri(context!!)?.let {
+                viewModel.populateLibrary(it)
+            }
+                    ?: throw NotImplementedError("so you thought this wouldn't happen, here's why you're dumb")
+        }
+
+        viewModel.getData().observe(this, Observer {
+            swRefresh.isRefreshing = it.progress
+            adapter.swapData(it.data)
         })
 
     }
@@ -103,21 +110,6 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
 
     }
 
-    private fun startLibSelector() {
-        var i = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-        i.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
-        startActivityForResult(i, 100)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 100 && resultCode == RESULT_OK) {
-            println(data!!.data)
-            LibraryPrefs.addLibUri(context!!, data.data)
-            viewModel.populateLibrary(data.data)
-        }
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater?) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater!!.inflate(R.menu.library_menu, menu)
@@ -130,20 +122,11 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
             }
 
             override fun onQueryTextChange(p0: String?): Boolean {
-                return false
+                viewModel.search(p0!!)
+                return true
             }
 
         })
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item!!.itemId) {
-            R.id.menu_set_lib_location -> {
-                startLibSelector()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
 }

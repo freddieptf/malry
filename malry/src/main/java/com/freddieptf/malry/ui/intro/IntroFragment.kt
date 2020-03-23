@@ -15,10 +15,15 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
+import com.freddieptf.malry.App
 import com.freddieptf.malry.PrefUtils
+import com.freddieptf.malry.di.LibViewModelFactory
 import com.freddieptf.malry.ui.library.LibraryFragment
 import com.freddieptf.malry.ui.library.LibraryPrefs
+import com.freddieptf.malry.ui.library.LibraryViewModel
 import com.freddieptf.mangatest.R
+import javax.inject.Inject
 
 /**
  * Created by freddieptf on 11/26/18.
@@ -29,6 +34,14 @@ class IntroFragment : Fragment() {
 
     private lateinit var btnSelectLocation: TextView
     private lateinit var tvTitle: TextView
+    @Inject
+    lateinit var viewModelFactory: LibViewModelFactory
+
+    private fun startLibSelector() {
+        val i = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+        i.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        startActivityForResult(i, 100)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.intro_frag, container, false)
@@ -40,6 +53,8 @@ class IntroFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        (activity!!.application as App).component.inject(this)
+
         tvTitle = view.findViewById(R.id.tv_introTitle)
         btnSelectLocation = view.findViewById(R.id.btn_selectLibLocation)
 
@@ -83,27 +98,20 @@ class IntroFragment : Fragment() {
             when (resultCode) {
                 RESULT_OK -> {
                     LibraryPrefs.addLibUri(context!!, data!!.data)
-                    finishSetup()
+                    PrefUtils.setFirstSetupComplete(context!!)
+
+                    (activity as AppCompatActivity).supportActionBar!!.show()
+                    ViewModelProviders.of(activity!!, viewModelFactory).get(LibraryViewModel::class.java).populateLibrary(LibraryPrefs.getLibUri(context!!)!!)
+
+                    fragmentManager!!.beginTransaction()
+                            .replace(R.id.container, LibraryFragment(), LibraryFragment::class.java.simpleName)
+                            .commit()
                 }
                 RESULT_CANCELED -> {
                     tvTitle.text = context!!.getString(R.string.set_lib_loc_b4_continue)
                 }
             }
         }
-    }
-
-    private fun startLibSelector() {
-        val i = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-        i.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
-        startActivityForResult(i, 100)
-    }
-
-    private fun finishSetup() {
-        (activity as AppCompatActivity).supportActionBar!!.show()
-        PrefUtils.setFirstSetupComplete(context!!)
-        fragmentManager!!.beginTransaction()
-                .replace(R.id.container, LibraryFragment(), LibraryFragment::class.java.simpleName)
-                .commit()
     }
 
     private fun hasStoragePerms(): Boolean {
