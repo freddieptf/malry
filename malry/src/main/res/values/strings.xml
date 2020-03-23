@@ -27,5 +27,8 @@
     <string name="cancel">Cancel</string>
     <string name="ok">Ok</string>
     <string name="search">Search</string>
+    <string name="perm_dialog_desc">I need this permission to fetch the comic/manga library on your phone\'s storage</string>
+    <string name="perm_dialog_title">Storage Permission</string>
+    <string name="later">Later</string>
 
 </resources>

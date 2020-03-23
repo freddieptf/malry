@@ -10,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -45,7 +47,7 @@ class IntroFragment : Fragment() {
             if (hasStoragePerms()) startLibSelector()
             else {
                 requestPermissions(
-                        Array<String>(1) { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                        Array(1) { Manifest.permission.WRITE_EXTERNAL_STORAGE },
                         STORAGE_REQ_CODE);
             }
         }
@@ -58,7 +60,19 @@ class IntroFragment : Fragment() {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startLibSelector()
             } else {
-                TODO("handle this...probably suggest installing an external provider")
+                AlertDialog.Builder(context!!)
+                        .setTitle(getString(R.string.perm_dialog_title))
+                        .setMessage(getString(R.string.perm_dialog_desc))
+                        .setPositiveButton(getString(R.string.ok)) { d, _ ->
+                            requestPermissions(
+                                    Array(1) { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                                    STORAGE_REQ_CODE);
+                            d.dismiss();
+                        }
+                        .setNeutralButton(getString(R.string.later)) { d, _ ->
+                            Toast.makeText(context!!, "I'm kinda useless like this...", Toast.LENGTH_SHORT).show(); d.dismiss()
+                        }
+                        .show()
             }
         }
     }
