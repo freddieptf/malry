@@ -58,10 +58,7 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
         adapter.setClickListener(this)
 
         swRefresh.setOnRefreshListener {
-            LibraryPrefs.getLibUri(context!!)?.let {
-                viewModel.populateLibrary(it)
-            }
-                    ?: throw NotImplementedError("so you thought this wouldn't happen, here's why you're dumb")
+
         }
 
         viewModel.getData().observe(this, Observer {

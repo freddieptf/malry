@@ -1,6 +1,5 @@
 package com.freddieptf.malry.ui.library
 
-import android.net.Uri
 import androidx.lifecycle.*
 import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.api.ChapterProvider
@@ -20,7 +19,7 @@ internal class LibraryViewModel constructor(private val dataProvider: DataProvid
     internal data class ViewState(var progress: Boolean = false, var data: List<LibraryItem>, var error: String? = null)
 
     private val viewData = MediatorLiveData<ViewState>()
-    private val dbItemsLiveData = dataProvider.getLibraryItems()
+    private val dbItemsLiveData = dataProvider.getCachedLibraryItems()
     private val dbItemsObserver = Observer<Any> {}
 
     init {
@@ -50,13 +49,6 @@ internal class LibraryViewModel constructor(private val dataProvider: DataProvid
         return (if (!searchTerm.isNullOrEmpty())
             localItems?.filter { it.title.contains(searchTerm, true) }
         else localItems) ?: mutableListOf()
-    }
-
-    fun populateLibrary(libLocationUri: Uri) {
-        viewData.value = viewData.value!!.copy(progress = true, error = null)
-        launch(Dispatchers.Default) {
-            dataProvider.saveToLibrary(libLocationUri)
-        }
     }
 
     fun search(mangaTitle: String) {

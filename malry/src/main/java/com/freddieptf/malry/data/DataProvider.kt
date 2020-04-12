@@ -1,10 +1,17 @@
 package com.freddieptf.malry.data
 
+import android.content.Context
 import android.net.Uri
+import android.preference.PreferenceManager
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.api.ChapterProvider
 import com.freddieptf.malry.api.LibraryItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Created by freddieptf on 11/14/18.
@@ -12,16 +19,35 @@ import com.freddieptf.malry.api.LibraryItem
 class DataProvider(private val localDbSource: DbDataSource,
                    private val storageDataSource: StorageDataSource) {
 
-    suspend fun saveToLibrary(libLocation: Uri) {
-        val items = storageDataSource.getLibraryItems(libLocation)
+    private val LIB_PATHS = "lib_paths"
+    private val libURIsLiveData = MutableLiveData<Uri>()
+
+    suspend fun addLibUri(ctx: Context, uri: Uri) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(ctx)
+        val editor = prefs.edit()
+        editor.putString(LIB_PATHS, uri.toString())
+        editor.apply()
+        withContext(Dispatchers.Main) {
+            libURIsLiveData.value = uri
+        }
+    }
+
+    suspend fun getLibUri(ctx: Context): LiveData<Uri> = coroutineScope {
+        launch(Dispatchers.IO) {
+            val uriString: String = PreferenceManager.getDefaultSharedPreferences(ctx).getString(LIB_PATHS, "none")
+            withContext(Dispatchers.Main) {
+                libURIsLiveData.value = Uri.parse(uriString)
+            }
+        }
+        libURIsLiveData
+    }
+
+    suspend fun importLibrary(libraryDirURI: Uri) {
+        val items = storageDataSource.getLibraryItems(libraryDirURI)
         localDbSource.saveLibraryItems(items)
     }
 
-    fun getLibraryItemFromLibrary(ID: String): LibraryItem? {
-        return localDbSource.getLibraryItem(ID)
-    }
-
-    fun getLibraryItems(): LiveData<List<com.freddieptf.malry.api.LibraryItem>> {
+    fun getCachedLibraryItems(): LiveData<List<LibraryItem>> {
         return localDbSource.getLibraryItems()
     }
 

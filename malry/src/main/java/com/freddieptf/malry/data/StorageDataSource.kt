@@ -3,8 +3,8 @@ package com.freddieptf.malry.data
 import android.content.Context
 import android.net.Uri
 import android.provider.DocumentsContract
+import com.freddieptf.malry.api.LibraryItem
 import com.freddieptf.malry.data.db.models.Chapter
-import com.freddieptf.malry.data.db.models.LibraryItem
 import com.freddieptf.malry.data.utils.ChapterTitleComparator
 import java.util.*
 
@@ -12,6 +12,7 @@ class StorageDataSource(private val ctx: Context) {
 
     companion object {
         const val SOURCE_PKG: Long = 1
+        const val SOURCE_NAME: String = "local_storage"
     }
 
     internal suspend fun getLibraryItems(treeUri: Uri): List<LibraryItem> {
@@ -30,7 +31,16 @@ class StorageDataSource(private val ctx: Context) {
         do {
             if (!cursor.getString(1).startsWith(".nomedia", ignoreCase = true)) {
                 val docURI = DocumentsContract.buildDocumentUriUsingTree(treeUri, cursor.getString(0))
-                val item = LibraryItem(docURI.toString(), docURI, StorageDataSource.SOURCE_PKG, cursor.getString(1), getChildDirChildCount(docURI), null)
+                val item = LibraryItem(
+                        ID = docURI.toString(),
+                        dirURI = docURI,
+                        sourceID = StorageDataSource.SOURCE_PKG,
+                        sourceName = SOURCE_NAME,
+                        title = cursor.getString(1),
+                        type = null,
+                        coverImg = null).apply {
+                    itemCount = getChildDirChildCount(docURI)
+                }
                 items.add(item)
             }
         } while (cursor.moveToNext())

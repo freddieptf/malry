@@ -15,14 +15,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.freddieptf.malry.App
 import com.freddieptf.malry.PrefUtils
 import com.freddieptf.malry.di.LibViewModelFactory
 import com.freddieptf.malry.ui.library.LibraryFragment
-import com.freddieptf.malry.ui.library.LibraryPrefs
-import com.freddieptf.malry.ui.library.LibraryViewModel
 import com.freddieptf.mangatest.R
+import kotlinx.android.synthetic.main.intro_frag.*
 import javax.inject.Inject
 
 /**
@@ -36,6 +36,7 @@ class IntroFragment : Fragment() {
     private lateinit var tvTitle: TextView
     @Inject
     lateinit var viewModelFactory: LibViewModelFactory
+    lateinit var introViewModel: IntroViewModel
 
     private fun startLibSelector() {
         val i = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
@@ -54,6 +55,7 @@ class IntroFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         (activity!!.application as App).component.inject(this)
+        introViewModel = ViewModelProviders.of(this, viewModelFactory).get(IntroViewModel::class.java)
 
         tvTitle = view.findViewById(R.id.tv_introTitle)
         btnSelectLocation = view.findViewById(R.id.btn_selectLibLocation)
@@ -66,6 +68,19 @@ class IntroFragment : Fragment() {
                         STORAGE_REQ_CODE);
             }
         }
+
+        introViewModel.getImportState().observe(this, Observer {
+            if (!it) {
+                (activity as AppCompatActivity).supportActionBar!!.show()
+                fragmentManager!!.beginTransaction()
+                        .replace(R.id.container, LibraryFragment(), LibraryFragment::class.java.simpleName)
+                        .commit()
+            } else {
+                intro_ll_content.visibility = View.GONE
+                intro_pb_import.visibility = View.VISIBLE
+            }
+        })
+
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -97,15 +112,8 @@ class IntroFragment : Fragment() {
         if (requestCode == 100) {
             when (resultCode) {
                 RESULT_OK -> {
-                    LibraryPrefs.addLibUri(context!!, data!!.data)
+                    introViewModel.addLibraryURI(context!!, data!!.data!!)
                     PrefUtils.setFirstSetupComplete(context!!)
-
-                    (activity as AppCompatActivity).supportActionBar!!.show()
-                    ViewModelProviders.of(activity!!, viewModelFactory).get(LibraryViewModel::class.java).populateLibrary(LibraryPrefs.getLibUri(context!!)!!)
-
-                    fragmentManager!!.beginTransaction()
-                            .replace(R.id.container, LibraryFragment(), LibraryFragment::class.java.simpleName)
-                            .commit()
                 }
                 RESULT_CANCELED -> {
                     tvTitle.text = context!!.getString(R.string.set_lib_loc_b4_continue)

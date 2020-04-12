@@ -22,8 +22,17 @@ class DbDataSource(private val db: LibraryDB) {
         return db.LibraryItemDao().saveLibraryItem(item)
     }
 
-    internal fun saveLibraryItems(items: List<LibraryItem>) {
-        return db.LibraryItemDao().saveLibraryItems(items)
+    internal fun saveLibraryItems(items: List<com.freddieptf.malry.api.LibraryItem>) {
+        return db.LibraryItemDao().saveLibraryItems(items.map {
+            LibraryItem(
+                    ID = it.ID,
+                    dirUri = it.dirURI!!,
+                    sourceID = it.sourceID,
+                    title = it.title,
+                    itemCount = it.itemCount,
+                    coverImg = it.coverImg
+            )
+        })
     }
 
     fun getChapters(mangaID: String): List<com.freddieptf.malry.api.Chapter> {

@@ -4,47 +4,70 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
+    android:animateLayoutChanges="true"
     android:padding="16dp"
     android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/intro_ll_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_introTitle"
+                style="@style/TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:gravity="center"
+                android:text="@string/select_the_location_of_your_library_to_continue" />
+
+            <TextView
+                android:id="@+id/btn_selectLibLocation"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select_loation" />
+
+
+            <TextView
+                style="@style/TextAppearance.AppCompat.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="@string/single_lib_location_text" />
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/intro_pb_import"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+    </FrameLayout>
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
         android:layout_marginTop="?actionBarSize"
+        android:layout_marginBottom="4dp"
         android:alpha="0.4"
         app:srcCompat="@drawable/ic_local_library_black_96dp" />
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         style="@style/TextAppearance.AppCompat.Medium"
-        android:text="Malry Setup"
-        android:layout_marginBottom="16dp" />
-
-    <TextView
-        style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:gravity="center"
-        android:id="@+id/tv_introTitle"
-        android:text="@string/select_the_location_of_your_library_to_continue" />
-
-    <TextView
-        android:id="@+id/btn_selectLibLocation"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/select_loation" />
-
-
-    <TextView
-        style="@style/TextAppearance.AppCompat.Small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:gravity="center"
-        android:text="@string/single_lib_location_text" />
+        android:layout_marginBottom="16dp"
+        android:text="Malry Setup" />
 
 </LinearLayout>
