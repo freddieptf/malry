@@ -17,4 +17,7 @@ data class LibraryItem(val ID: String,
         get
         set
 
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other) && (other as LibraryItem).itemCount == itemCount
+    }
 }

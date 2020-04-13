@@ -1,5 +1,6 @@
 package com.freddieptf.malry.ui.library
 
+import android.content.Context
 import androidx.lifecycle.*
 import com.freddieptf.malry.api.Chapter
 import com.freddieptf.malry.api.ChapterProvider
@@ -21,6 +22,7 @@ internal class LibraryViewModel constructor(private val dataProvider: DataProvid
     private val viewData = MediatorLiveData<ViewState>()
     private val dbItemsLiveData = dataProvider.getCachedLibraryItems()
     private val dbItemsObserver = Observer<Any> {}
+    private var updating = false
 
     init {
         job = Job()
@@ -28,9 +30,8 @@ internal class LibraryViewModel constructor(private val dataProvider: DataProvid
         viewData.addSource(searchInput) { term ->
             viewData.value = viewData.value!!.copy(data = combineLatest(term, dbItemsLiveData.value), error = null)
         }
-        // @TODO should't depend on this directly like this..first time it will always return an empty list and set progress to false..
         viewData.addSource(dbItemsLiveData) { data ->
-            viewData.value = viewData.value!!.copy(progress = false, data = combineLatest(searchInput.value, data), error = null)
+            viewData.value = viewData.value!!.copy(progress = updating, data = combineLatest(searchInput.value, data), error = null)
         }
         dbItemsLiveData.observeForever(dbItemsObserver)
     }
@@ -55,7 +56,19 @@ internal class LibraryViewModel constructor(private val dataProvider: DataProvid
         searchInput.value = mangaTitle
     }
 
-    fun getData(): LiveData<ViewState> {
+    fun triggerUpdate(ctx: Context) {
+        launch(Dispatchers.Default) {
+            updating = true
+            dataProvider.updateLibrary(ctx)
+            updating = false
+            withContext(Dispatchers.Main) {
+                viewData.value = viewData.value!!.copy(progress = updating)
+            }
+        }
+    }
+
+    fun getData(ctx: Context): LiveData<ViewState> {
+        triggerUpdate(ctx)
         return viewData
     }
 

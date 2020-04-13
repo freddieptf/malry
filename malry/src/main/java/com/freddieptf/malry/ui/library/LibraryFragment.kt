@@ -58,10 +58,10 @@ class LibraryFragment : Fragment(), LibraryAdapter.ClickListener {
         adapter.setClickListener(this)
 
         swRefresh.setOnRefreshListener {
-
+            viewModel.triggerUpdate(context!!)
         }
 
-        viewModel.getData().observe(this, Observer {
+        viewModel.getData(context!!).observe(this, Observer {
             swRefresh.isRefreshing = it.progress
             adapter.swapData(it.data)
         })

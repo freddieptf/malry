@@ -17,7 +17,7 @@ class IntroViewModel(private val ctx: Context, private val provider: DataProvide
     init {
         job = Job()
         launch(Dispatchers.Main) {
-            provider.getLibUri(ctx).observeForever {
+            provider.getLibUriLiveData(ctx).observeForever {
                 if (it.toString() != "none") importLibrary(it)
             }
         }

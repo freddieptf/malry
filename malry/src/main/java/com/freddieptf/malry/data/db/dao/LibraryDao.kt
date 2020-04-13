@@ -14,7 +14,11 @@ internal interface LibraryDao {
 
     @Query("SELECT lib.ID, dirUri as dirURI, sourceID, lib.title as title, itemCount, coverImg, manga_source.name as sourceName " +
             "FROM library as lib left join manga_source on lib.sourceID=manga_source.id")
-    fun getLibraryItems(): LiveData<List<com.freddieptf.malry.api.LibraryItem>>
+    fun getLibraryItemsLiveData(): LiveData<List<com.freddieptf.malry.api.LibraryItem>>
+
+    @Query("SELECT lib.ID, dirUri as dirURI, sourceID, lib.title as title, itemCount, coverImg, manga_source.name as sourceName " +
+            "FROM library as lib left join manga_source on lib.sourceID=manga_source.id")
+    fun getLibraryItems(): List<com.freddieptf.malry.api.LibraryItem>
 
     @Query("SELECT lib.ID, dirUri as dirURI, sourceID, lib.title as title, itemCount, coverImg, manga_source.name as sourceName " +
             "FROM library as lib left join manga_source on lib.sourceID=manga_source.id WHERE lib.ID=:ID")

@@ -32,11 +32,14 @@ class DataProvider(private val localDbSource: DbDataSource,
         }
     }
 
-    suspend fun getLibUri(ctx: Context): LiveData<Uri> = coroutineScope {
+    private fun getLibUri(ctx: Context): Uri =
+            Uri.parse(PreferenceManager.getDefaultSharedPreferences(ctx).getString(LIB_PATHS, "none"))
+
+    suspend fun getLibUriLiveData(ctx: Context): LiveData<Uri> = coroutineScope {
         launch(Dispatchers.IO) {
-            val uriString: String = PreferenceManager.getDefaultSharedPreferences(ctx).getString(LIB_PATHS, "none")
+            val uri = getLibUri(ctx)
             withContext(Dispatchers.Main) {
-                libURIsLiveData.value = Uri.parse(uriString)
+                libURIsLiveData.value = uri
             }
         }
         libURIsLiveData
@@ -48,7 +51,19 @@ class DataProvider(private val localDbSource: DbDataSource,
     }
 
     fun getCachedLibraryItems(): LiveData<List<LibraryItem>> {
-        return localDbSource.getLibraryItems()
+        return localDbSource.getLibraryItemsLiveData()
+    }
+
+    suspend fun updateLibrary(ctx: Context) {
+        val cachedItems: List<LibraryItem> = localDbSource.getLibraryItems()
+        val updated = mutableListOf<LibraryItem>()
+        storageDataSource.getLibraryItems(getLibUri(ctx)).forEach { s ->
+            val cached = cachedItems.firstOrNull { it.ID == s.ID }
+            if (cached == null || cached != s) {
+                updated.add(s)
+            }
+        }
+        localDbSource.saveLibraryItems(updated)
     }
 
     suspend fun saveChapters(dirUri: Uri) {
